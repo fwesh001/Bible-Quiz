@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bible Quiz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>📜 Bible Quiz</h1>
+  </header>
+  <main>
+    <div class="container">
+      <!-- Welcome Screen -->
+      <section id="screen-welcome" class="screen active">
+        <div class="title-row">
+          <h2 style="margin:0">Welcome</h2>
+          <span class="subtitle">A fun single-player Scripture challenge</span>
+        </div>
+        <div class="grid">
+          <div>
+            <label for="category" class="subtitle">Category</label>
+            <div class="controls">
+              <select id="category" class="select" aria-label="Category">
+                <option value="All">All</option>
+                <option value="Old Testament">Old Testament</option>
+                <option value="New Testament">New Testament</option>
+              </select>
+              <label class="toggle" title="Enable a 15-second timer">
+                <input type="checkbox" id="enable-timer" />
+                <span>15s Timer</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button id="btn-start" class="primary">Start Quiz</button>
+            <button id="btn-daily" class="secondary" title="5 random questions for today">Daily Challenge</button>
+          </div>
+
+          <div class="stats" id="welcome-stats">
+            <div class="stat">
+              <div class="big" id="best-score">0</div>
+              <div class="label">Best Score</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="best-accuracy">0%</div>
+              <div class="label">Best Accuracy</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="longest-streak-best">0</div>
+              <div class="label">Best Streak</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quiz Screen -->
+      <section id="screen-quiz" class="screen">
+        <div class="quiz-head">
+          <div class="progress"><span id="progress-text">Question 1</span></div>
+          <div class="timer" id="timer" aria-hidden="true" title="Time remaining">
+            <div class="timer-fill" id="timer-fill"></div>
+          </div>
+        </div>
+        <div class="question" id="question-text">Question will appear here</div>
+        <div class="options">
+          <button class="option" id="opt-0" data-index="0"><span class="badge">A</span><span class="opt-text"></span></button>
+          <button class="option" id="opt-1" data-index="1"><span class="badge">B</span><span class="opt-text"></span></button>
+          <button class="option" id="opt-2" data-index="2"><span class="badge">C</span><span class="opt-text"></span></button>
+          <button class="option" id="opt-3" data-index="3"><span class="badge">D</span><span class="opt-text"></span></button>
+        </div>
+        <div class="feedback" id="feedback">
+          <div class="ref" id="ref"></div>
+          <div class="fact" id="fact"></div>
+        </div>
+      </section>
+
+      <!-- Results Screen -->
+      <section id="screen-results" class="screen">
+        <div class="title-row">
+          <h2 style="margin:0">Results</h2>
+          <span class="subtitle" id="encouragement"></span>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <div class="big" id="final-score">0</div>
+            <div class="label">Final Score</div>
+          </div>
+          <div class="stat">
+            <div class="big" id="final-accuracy">0%</div>
+            <div class="label">Accuracy</div>
+          </div>
+          <div class="stat">
+            <div class="big" id="final-longest">0</div>
+            <div class="label">Longest Streak</div>
+          </div>
+          <div class="stat">
+            <div class="big" id="final-bonuses">0</div>
+            <div class="label">Bonus Streaks</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <h3 style="margin:0 0 8px; font-size:1.05rem; color:var(--brand-2)">Achievements</h3>
+          <div class="achievements" id="achievements"></div>
+        </div>
+
+        <div class="controls" style="margin-top:16px;">
+          <button id="btn-restart" class="primary">Play Again</button>
+          <button id="btn-home" class="secondary">Home</button>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer>
+    Made with care for learning Scripture. Your progress is saved locally.
+  </footer>
+
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
