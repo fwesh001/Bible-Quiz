@@ -13,6 +13,14 @@ const bibleQuestions = [
     category: "OLD TESTAMENT"
   },
   {
+    "question": "How many wives did Abraham have?",
+    "options": ["1", "2", "3", "4"],
+    "correct": 2,
+    "reference": "Genesis 16:1; 25:1",
+    "fact": "Abraham had three women who bore him children: Sarah, Hagar and Keturah.",
+    "category": "OLD TESTAMENT"
+},
+  {
     question: "Who was the first man created by Jehovah?",
     options: ["Adam", "Seth", "Enoch", "Cain"],
     correct: 0,
@@ -335,7 +343,7 @@ const bibleQuestions = [
 
   // 2 Chronicles
   {
-    question: "Which king rebuilt the temple in Jerusalem?",
+    question: "Which king built the temple in Jerusalem?",
     options: ["Hezekiah", "Josiah", "Solomon", "Jehoshaphat"],
     correct: 2,
     reference: "2 Chronicles 3:1",
@@ -765,10 +773,10 @@ const bibleQuestions = [
   // Acts
   {
     question: "Who received the Holy Spirit at Pentecost?",
-    options: ["The apostles", "Peter", "Paul", "John"],
-    correct: 0,
-    reference: "Acts 2:1–4",
-    fact: "The apostles were filled with Jehovah’s spirit and spoke in tongues.",
+    options: ["The apostles", "120", "Paul", "3000"],
+    correct: 1,
+    reference: "Acts 1:15-16",
+    fact: "the number of people was altogether about 120",
     category: "NEW TESTAMENT"
   },
   {
@@ -915,18 +923,228 @@ const bibleQuestions = [
   },
   {
     question: "What is the first thing John saw in Revelation?",
-    options: ["A vision of Christ", "The throne of God", "Angels", "The seven churches"],
+    options: ["A vision of Christ", "The throne of God", "Angels", "The 144,000"],
     correct: 0,
     reference: "Revelation 1:12–16",
     fact: "John saw Christ standing among seven golden lampstands.",
     category: "NEW TESTAMENT"
   },
   {
-    question: "How many churches did Jesus address in Revelation 2–3?",
+    question: "How many congreation  did Jesus address in Revelation 2–3?",
     options: ["7", "12", "10", "5"],
     correct: 0,
     reference: "Revelation 2:1–3:22",
     fact: "Jesus sent letters to seven congregations in Asia.",
     category: "NEW TESTAMENT"
-  }
-];
+  },
+  {
+    question: "How old was Methuselah when he died?",
+    options: ["969", "930", "912", "950"],
+    correct: 0,
+    reference: "Genesis 5:27",
+    fact: "Methuselah lived 969 years, making him the oldest person recorded in the Bible.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many cubits long, wide, and high was Noah's Ark?",
+    options: ["300x50x30", "250x40x20", "200x40x30", "350x60x30"],
+    correct: 0,
+    reference: "Genesis 6:15",
+    fact: "Noah's Ark was 300 cubits long, 50 cubits wide, and 30 cubits high.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who said, “Am I my brother’s keeper?”",
+    options: ["Abel", "Cain", "Seth", "Noah"],
+    correct: 1,
+    reference: "Genesis 4:9",
+    fact: "Cain said this after God asked him about Abel, whom he had killed.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "What were the seven plagues of Egypt that came before the death of the firstborn?",
+    options: ["Water to blood, frogs, lice, flies, livestock, boils, hail", "Frogs, lice, flies, livestock, boils, hail, locusts", "Water to blood, frogs, locusts, darkness, boils, hail, flies", "Water to blood, frogs, lice, locusts, livestock, hail, darkness"],
+    correct: 0,
+    reference: "Exodus 7–9",
+    fact: "The first seven plagues were: water turning to blood, frogs, lice, flies, livestock disease, boils, and hail.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many spies did Moses send into Canaan?",
+    options: ["10", "12", "14", "15"],
+    correct: 1,
+    reference: "Numbers 13:1–2",
+    fact: "Moses sent twelve men, one from each tribe, to spy out the land of Canaan.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many stones did David take to fight Goliath?",
+    options: ["3", "5", "7", "10"],
+    correct: 1,
+    reference: "1 Samuel 17:40",
+    fact: "David selected five smooth stones from the brook before facing Goliath.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who interpreted Pharaoh's dreams?",
+    options: ["Joseph", "Moses", "Aaron", "Daniel"],
+    correct: 0,
+    reference: "Genesis 41:14–16",
+    fact: "Joseph interpreted Pharaoh's dreams and predicted seven years of plenty followed by seven years of famine.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many years did the Israelites wander in the wilderness?",
+    options: ["20", "30", "40", "50"],
+    correct: 2,
+    reference: "Numbers 14:33–34",
+    fact: "Because of their lack of faith, the Israelites wandered 40 years before entering Canaan.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "From which tribe was the first king of Israel, Saul?",
+    options: ["Judah", "Benjamin", "Levi", "Ephraim"],
+    correct: 1,
+    reference: "1 Samuel 9:1–2",
+    fact: "Saul was from the tribe of Benjamin.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many books are in the Old Testament?",
+    options: ["35", "36", "39", "40"],
+    correct: 2,
+    reference: "NWT Old Testament",
+    fact: "The Old Testament contains 39 books in the New World Translation.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many people were true worshippers of Jehovah when Elijah wanted to give up?",
+    options: ["700", "7000", "77,000", "70,000"],
+    correct: 1,
+    reference: "1 Kings 19:18",
+    fact: "Elijah was encouraged by God that 7,000 in Israel had not worshiped Baal.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who was the prophet that prophesied the fall of Nineveh?",
+    options: ["Jonah", "Nahum", "Hosea", "Amos"],
+    correct: 1,
+    reference: "Nahum 1:1",
+    fact: "Nahum delivered God's message about Nineveh's coming destruction.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who was the prophet that saw a vision of a valley of dry bones?",
+    options: ["Ezekiel", "Isaiah", "Jeremiah", "Daniel"],
+    correct: 0,
+    reference: "Ezekiel 37:1–14",
+    fact: "Ezekiel saw a vision where God caused dry bones to come to life, symbolizing Israel's restoration.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+
+  //new
+  {
+    question: "Who was the second disciple Jesus called when gathering His followers?",
+    options: ["Andrew", "Peter", "John", "Philip"],
+    correct: 0,
+    reference: "John 1:40–42",
+    fact: "Andrew was the first disciple called by Jesus, and he then brought his brother Simon Peter to Him.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who said, 'Truly this man was the Son of God' at Jesus' execution on the stake?",
+    options: ["Centurion", "Peter", "Mary Magdalene", "John"],
+    correct: 0,
+    reference: "Mark 15:39",
+    fact: "A Roman centurion recognized Jesus as the Son of God when He died on the stake.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who was the first Christian martyr?",
+    options: ["Stephen", "James", "Peter", "Paul"],
+    correct: 0,
+    reference: "Acts 7:54–60",
+    fact: "Stephen was stoned to death for his faith, becoming the first Christian martyr.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many people were on the road to Emmaus when Jesus joined them after His resurrection?",
+    options: ["2", "3", "5", "7"],
+    correct: 0,
+    reference: "Luke 24:13–31",
+    fact: "Two disciples were walking to Emmaus when Jesus appeared to them and explained the Scriptures.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who was the Pharisee that came to Jesus by night to inquire about the Kingdom of God?",
+    options: ["Nicodemus", "Joseph of Arimathea", "Gamaliel", "Caiaphas"],
+    correct: 0,
+    reference: "John 3:1–21",
+    fact: "Nicodemus visited Jesus at night because he was a respected Pharisee curious about His teachings.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many resurrections did Jesus perform during His ministry?",
+    options: ["3", "2", "1", "4"],
+    correct: 0,
+    reference: "Luke 7:11–17; John 11:1–44; Matthew 9:18–26",
+    fact: "Jesus raised at least three people: the widow's son at Nain, Jairus' daughter, and Lazarus.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "How many people were baptized on the day of Pentecost?",
+    options: ["About 3,000", "1,200", "5,000", "2,000"],
+    correct: 0,
+    reference: "Acts 2:41",
+    fact: "After Peter's speech, about 3,000 people were baptized and became followers of Christ.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who said, 'Lord, show us the Father, and it is enough for us'?",
+    options: ["Philip", "Thomas", "Peter", "John"],
+    correct: 0,
+    reference: "John 14:8",
+    fact: "Philip requested Jesus to reveal the Father more clearly to the disciples.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who said, 'I am not worthy that you should enter under my roof'?",
+    options: ["Centurion", "Peter", "John", "Matthew"],
+    correct: 0,
+    reference: "Matthew 8:8",
+    fact: "A Roman centurion showed humility when asking Jesus to heal his servant.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "For how many days was Jesus seen by His disciples after His resurrection?",
+    options: ["40", "30", "50", "20"],
+    correct: 0,
+    reference: "Acts 1:3",
+    fact: "Jesus was seen by His disciples throughout 40 days, speaking about the Kingdom of God.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+}
+
+]

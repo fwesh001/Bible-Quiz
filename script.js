@@ -34,6 +34,29 @@ function seededPick(arr, count, seed) {
   return a.slice(0, Math.min(count, a.length));
 }
 
+// Shuffle with optional RNG (for deterministic daily mode)
+function shuffleWithRng(arr, rng) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const r = rng ? rng() : Math.random();
+    const j = Math.floor(r * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// For each question, shuffle options and update the correct index to match the new order
+function randomizeOptionsForQuestions(questions, seed) {
+  return questions.map((q, idx) => {
+    const opts = q.options.slice();
+    const correctText = opts[q.correct];
+    const rng = (typeof seed === 'number') ? mulberry32(seed + idx) : null;
+    const shuffled = shuffleWithRng(opts, rng);
+    const newCorrect = Math.max(0, shuffled.indexOf(correctText));
+    return { ...q, options: shuffled, correct: newCorrect };
+  });
+}
+
 // ========================
 // Audio (WebAudio beeps)
 // ========================
@@ -79,13 +102,15 @@ const state = {
   longestStreak: 0,
   bonuses3: 0,
   bonuses5: 0,
+  missed: [],
   timerEnabled: false,
   timeLimit: 15,
   timeLeft: 15,
   timerId: null,
   accepting: true,
   mode: 'normal', // 'normal' | 'daily'
-  category: 'All'
+  category: 'All',
+  difficulty: 'All'
 };
 
 // ========================
@@ -118,6 +143,8 @@ const screens = {
 };
 const els = {
   category: $('#category'),
+  difficulty: $('#difficulty'),
+  numQuestions: $('#num-questions'),
   enableTimer: $('#enable-timer'),
   start: $('#btn-start'),
   daily: $('#btn-daily'),
@@ -141,6 +168,7 @@ const els = {
   bestAcc: $('#best-accuracy'),
   bestStreak: $('#longest-streak-best'),
   achievementsBox: $('#achievements'),
+  missedList: $('#missed-list'),
   navList: $('#nav-list'),
   modalSubmit: $('#modal-submit'),
   modalSubmitConfirm: $('#btn-confirm-submit'),
@@ -162,6 +190,7 @@ function startQuiz(mode = 'normal') {
   initAudio();
   state.mode = mode;
   state.category = els.category.value;
+  state.difficulty = els.difficulty ? els.difficulty.value : 'All';
   state.timerEnabled = els.enableTimer.checked;
   state.timeLeft = state.timeLimit;
   state.index = 0;
@@ -172,6 +201,7 @@ function startQuiz(mode = 'normal') {
   state.longestStreak = 0;
   state.bonuses3 = 0;
   state.bonuses5 = 0;
+  state.missed = [];
   state.accepting = true;
 
   let pool = bibleQuestions;
@@ -179,14 +209,43 @@ function startQuiz(mode = 'normal') {
     const sel = (state.category || '').toLowerCase();
     pool = pool.filter(q => ((q.category || '').toLowerCase() === sel));
   }
+  // Apply difficulty filter: default questions without a difficulty are treated as NORMAL
+  if (state.mode === 'normal') {
+    const diffSel = (state.difficulty || 'All').toLowerCase();
+    if (diffSel !== 'all') {
+      pool = pool.filter(q => (String(q.difficulty || 'NORMAL').toLowerCase() === diffSel));
+    }
+  }
+  // Fallback if no questions match
+  if (state.mode === 'normal' && pool.length === 0) {
+    alert('No questions match the selected Category and Difficulty. Showing all difficulties instead.');
+    state.difficulty = 'All';
+    if (els.difficulty) els.difficulty.value = 'All';
+    pool = bibleQuestions;
+    if (state.category !== 'All') {
+      const sel = (state.category || '').toLowerCase();
+      pool = pool.filter(q => ((q.category || '').toLowerCase() === sel));
+    }
+  }
 
   if (state.mode === 'daily') {
     const today = new Date();
     const seed = parseInt(`${today.getFullYear()}${(today.getMonth()+1).toString().padStart(2,'0')}${today.getDate().toString().padStart(2,'0')}`);
-    state.questions = seededPick(bibleQuestions, 5, seed);
+    // Pick questions deterministically and also shuffle options deterministically
+    const picked = seededPick(bibleQuestions, 5, seed);
+    state.questions = randomizeOptionsForQuestions(picked, seed);
   } else {
-    const count = Math.min(10, pool.length);
-    state.questions = shuffle(pool).slice(0, count);
+    // Determine requested number of questions (default 10, max 50)
+    let requested = 10;
+    if (els.numQuestions && typeof els.numQuestions.value !== 'undefined') {
+      const n = parseInt(els.numQuestions.value, 10);
+      if (!isNaN(n)) requested = n;
+    }
+    requested = Math.max(1, Math.min(50, requested));
+    const count = Math.min(requested, pool.length);
+    // Shuffle question order randomly, then randomize options randomly
+    const picked = shuffle(pool).slice(0, count);
+    state.questions = randomizeOptionsForQuestions(picked);
   }
 
   showScreen('quiz');
@@ -322,6 +381,16 @@ function showAnswer(chosenIndex) {
     playCorrect();
   } else {
     state.streak = 0;
+    // Record missed question details (failed/timeout)
+    try {
+      state.missed.push({
+        index: state.index,
+        question: q.question,
+        correctAnswer: q.options[correctIdx],
+        reference: q.reference,
+        category: q.category
+      });
+    } catch {}
     playWrong();
   }
 
@@ -370,6 +439,32 @@ function showResults() {
   // Achievements
   const earned = evaluateAchievements(accuracy);
   renderAchievements(earned);
+
+  // Missed questions list
+  if (els.missedList) {
+    els.missedList.innerHTML = '';
+    if (!state.missed || state.missed.length === 0) {
+      const div = document.createElement('div');
+      div.className = 'achievement';
+      div.innerHTML = `<div style="grid-column:1 / -1; color: var(--muted);">No missed questions</div>`;
+      els.missedList.appendChild(div);
+    } else {
+      state.missed.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'achievement';
+        div.innerHTML = `
+          <span class="status locked"></span>
+          <div>
+            <div style="font-weight:700;">${item.question}</div>
+            <div class="subtitle" style="margin:2px 0 0;">Answer: <span style="font-weight:700; color: var(--correct);">${item.correctAnswer}</span></div>
+            <div class="subtitle" style="margin:2px 0 0; color:#93c5fd;">${item.reference}</div>
+          </div>
+          <div style="color: var(--brand-2); font-weight:700; text-transform: capitalize;">${item.category || ''}</div>
+        `;
+        els.missedList.appendChild(div);
+      });
+    }
+  }
 
   // Update welcome stats now (so returning home shows latest)
   updateWelcomeStats();
@@ -527,3 +622,41 @@ if (els.fact && els.ref && els.ref.parentElement && els.ref.parentElement.id ===
   els.fact.insertAdjacentElement('afterend', els.ref);
 }
 updateWelcomeStats();
+
+const sidebar = document.getElementById('sidebar');
+const sidebarToggleBtn = document.getElementById('sidebar-toggle');
+const toggleMuteBtn = document.getElementById('toggle-mute');
+const toggleDarkmodeBtn = document.getElementById('toggle-darkmode');
+
+let isMuted = false;
+let isDark = false;
+
+// Open/close sidebar
+sidebarToggleBtn.addEventListener('click', () => {
+  sidebar.classList.toggle('active');
+});
+
+// Close sidebar when clicking outside
+document.addEventListener('click', (e) => {
+  if (!sidebar.contains(e.target) && !sidebarToggleBtn.contains(e.target)) {
+    sidebar.classList.remove('active');
+  }
+});
+
+// ===== Mute toggle =====
+toggleMuteBtn.addEventListener('click', () => {
+  isMuted = !isMuted;
+  toggleMuteBtn.textContent = isMuted ? '🔊 Unmute' : '🔇 Mute';
+
+  if (window.audioCtx) {
+    if (isMuted) audioCtx.suspend();
+    else audioCtx.resume();
+  }
+});
+
+// ===== Dark mode toggle =====
+toggleDarkmodeBtn.addEventListener('click', () => {
+  isDark = !isDark;
+  document.body.classList.toggle('dark-mode', isDark);
+  toggleDarkmodeBtn.textContent = isDark ? '🔆 Light Mode' : '🌙 Dark Mode';
+});

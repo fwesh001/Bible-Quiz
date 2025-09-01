@@ -9,6 +9,25 @@
 <body>
   <header>
     <h1>📜 Bible Quiz</h1>
+<!-- Sidebar -->
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-header">
+    <h3>Menu</h3>
+  </div>
+  <div class="sidebar-content">
+    <div class="sidebar-item">
+      <button id="toggle-mute"> 🔇 Mute </button>
+    </div>
+    <div class="sidebar-item">
+      <button id="toggle-darkmode">🌙 Dark Mode</button>
+    </div></button>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar Toggle Button -->
+<button id="sidebar-toggle" class="sidebar-open-btn">☰
+
   </header>
   <main>
     <div class="container">
@@ -31,6 +50,18 @@
                 <input type="checkbox" id="enable-timer" />
                 <span>15s Timer</span>
               </label>
+            </div>
+            <label for="difficulty" class="subtitle" style="margin-top:8px; display:block;">Difficulty</label>
+            <div class="controls">
+              <select id="difficulty" class="select" aria-label="Difficulty">
+                <option value="All">All</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <div class="controls" style="margin-top:8px;">
+              <label class="subtitle" for="num-questions" style="margin-right:8px;">Number of Questions</label>
+              <input id="num-questions" type="number" min="1" max="50" value="10" class="select" style="width:110px" aria-label="Number of Questions" />
             </div>
           </div>
 
@@ -118,6 +149,11 @@
           <div class="achievements" id="achievements"></div>
         </div>
 
+        <div style="margin-top:16px;">
+          <h3 style="margin:0 0 8px; font-size:1.05rem; color:var(--brand-2)">Missed Questions</h3>
+          <div class="achievements" id="missed-list"></div>
+        </div>
+
         <div class="controls" style="margin-top:16px;">
           <button id="btn-restart" class="primary">Play Again</button>
           <button id="btn-home" class="secondary">Home</button>
@@ -139,6 +175,41 @@
   <footer>
     Made with care for learning Scripture. Your progress is saved locally.
   </footer>
+
+  <!-- Sidebar Backdrop and Panel -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+  <aside id="sidebar" class="sidebar" aria-hidden="true" role="dialog" aria-label="Settings menu">
+    <div class="sidebar-inner">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Settings</div>
+        <button id="btn-close-sidebar" class="icon-btn small" aria-label="Close menu" title="Close menu">
+          <span class="bar close"></span><span class="bar close"></span>
+        </button>
+      </div>
+      <div class="sidebar-content">
+        <div class="s-item">
+          <div class="s-text">
+            <div class="s-title">Dark Mode</div>
+            <div class="s-sub">Switch between light and dark themes</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-dark" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="s-item">
+          <div class="s-text">
+            <div class="s-title">Mute Sounds</div>
+            <div class="s-sub">Mute/unmute sound effects globally</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-mute" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </aside>
 
   <script src="questions.js"></script>
   <script src="script.js"></script>
