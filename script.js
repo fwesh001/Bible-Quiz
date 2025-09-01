@@ -121,6 +121,7 @@ const els = {
   enableTimer: $('#enable-timer'),
   start: $('#btn-start'),
   daily: $('#btn-daily'),
+  skip: $('#btn-skip'),
   timer: $('#timer'),
   timerFill: $('#timer-fill'),
   qText: $('#question-text'),
@@ -139,7 +140,11 @@ const els = {
   bestScore: $('#best-score'),
   bestAcc: $('#best-accuracy'),
   bestStreak: $('#longest-streak-best'),
-  achievementsBox: $('#achievements')
+  achievementsBox: $('#achievements'),
+  navList: $('#nav-list'),
+  modalSubmit: $('#modal-submit'),
+  modalSubmitConfirm: $('#btn-confirm-submit'),
+  modalSubmitCancel: $('#btn-cancel-submit')
 };
 
 // ========================
@@ -185,8 +190,47 @@ function startQuiz(mode = 'normal') {
   }
 
   showScreen('quiz');
+  buildNavigator();
   renderQuestion();
   updateTimerUI();
+}
+
+function buildNavigator() {
+  if (!els.navList) return;
+  els.navList.innerHTML = '';
+  state.questions.forEach((_, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-item';
+    btn.type = 'button';
+    btn.textContent = String(i + 1);
+    btn.dataset.index = String(i);
+    btn.addEventListener('click', () => {
+      if (!state.accepting) return;
+      stopTimer();
+      state.streak = 0; // jumping breaks streak
+      state.index = i;
+      renderQuestion();
+    });
+    els.navList.appendChild(btn);
+  });
+  updateNavigator();
+}
+
+function updateNavigator() {
+  if (!els.navList) return;
+  const items = Array.from(els.navList.querySelectorAll('.nav-item'));
+  items.forEach((el, i) => {
+    el.classList.remove('current');
+    el.classList.toggle('current', i === state.index);
+  });
+}
+
+function markNav(i, status) {
+  if (!els.navList) return;
+  const item = els.navList.querySelector(`.nav-item[data-index="${i}"]`);
+  if (!item) return;
+  item.classList.remove('correct', 'wrong', 'skipped');
+  if (status) item.classList.add(status);
 }
 
 function renderQuestion() {
@@ -200,8 +244,12 @@ function renderQuestion() {
   els.feedback.classList.remove('show');
   els.ref.textContent = '';
   els.fact.textContent = '';
+  // Hide inline fact/reference until an answer is revealed
+  if (els.ref) els.ref.classList.remove('show');
+  if (els.fact) els.fact.classList.remove('show');
 
   els.progress.textContent = `Question ${state.index + 1} of ${state.questions.length}`;
+  updateNavigator();
 
   if (state.timerEnabled) {
     startTimer();
@@ -255,6 +303,12 @@ function showAnswer(chosenIndex) {
   if (chosenIndex !== null && chosenIndex !== correctIdx) {
     els.opts[chosenIndex].classList.add('wrong');
   }
+  // mark navigator status for this question
+  if (chosenIndex === correctIdx) {
+    markNav(state.index, 'correct');
+  } else {
+    markNav(state.index, 'wrong');
+  }
 
   // Score & streaks
   state.answered++;
@@ -271,10 +325,11 @@ function showAnswer(chosenIndex) {
     playWrong();
   }
 
-  // Feedback
+  // Show inline fact and reference under the question
   els.ref.textContent = q.reference;
+  if (els.ref) els.ref.classList.add('show');
   els.fact.textContent = q.fact;
-  els.feedback.classList.add('show');
+  if (els.fact) els.fact.classList.add('show');
 
   // Next question after delay
   setTimeout(() => {
@@ -400,11 +455,40 @@ function updateTimerUI() {
   }
 }
 
+function showSubmitModal(show) {
+  if (!els.modalSubmit) return;
+  if (show) {
+    els.modalSubmit.classList.add('show');
+    els.modalSubmit.setAttribute('aria-hidden', 'false');
+    if (els.modalSubmitConfirm) els.modalSubmitConfirm.focus();
+  } else {
+    els.modalSubmit.classList.remove('show');
+    els.modalSubmit.setAttribute('aria-hidden', 'true');
+  }
+}
+
 // ========================
 // Event Listeners
 // ========================
 els.start.addEventListener('click', () => startQuiz('normal'));
 els.daily.addEventListener('click', () => startQuiz('daily'));
+
+// Skip current question (does not affect score or accuracy; breaks streak)
+els.skip.addEventListener('click', () => {
+  if (!state.accepting) return;
+  state.accepting = false;
+  stopTimer();
+  const isLast = state.index === state.questions.length - 1;
+  // On last question, prompt to submit
+  if (isLast) {
+    markNav(state.index, 'skipped');
+    showSubmitModal(true);
+  } else {
+    state.streak = 0; // break streak on skip
+    markNav(state.index, 'skipped');
+    nextQuestion();
+  }
+});
 
 els.opts.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -419,5 +503,27 @@ els.opts.forEach(btn => {
 els.restart.addEventListener('click', () => startQuiz(state.mode));
 els.home.addEventListener('click', () => { stopTimer(); showScreen('welcome'); });
 
+// Modal events
+if (els.modalSubmitCancel) {
+  els.modalSubmitCancel.addEventListener('click', () => {
+    showSubmitModal(false);
+    // allow user to continue; keep accepting true and timer off until user chooses
+    state.accepting = true;
+  });
+}
+if (els.modalSubmitConfirm) {
+  els.modalSubmitConfirm.addEventListener('click', () => {
+    showSubmitModal(false);
+    // finalize quiz without incrementing answered for skipped modal case
+    // We'll intentionally not count this last question as answered.
+    showResults();
+  });
+}
+
 // Init
+// Ensure reference element is under the question (after fact)
+if (els.fact && els.ref && els.ref.parentElement && els.ref.parentElement.id === 'feedback') {
+  els.ref.classList.add('q-ref');
+  els.fact.insertAdjacentElement('afterend', els.ref);
+}
 updateWelcomeStats();

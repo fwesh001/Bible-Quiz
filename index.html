@@ -58,22 +58,33 @@
 
       <!-- Quiz Screen -->
       <section id="screen-quiz" class="screen">
-        <div class="quiz-head">
-          <div class="progress"><span id="progress-text">Question 1</span></div>
-          <div class="timer" id="timer" aria-hidden="true" title="Time remaining">
-            <div class="timer-fill" id="timer-fill"></div>
+        <div class="quiz-grid">
+          <div class="quiz-main">
+            <div class="quiz-head">
+              <div class="progress"><span id="progress-text">Question 1</span></div>
+              <div class="timer" id="timer" aria-hidden="true" title="Time remaining">
+                <div class="timer-fill" id="timer-fill"></div>
+              </div>
+            </div>
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="q-fact" id="fact"></div>
+            <div class="options">
+              <button class="option" id="opt-0" data-index="0"><span class="badge">A</span><span class="opt-text"></span></button>
+              <button class="option" id="opt-1" data-index="1"><span class="badge">B</span><span class="opt-text"></span></button>
+              <button class="option" id="opt-2" data-index="2"><span class="badge">C</span><span class="opt-text"></span></button>
+              <button class="option" id="opt-3" data-index="3"><span class="badge">D</span><span class="opt-text"></span></button>
+            </div>
+            <div class="feedback" id="feedback">
+              <div class="ref" id="ref"></div>
+            </div>
+            <div class="controls">
+              <button id="btn-skip" class="secondary" title="Skip this question and move on">Skip</button>
+            </div>
           </div>
-        </div>
-        <div class="question" id="question-text">Question will appear here</div>
-        <div class="options">
-          <button class="option" id="opt-0" data-index="0"><span class="badge">A</span><span class="opt-text"></span></button>
-          <button class="option" id="opt-1" data-index="1"><span class="badge">B</span><span class="opt-text"></span></button>
-          <button class="option" id="opt-2" data-index="2"><span class="badge">C</span><span class="opt-text"></span></button>
-          <button class="option" id="opt-3" data-index="3"><span class="badge">D</span><span class="opt-text"></span></button>
-        </div>
-        <div class="feedback" id="feedback">
-          <div class="ref" id="ref"></div>
-          <div class="fact" id="fact"></div>
+          <aside class="quiz-sidebar">
+            <h3 class="nav-title">Questions</h3>
+            <div class="nav-list" id="nav-list" aria-label="Question navigator"></div>
+          </aside>
         </div>
       </section>
 
@@ -112,6 +123,17 @@
           <button id="btn-home" class="secondary">Home</button>
         </div>
       </section>
+      <div id="modal-submit" class="modal" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="submit-title">
+          <h3 id="submit-title" style="margin:0">Submit results?</h3>
+          <p class="subtitle" style="margin:8px 0 12px">Some questions were not answered. Submit now?</p>
+          <div class="controls" style="justify-content:flex-end;">
+            <button id="btn-cancel-submit" class="secondary">Cancel</button>
+            <button id="btn-confirm-submit" class="primary">Submit Results</button>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
   <footer>

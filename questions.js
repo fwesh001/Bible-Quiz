@@ -848,7 +848,7 @@ const bibleQuestions = [
 
   // 1 Corinthians
   {
-    question: "Who is the head of the church?",
+    question: "Who is the head of the congreation?",
     options: ["Christ", "Peter", "Paul", "John"],
     correct: 0,
     reference: "1 Corinthians 11:3",
