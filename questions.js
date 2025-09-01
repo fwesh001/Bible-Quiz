@@ -3,6 +3,10 @@
 // Fields: question, options[4], correct (index), reference, fact, category
 
 const bibleQuestions = [
+  ////////////////////
+  //OLD TESTAMENT NORMAL
+  ////////////////////
+
   // Genesis
   {
     question: "Who built the ark of salvation?",
@@ -599,8 +603,9 @@ const bibleQuestions = [
   fact: "Malachi predicted the arrival of a messenger who would prepare people for Jehovah’s intervention.",
   category: "OLD TESTAMENT"
 },
-
-//NEW TESTAMENT
+   ////////////////////
+  //NEW TESTAMENT NORMAL
+  ////////////////////
 
   // Matthew
   {
@@ -643,6 +648,7 @@ const bibleQuestions = [
     fact: "Jesus miraculously fed about 5,000 men plus women and children.",
     category: "NEW TESTAMENT"
   },
+  
 
   // Mark
   {
@@ -897,6 +903,14 @@ const bibleQuestions = [
   },
 
   // Revelation
+    {
+    question: "Who is declared worthy to receive glory and honor?",
+    options: ["Jesus", "Peter", "Jehovah our God", "Moses"],
+    correct: 2,
+    reference: "Revelation 4:11",
+    fact: "Jehovah our God is declared worthy to receive glory and honor.",
+    category: "NEW TESTAMENT"
+  },
   {
     question: "Who will judge the living and the dead?",
     options: ["Jesus Christ", "Peter", "Paul", "Michael"],
@@ -937,6 +951,10 @@ const bibleQuestions = [
     fact: "Jesus sent letters to seven congregations in Asia.",
     category: "NEW TESTAMENT"
   },
+  ////////////////////
+  //OLD TESTAMENT HARD
+  ////////////////////
+
   {
     question: "How old was Methuselah when he died?",
     options: ["969", "930", "912", "950"],
@@ -1054,8 +1072,45 @@ const bibleQuestions = [
     category: "OLD TESTAMENT",
     difficulty: "HARD"
   },
-
-  //new
+{
+  question: "What did God create on the fourth day of creation?",
+  options: ["Sun, moon, and stars", "Land animals", "Birds", "Fish"],
+  correct: 0,
+  reference: "Genesis 1:14-19",
+  fact: "On the fourth day, God created the sun to rule the day, the moon to rule the night, and the stars.",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "How many prophetesses are  mentioned in the Bible?",
+  options: ["3", "5", "7", "9"],
+  correct: 1,
+  reference: "Exodus 15:20; Judges 4:4; 2 Kings 22:14; Nehemiah 6:14; Luke 2:36",
+  fact: "The Bible names five prophetesses: Miriam, Deborah, Huldah, Noadiah, and Anna.",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who was Jacob's 4th son?",
+  options: ["Reuben", "Simeon", "Levi", "Judah"],
+  correct: 3,
+  reference: "Genesis 29:35; 30:1–5",
+  fact: "Judah was Jacob's fourth son, born to Leah.",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who was the first to know the meaning of Jehovah's name according to the Bible?",
+  options: ["Moses", "Abraham", "Noah", "Adam"],
+  correct: 0,
+  reference: "Exodus 3:13-14",
+  fact: "So God said to Moses: 'I Will Become What I Choose to Become.'",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+   ////////////////////
+  //NEW TESTAMENT HARD
+  ////////////////////
   {
     question: "Who was the second disciple Jesus called when gathering His followers?",
     options: ["Andrew", "Peter", "John", "Philip"],
@@ -1145,6 +1200,115 @@ const bibleQuestions = [
     fact: "Jesus was seen by His disciples throughout 40 days, speaking about the Kingdom of God.",
     category: "NEW TESTAMENT",
     difficulty: "HARD"
-}
+},
+
+  {
+    question: "What did Jesus say about himself in relation to Abraham’s existence?",
+    options: ["I am", "Before Abraham came into existence, I have been", "I existed after Abraham", "I am the Son of Abraham"],
+    correct: 1,
+    reference: "John 8:58",
+    fact: "Jesus said, 'Before Abraham came into existence, I have been.'",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "Who is said to teach everyone as written in the prophets?",
+    options: ["Jesus", "Moses", "Jehovah", "Peter"],
+    correct: 2,
+    reference: "John 6:45",
+    fact: "Jehovah is the one who teaches everyone, fulfilling what the prophets wrote.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "What did the king command to be done to those who did not want him to reign over them?",
+    options: ["Exile them", "Bring them here and kill them before me", "Ignore them", "Imprison them"],
+    correct: 1,
+    reference: "Luke 19:27",
+    fact: "The king commanded to bring them and kill them before him.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "What document was nailed to the stake?",
+    options: ["The law of Moses", "The certificate of debt", "The scroll of prophets", "The commandments"],
+    correct: 1,
+    reference: "Colossians 2:14",
+    fact: "The certificate of debt (handwriting of requirements) that was against us was nailed to the stake.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "What four things were Gentile Christians told to abstain from?",
+    options: ["Blood, things strangled, sexual immorality, things polluted by idols", "Only blood, things strangled", "Idols, altars, temples, sacrifices", "Meat, wine, oil, grain"],
+    correct: 0,
+    reference: "Acts 15:20",
+    fact: "Gentiles were instructed to abstain from blood, things strangled, sexual immorality, and things polluted by idols.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "How did the women react after visiting Jesus’ tomb?",
+    options: ["They rejoiced and told everyone", "They fled trembling and said nothing", "They prayed silently", "They waited for the apostles"],
+    correct: 1,
+    reference: "Mark 16:8",
+    fact: "They fled trembling and overwhelmed with emotion, and they said nothing because they were afraid.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "What does Ephesians 2:8  say about how we have been saved?",
+    options: ["Through works", "By God’s undeserved kindness through faith", "By following the law", "By baptism only"],
+    correct: 1,
+    reference: "Ephesians 2:8",
+    fact: "We are saved by God’s undeserved kindness through faith; it is God’s gift.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "How did the little scroll taste and what happened after John swallowed it?",
+    options: ["Bitter first, then sweet", "Sweet as honey but bitter in stomach", "Only sweet", "Only bitter"],
+    correct: 1,
+    reference: "Revelation 10:10",
+    fact: "The little scroll tasted sweet as honey but became bitter in his stomach.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "Why did Jesus not do many miracles in his hometown?",
+    options: ["Because of their unbelief", "Because of lack of power", "Because it was a small town", "Because he was tired"],
+    correct: 0,
+    reference: "Mark 6:5",
+    fact: "Jesus could do only a few miracles because of their unbelief.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "According to Acts 4:12 , by what name must we be saved?",
+    options: ["Jesus Christ", "Jehovah", "Peter", "Paul"],
+    correct: 0,
+    reference: "Acts 4:12",
+    fact: "Salvation is only through the name of Jesus Christ.",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "In Revelation 1:8 , how does the Jehovah describe himself?",
+    options: ["Alpha and Omega, beginning and end", "Mighty God, everlasting Father", "Lord of Hosts", "Prince of Peace"],
+    correct: 0,
+    reference: "Revelation 1:8",
+    fact: "The Lord describes himself as 'The Alpha and the Omega, the beginning and the end.'",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  },
+  {
+    question: "Revelation 19:16 describes a name on Jesus’ robe and thigh. What is this name?",
+    options: ["King of kings and Lord of lords", "Prince of Peace", "Son of God", "Messiah"],
+    correct: 0,
+    reference: "Revelation 19:16",
+    fact: "The name on Jesus’ robe and thigh is 'King of kings and Lord of lords.'",
+    category: "NEW TESTAMENT",
+    difficulty: HARD
+  }
 
 ]
