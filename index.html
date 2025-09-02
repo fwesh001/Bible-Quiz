@@ -35,7 +35,7 @@
       <section id="screen-welcome" class="screen active">
         <div class="title-row">
           <h2 style="margin:0">Welcome</h2>
-          <span class="subtitle">A fun single-player Scripture challenge</span>
+          <span class="subtitle">Test your knowledge of the Scriptures</span>
         </div>
         <div class="grid">
           <div>
@@ -59,9 +59,13 @@
                 <option value="hard">Hard</option>
               </select>
             </div>
-            <div class="controls" style="margin-top:8px;">
+            <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
               <label class="subtitle" for="num-questions" style="margin-right:8px;">Number of Questions</label>
               <input id="num-questions" type="number" min="1" max="50" value="10" class="select" style="width:110px" aria-label="Number of Questions" />
+              <label class="subtitle" for="round-time" style="margin-left:16px; margin-right:8px;">Round Time (sec)</label>
+              <input id="round-time" type="number" min="30" max="900" value="180" class="select" style="width:90px" aria-label="Round Time" />
+              <label class="subtitle" for="question-time" style="margin-left:16px; margin-right:8px;">Per-Question Time (sec)</label>
+              <input id="question-time" type="number" min="5" max="120" value="20" class="select" style="width:90px" aria-label="Per-Question Time" />
             </div>
           </div>
 
@@ -89,13 +93,24 @@
 
       <!-- Quiz Screen -->
       <section id="screen-quiz" class="screen">
+        <!-- Per-Question Horizontal Timer Bar (full width, below header) -->
+        <div class="question-timer-bar-outer" id="question-timer-bar-outer">
+          <div class="question-timer-bar-bg">
+            <div class="question-timer-bar-fill" id="question-timer-bar-fill"></div>
+          </div>
+          <div class="question-timer-bar-label" id="question-timer-bar-label">20s</div>
+        </div>
         <div class="quiz-grid">
+          <!-- Round Timer Vertical Bar -->
+          <div class="round-timer-bar-outer" id="round-timer-bar">
+            <div class="round-timer-bar-bg">
+              <div class="round-timer-bar-fill" id="round-timer-bar-fill"></div>
+            </div>
+            <div class="round-timer-label" id="round-timer-label">3:00</div>
+          </div>
           <div class="quiz-main">
             <div class="quiz-head">
               <div class="progress"><span id="progress-text">Question 1</span></div>
-              <div class="timer" id="timer" aria-hidden="true" title="Time remaining">
-                <div class="timer-fill" id="timer-fill"></div>
-              </div>
             </div>
             <div class="question" id="question-text">Question will appear here</div>
             <div class="q-fact" id="fact"></div>

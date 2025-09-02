@@ -172,7 +172,15 @@ const els = {
   navList: $('#nav-list'),
   modalSubmit: $('#modal-submit'),
   modalSubmitConfirm: $('#btn-confirm-submit'),
-  modalSubmitCancel: $('#btn-cancel-submit')
+  modalSubmitCancel: $('#btn-cancel-submit'),
+  roundTimerBar: document.getElementById('round-timer-bar'),
+  roundTimerBarFill: document.getElementById('round-timer-bar-fill'),
+  roundTimerLabel: document.getElementById('round-timer-label'),
+  questionTimerBarOuter: document.getElementById('question-timer-bar-outer'),
+  questionTimerBarFill: document.getElementById('question-timer-bar-fill'),
+  questionTimerBarLabel: document.getElementById('question-timer-bar-label'),
+  roundTimeInput: document.getElementById('round-time'),
+  questionTimeInput: document.getElementById('question-time')
 };
 
 // ========================
@@ -184,8 +192,15 @@ function showScreen(name) {
 }
 
 // ========================
-// Game Setup & Flow
+// Game Setup & Flow (with round & question timers)
 // ========================
+let roundTimer = null;
+let roundTimeTotal = 180; // default, will be set from input
+let roundTimeLeft = 180;
+let questionTimer = null;
+let questionTimeTotal = 20; // default, will be set from input
+let questionTimeLeft = 20;
+
 function startQuiz(mode = 'normal') {
   initAudio();
   state.mode = mode;
@@ -203,6 +218,14 @@ function startQuiz(mode = 'normal') {
   state.bonuses5 = 0;
   state.missed = [];
   state.accepting = true;
+
+  // Set round and per-question timer from user input
+  roundTimeTotal = parseInt(els.roundTimeInput?.value, 10) || 180;
+  roundTimeLeft = roundTimeTotal;
+  questionTimeTotal = parseInt(els.questionTimeInput?.value, 10) || 20;
+  questionTimeLeft = questionTimeTotal;
+  clearInterval(roundTimer);
+  clearInterval(questionTimer);
 
   let pool = bibleQuestions;
   if (state.mode === 'normal' && state.category !== 'All') {
@@ -252,6 +275,39 @@ function startQuiz(mode = 'normal') {
   buildNavigator();
   renderQuestion();
   updateTimerUI();
+  startRoundTimer();
+}
+
+function startRoundTimer() {
+  // Reset round timer bar
+  updateRoundTimerBar();
+  clearInterval(roundTimer);
+  roundTimer = setInterval(() => {
+    roundTimeLeft -= 0.2;
+    if (roundTimeLeft < 0) roundTimeLeft = 0;
+    updateRoundTimerBar();
+    if (roundTimeLeft <= 0) {
+      clearInterval(roundTimer);
+      clearInterval(questionTimer);
+      endRoundDueToTimeout();
+    }
+  }, 200);
+}
+
+function updateRoundTimerBar() {
+  if (!els.roundTimerBarFill || !els.roundTimerLabel) return;
+  const pct = Math.max(0, (roundTimeLeft / roundTimeTotal));
+  els.roundTimerBarFill.style.height = (pct * 100) + '%';
+  // Color gradient handled by CSS background
+  // Update label
+  const min = Math.floor(roundTimeLeft / 60);
+  const sec = Math.floor(roundTimeLeft % 60);
+  els.roundTimerLabel.textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+}
+
+// No dynamic question time, use user input
+function getDynamicQuestionTime() {
+  return questionTimeTotal;
 }
 
 function buildNavigator() {
@@ -303,46 +359,106 @@ function renderQuestion() {
   els.feedback.classList.remove('show');
   els.ref.textContent = '';
   els.fact.textContent = '';
-  // Hide inline fact/reference until an answer is revealed
   if (els.ref) els.ref.classList.remove('show');
   if (els.fact) els.fact.classList.remove('show');
 
   els.progress.textContent = `Question ${state.index + 1} of ${state.questions.length}`;
   updateNavigator();
 
+  // Per-question timer logic
   if (state.timerEnabled) {
-    startTimer();
-    els.timer.setAttribute('aria-hidden', 'false');
+    startQuestionTimerBar();
   } else {
-    stopTimer();
-    els.timer.setAttribute('aria-hidden', 'true');
-    els.timerFill.style.width = '100%';
+    stopQuestionTimer();
+    if (els.questionTimerBarFill) els.questionTimerBarFill.style.width = '100%';
+    if (els.questionTimerBarLabel) els.questionTimerBarLabel.textContent = '';
   }
 
   state.accepting = true;
 }
 
-function startTimer() {
-  stopTimer();
-  state.timeLeft = state.timeLimit;
-  els.timerFill.style.width = '100%';
-  state.timerId = setInterval(() => {
-    state.timeLeft -= 0.2;
-    const pct = Math.max(0, (state.timeLeft / state.timeLimit) * 100);
-    els.timerFill.style.width = pct + '%';
-    if (state.timeLeft <= 0) {
-      stopTimer();
+function startQuestionTimerBar() {
+  stopQuestionTimer();
+  questionTimeLeft = questionTimeTotal;
+  updateQuestionTimerBar();
+  questionTimer = setInterval(() => {
+    questionTimeLeft -= 0.2;
+    if (questionTimeLeft < 0) questionTimeLeft = 0;
+    updateQuestionTimerBar();
+    if (questionTimeLeft <= 0) {
+      stopQuestionTimer();
       handleAnswerTimeout();
     }
   }, 200);
 }
 
-function stopTimer() {
-  if (state.timerId) {
-    clearInterval(state.timerId);
-    state.timerId = null;
+function updateQuestionTimerBar() {
+  if (!els.questionTimerBarFill || !els.questionTimerBarLabel) return;
+  const pct = Math.max(0, questionTimeLeft / questionTimeTotal);
+  els.questionTimerBarFill.style.width = (pct * 100) + '%';
+  // Color: green > yellow > red
+  let bg = 'linear-gradient(90deg, #22c55e 0%, #facc15 60%, #ef4444 100%)';
+  if (pct <= 0.2) bg = 'linear-gradient(90deg, #ef4444 0%, #ef4444 100%)';
+  else if (pct <= 0.4) bg = 'linear-gradient(90deg, #facc15 0%, #ef4444 100%)';
+  els.questionTimerBarFill.style.background = bg;
+  els.questionTimerBarLabel.textContent = Math.ceil(questionTimeLeft) + 's';
+}
+
+function startQuestionTimer() {
+  stopQuestionTimer();
+  questionTimeTotal = getDynamicQuestionTime();
+  questionTimeLeft = questionTimeTotal;
+  updateQuestionTimerCircle();
+  questionTimer = setInterval(() => {
+    questionTimeLeft -= 0.2;
+    if (questionTimeLeft < 0) questionTimeLeft = 0;
+    updateQuestionTimerCircle();
+    if (questionTimeLeft <= 0) {
+      stopQuestionTimer();
+      handleAnswerTimeout();
+    }
+  }, 200);
+}
+
+function stopQuestionTimer() {
+  if (questionTimer) {
+    clearInterval(questionTimer);
+    questionTimer = null;
   }
 }
+
+function updateQuestionTimerCircle() {
+  if (!els.questionTimerArc || !els.questionTimerLabel) return;
+  const pct = Math.max(0, questionTimeLeft / questionTimeTotal);
+  // SVG circle: circumference = 2 * PI * r = 2*PI*20 = ~125.66
+  const CIRC = 125.66;
+  els.questionTimerArc.setAttribute('stroke-dasharray', CIRC);
+  els.questionTimerArc.setAttribute('stroke-dashoffset', (CIRC * (1 - pct)).toFixed(2));
+  // Color: green > yellow > red
+  let color = '#22c55e';
+  if (pct <= 0.2) color = '#ef4444';
+  else if (pct <= 0.4) color = '#facc15';
+  els.questionTimerArc.setAttribute('stroke', color);
+  els.questionTimerLabel.textContent = Math.ceil(questionTimeLeft);
+}
+
+function endRoundDueToTimeout() {
+  // End the round immediately if round timer expires
+  stopQuestionTimer();
+  stopRoundTimer();
+  showResults();
+}
+
+function stopRoundTimer() {
+  if (roundTimer) {
+    clearInterval(roundTimer);
+    roundTimer = null;
+  }
+}
+
+// (Legacy timer functions kept for fallback, but not used)
+function startTimer() {}
+function stopTimer() {}
 
 function handleAnswerTimeout() {
   if (!state.accepting) return;
@@ -351,6 +467,7 @@ function handleAnswerTimeout() {
 }
 
 function showAnswer(chosenIndex) {
+  stopQuestionTimer();
   const q = state.questions[state.index];
   const correctIdx = q.correct;
 
@@ -409,7 +526,8 @@ function showAnswer(chosenIndex) {
 function nextQuestion() {
   state.index++;
   if (state.index >= state.questions.length) {
-    stopTimer();
+    stopQuestionTimer();
+    stopRoundTimer();
     showResults();
     return;
   }
@@ -631,6 +749,28 @@ const toggleDarkmodeBtn = document.getElementById('toggle-darkmode');
 let isMuted = false;
 let isDark = false;
 
+// Helper to globally mute/unmute audio
+function setMute(mute) {
+  isMuted = mute;
+  if (window.audioCtx) {
+    try {
+      if (isMuted) {
+        window.audioCtx.suspend();
+      } else {
+        window.audioCtx.resume();
+      }
+    } catch (e) {
+      console.error('Audio mute error:', e);
+    }
+  }
+}
+
+// Patch playCorrect and playWrong to respect mute
+const origPlayCorrect = playCorrect;
+const origPlayWrong = playWrong;
+playCorrect = function() { if (!isMuted) origPlayCorrect(); };
+playWrong = function() { if (!isMuted) origPlayWrong(); };
+
 // Open/close sidebar
 sidebarToggleBtn.addEventListener('click', () => {
   sidebar.classList.toggle('active');
@@ -645,18 +785,24 @@ document.addEventListener('click', (e) => {
 
 // ===== Mute toggle =====
 toggleMuteBtn.addEventListener('click', () => {
-  isMuted = !isMuted;
-  toggleMuteBtn.textContent = isMuted ? '🔊 Unmute' : '🔇 Mute';
-
-  if (window.audioCtx) {
-    if (isMuted) audioCtx.suspend();
-    else audioCtx.resume();
+  try {
+    setMute(!isMuted);
+    toggleMuteBtn.textContent = isMuted ? '🔊 Unmute' : '🔇 Mute';
+    console.log('Mute toggled:', isMuted);
+  } catch (e) {
+    console.error('Mute toggle error:', e);
   }
 });
 
 // ===== Dark mode toggle =====
 toggleDarkmodeBtn.addEventListener('click', () => {
-  isDark = !isDark;
-  document.body.classList.toggle('dark-mode', isDark);
-  toggleDarkmodeBtn.textContent = isDark ? '🔆 Light Mode' : '🌙 Dark Mode';
+  try {
+    isDark = !isDark;
+    document.body.classList.toggle('dark-mode', isDark);
+    toggleDarkmodeBtn.textContent = isDark ? '🔆 Light Mode' : '🌙 Dark Mode';
+    console.log('Dark mode toggled:', isDark);
+  } catch (e) {
+    console.error('Dark mode toggle error:', e);
+  }
 });
+ 
