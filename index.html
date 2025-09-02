@@ -89,18 +89,28 @@
 
       <!-- Quiz Screen -->
       <section id="screen-quiz" class="screen">
-        <!-- Per-Question Horizontal Timer Bar (full width, below header) -->
-        <div class="question-timer-bar-outer" id="question-timer-bar-outer">
-          <div class="question-timer-bar-bg">
-            <div class="question-timer-bar-fill" id="question-timer-bar-fill"></div>
+        <!-- ROUND TIMER: Horizontal bar across the top of quiz area -->
+        <div class="round-timer-bar-outer" id="round-timer-bar-outer">
+          <div class="round-timer-bar-bg">
+            <div class="round-timer-bar-fill" id="round-timer-bar-fill"></div>
           </div>
+          <div class="round-timer-label" id="round-timer-label">3:00</div>
         </div>
         <div class="quiz-grid">
           <div class="quiz-main">
             <div class="quiz-head">
               <div class="progress"><span id="progress-text">Question 1</span></div>
             </div>
+            <!-- QUESTION TEXT -->
             <div class="question" id="question-text">Question will appear here</div>
+            <!-- PER-QUESTION TIMER: Circular countdown below question text -->
+            <div class="question-timer-circle-outer" id="question-timer-circle-outer">
+              <svg class="question-timer-svg" width="48" height="48" viewBox="0 0 48 48">
+                <circle class="question-timer-bg" cx="24" cy="24" r="20" fill="none" stroke="#eee" stroke-width="6" />
+                <circle class="question-timer-arc" id="question-timer-arc" cx="24" cy="24" r="20" fill="none" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="0" />
+                <text id="question-timer-label" class="question-timer-label-svg" x="24" y="29" text-anchor="middle" alignment-baseline="middle" font-size="1.3em" font-family="inherit" fill="var(--brand-2)">15</text>
+              </svg>
+            </div>
             <div class="q-fact" id="fact"></div>
             <div class="options">
               <button class="option" id="opt-0" data-index="0"><span class="badge">A</span><span class="opt-text"></span></button>

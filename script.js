@@ -297,8 +297,13 @@ function startRoundTimer() {
 function updateRoundTimerBar() {
   if (!els.roundTimerBarFill || !els.roundTimerLabel) return;
   const pct = Math.max(0, (roundTimeLeft / roundTimeTotal));
-  els.roundTimerBarFill.style.height = (pct * 100) + '%';
-  // Color gradient handled by CSS background
+  els.roundTimerBarFill.style.width = (pct * 100) + '%';
+  els.roundTimerBarFill.style.transform = 'scaleX(' + pct + ')';
+  // Color gradient: green > yellow > red
+  let bg = 'linear-gradient(90deg, #22c55e 0%, #facc15 60%, #ef4444 100%)';
+  if (pct <= 0.2) bg = 'linear-gradient(90deg, #ef4444 0%, #ef4444 100%)';
+  else if (pct <= 0.4) bg = 'linear-gradient(90deg, #facc15 0%, #ef4444 100%)';
+  els.roundTimerBarFill.style.background = bg;
   // Update label
   const min = Math.floor(roundTimeLeft / 60);
   const sec = Math.floor(roundTimeLeft % 60);
@@ -365,43 +370,54 @@ function renderQuestion() {
   els.progress.textContent = `Question ${state.index + 1} of ${state.questions.length}`;
   updateNavigator();
 
-  // Per-question timer logic
+  // Per-question timer logic (circular)
   if (state.timerEnabled) {
-    startQuestionTimerBar();
+    startQuestionTimerCircle();
   } else {
     stopQuestionTimer();
-    if (els.questionTimerBarFill) els.questionTimerBarFill.style.width = '100%';
-    if (els.questionTimerBarLabel) els.questionTimerBarLabel.textContent = '';
+    if (els.questionTimerArc) {
+      els.questionTimerArc.setAttribute('stroke-dashoffset', '0');
+      els.questionTimerArc.setAttribute('stroke', '#22c55e');
+    }
+    if (els.questionTimerLabel) {
+      els.questionTimerLabel.textContent = questionTimeTotal;
+    }
   }
 
   state.accepting = true;
 }
 
-function startQuestionTimerBar() {
+
+// Per-question timer (circular)
+function startQuestionTimerCircle() {
   stopQuestionTimer();
   questionTimeLeft = questionTimeTotal;
-  updateQuestionTimerBar();
+  updateQuestionTimerCircle();
   questionTimer = setInterval(() => {
     questionTimeLeft -= 0.2;
     if (questionTimeLeft < 0) questionTimeLeft = 0;
-    updateQuestionTimerBar();
+    updateQuestionTimerCircle();
     if (questionTimeLeft <= 0) {
       stopQuestionTimer();
       handleAnswerTimeout();
     }
-  }, 200);
+  }, 150);
 }
 
-function updateQuestionTimerBar() {
-  if (!els.questionTimerBarFill || !els.questionTimerBarLabel) return;
+function updateQuestionTimerCircle() {
+  if (!els.questionTimerArc || !els.questionTimerLabel) return;
   const pct = Math.max(0, questionTimeLeft / questionTimeTotal);
-  els.questionTimerBarFill.style.width = (pct * 100) + '%';
+  // SVG circle: circumference = 2 * PI * r = 2*PI*20 = ~125.66
+  const CIRC = 125.66;
+  els.questionTimerArc.setAttribute('stroke-dasharray', CIRC);
+  // Animate clockwise: pct=1 is full, pct=0 is empty (clockwise)
+  els.questionTimerArc.setAttribute('stroke-dashoffset', (CIRC * (1 - pct)).toFixed(2));
   // Color: green > yellow > red
-  let bg = 'linear-gradient(90deg, #22c55e 0%, #facc15 60%, #ef4444 100%)';
-  if (pct <= 0.2) bg = 'linear-gradient(90deg, #ef4444 0%, #ef4444 100%)';
-  else if (pct <= 0.4) bg = 'linear-gradient(90deg, #facc15 0%, #ef4444 100%)';
-  els.questionTimerBarFill.style.background = bg;
-  els.questionTimerBarLabel.textContent = Math.ceil(questionTimeLeft) + 's';
+  let color = '#22c55e';
+  if (pct <= 0.2) color = '#ef4444';
+  else if (pct <= 0.4) color = '#facc15';
+  els.questionTimerArc.setAttribute('stroke', color);
+  els.questionTimerLabel.textContent = Math.ceil(questionTimeLeft);
 }
 
 function startQuestionTimer() {
@@ -439,7 +455,10 @@ function updateQuestionTimerCircle() {
   if (pct <= 0.2) color = '#ef4444';
   else if (pct <= 0.4) color = '#facc15';
   els.questionTimerArc.setAttribute('stroke', color);
-  els.questionTimerLabel.textContent = Math.ceil(questionTimeLeft);
+  // Set SVG <text> value
+  if (els.questionTimerLabel instanceof SVGTextElement) {
+    els.questionTimerLabel.textContent = Math.ceil(questionTimeLeft);
+  }
 }
 
 function endRoundDueToTimeout() {
@@ -660,13 +679,8 @@ function updateWelcomeStats() {
   els.bestStreak.textContent = high.bestStreak || 0;
 }
 
-function updateTimerUI() {
-  if (state.timerEnabled) {
-    $('#timer').style.display = '';
-  } else {
-    $('#timer').style.display = 'none';
-  }
-}
+// updateTimerUI is now a no-op, as timer updates are handled by updateRoundTimerBar and updateQuestionTimerCircle
+function updateTimerUI() {}
 
 function showSubmitModal(show) {
   if (!els.modalSubmit) return;

@@ -1,3 +1,73 @@
+/* === ROUND TIMER (Horizontal Bar) === */
+.round-timer-bar-outer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 18px auto;
+  position: relative;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+}
+.round-timer-bar-bg {
+  width: 100%;
+  height: 12px;
+  background: #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+.round-timer-bar-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #22c55e 0%, #facc15 60%, #ef4444 100%);
+  border-radius: 8px;
+  transition: width 0.2s linear, background 0.2s linear;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: left center;
+}
+.round-timer-label {
+  min-width: 48px;
+  text-align: right;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--brand-2);
+  margin-left: 12px;
+  letter-spacing: 0.5px;
+}
+
+/* === PER-QUESTION TIMER (Circular) === */
+.question-timer-circle-outer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 8px 0;
+  justify-content: flex-start;
+}
+.question-timer-svg {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+.question-timer-bg {
+  stroke: #eee;
+}
+.question-timer-arc {
+  transition: stroke-dashoffset 0.2s linear, stroke 0.2s linear;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+.question-timer-label-svg {
+  font-size: 1.3em;
+  font-weight: 700;
+  fill: var(--brand-2);
+  dominant-baseline: middle;
+  alignment-baseline: middle;
+  pointer-events: none;
+  user-select: none;
+}
 /* Bible Quiz Styles */
 :root {
   --bg: #fef9c3;        /* light yellow background */
