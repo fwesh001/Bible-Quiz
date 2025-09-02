@@ -1109,7 +1109,7 @@ const bibleQuestions = [
   difficulty: "HARD"
 },
    ////////////////////
-  //NEW TESTAMENT HARD
+  //NEW TESTAMENT "HARD"
   ////////////////////
   {
     question: "Who was the second disciple Jesus called when gathering His followers?",
@@ -1167,7 +1167,7 @@ const bibleQuestions = [
   },
   {
     question: "How many people were baptized on the day of Pentecost?",
-    options: ["About 3,000", "1,200", "5,000", "2,000"],
+    options: ["3,000", "1,200", "5,000", "2,000"],
     correct: 0,
     reference: "Acts 2:41",
     fact: "After Peter's speech, about 3,000 people were baptized and became followers of Christ.",
@@ -1209,7 +1209,7 @@ const bibleQuestions = [
     reference: "John 8:58",
     fact: "Jesus said, 'Before Abraham came into existence, I have been.'",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "Who is said to teach everyone as written in the prophets?",
@@ -1218,7 +1218,7 @@ const bibleQuestions = [
     reference: "John 6:45",
     fact: "Jehovah is the one who teaches everyone, fulfilling what the prophets wrote.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "What did the king command to be done to those who did not want him to reign over them?",
@@ -1227,7 +1227,7 @@ const bibleQuestions = [
     reference: "Luke 19:27",
     fact: "The king commanded to bring them and kill them before him.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "What document was nailed to the stake?",
@@ -1236,7 +1236,7 @@ const bibleQuestions = [
     reference: "Colossians 2:14",
     fact: "The certificate of debt (handwriting of requirements) that was against us was nailed to the stake.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "What four things were Gentile Christians told to abstain from?",
@@ -1245,7 +1245,7 @@ const bibleQuestions = [
     reference: "Acts 15:20",
     fact: "Gentiles were instructed to abstain from blood, things strangled, sexual immorality, and things polluted by idols.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "How did the women react after visiting Jesus’ tomb?",
@@ -1254,7 +1254,7 @@ const bibleQuestions = [
     reference: "Mark 16:8",
     fact: "They fled trembling and overwhelmed with emotion, and they said nothing because they were afraid.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "What does Ephesians 2:8  say about how we have been saved?",
@@ -1263,7 +1263,7 @@ const bibleQuestions = [
     reference: "Ephesians 2:8",
     fact: "We are saved by God’s undeserved kindness through faith; it is God’s gift.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "How did the little scroll taste and what happened after John swallowed it?",
@@ -1272,7 +1272,7 @@ const bibleQuestions = [
     reference: "Revelation 10:10",
     fact: "The little scroll tasted sweet as honey but became bitter in his stomach.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "Why did Jesus not do many miracles in his hometown?",
@@ -1281,7 +1281,7 @@ const bibleQuestions = [
     reference: "Mark 6:5",
     fact: "Jesus could do only a few miracles because of their unbelief.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "According to Acts 4:12 , by what name must we be saved?",
@@ -1290,7 +1290,7 @@ const bibleQuestions = [
     reference: "Acts 4:12",
     fact: "Salvation is only through the name of Jesus Christ.",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "In Revelation 1:8 , how does the Jehovah describe himself?",
@@ -1299,7 +1299,7 @@ const bibleQuestions = [
     reference: "Revelation 1:8",
     fact: "The Lord describes himself as 'The Alpha and the Omega, the beginning and the end.'",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   },
   {
     question: "Revelation 19:16 describes a name on Jesus’ robe and thigh. What is this name?",
@@ -1308,7 +1308,7 @@ const bibleQuestions = [
     reference: "Revelation 19:16",
     fact: "The name on Jesus’ robe and thigh is 'King of kings and Lord of lords.'",
     category: "NEW TESTAMENT",
-    difficulty: HARD
+    difficulty: "HARD"
   }
 
 ]
