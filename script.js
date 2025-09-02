@@ -444,7 +444,10 @@ function stopQuestionTimer() {
 }
 
 function updateQuestionTimerCircle() {
-  if (!els.questionTimerArc || !els.questionTimerLabel) return;
+  if (!els.questionTimerArc || !els.questionTimerLabel) {
+    console.log('Timer arc or label not found', els.questionTimerArc, els.questionTimerLabel);
+    return;
+  }
   const pct = Math.max(0, questionTimeLeft / questionTimeTotal);
   // SVG circle: circumference = 2 * PI * r = 2*PI*20 = ~125.66
   const CIRC = 125.66;
@@ -456,8 +459,12 @@ function updateQuestionTimerCircle() {
   else if (pct <= 0.4) color = '#facc15';
   els.questionTimerArc.setAttribute('stroke', color);
   // Set SVG <text> value
-  if (els.questionTimerLabel instanceof SVGTextElement) {
+  console.log('Timer update:', {questionTimeLeft, pct, label: els.questionTimerLabel});
+  if (typeof els.questionTimerLabel.textContent !== 'undefined') {
     els.questionTimerLabel.textContent = Math.ceil(questionTimeLeft);
+    console.log('Set timer label to', Math.ceil(questionTimeLeft));
+  } else {
+    console.log('SVG text element not found or not settable');
   }
 }
 
