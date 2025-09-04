@@ -220,7 +220,12 @@ function startQuiz(mode = 'normal') {
   state.accepting = true;
 
   // Set round and per-question timer from user input
-  roundTimeTotal = parseInt(els.roundTimeInput?.value, 10) || 180;
+  // Get round time from input (in minutes), default 3
+  let roundTimeMinutes = 3;
+  if (els.roundTimeInput && els.roundTimeInput.value) {
+    roundTimeMinutes = Math.max(1, Math.min(30, parseInt(els.roundTimeInput.value, 10) || 3));
+  }
+  roundTimeTotal = roundTimeMinutes * 60;
   roundTimeLeft = roundTimeTotal;
   questionTimeTotal = parseInt(els.questionTimeInput?.value, 10) || 20;
   questionTimeLeft = questionTimeTotal;
@@ -546,7 +551,7 @@ function showAnswer(chosenIndex) {
   // Next question after delay
   setTimeout(() => {
     nextQuestion();
-  }, 1800);
+  }, 3000);
 }
 
 function nextQuestion() {

@@ -38,36 +38,6 @@
   letter-spacing: 0.5px;
 }
 
-/* === PER-QUESTION TIMER (Circular) === */
-.question-timer-circle-outer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 12px 0 8px 0;
-  justify-content: flex-start;
-}
-.question-timer-svg {
-  width: 48px;
-  height: 48px;
-  display: block;
-}
-.question-timer-bg {
-  stroke: #eee;
-}
-.question-timer-arc {
-  transition: stroke-dashoffset 0.2s linear, stroke 0.2s linear;
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-}
-.question-timer-label-svg {
-  font-size: 1.3em;
-  font-weight: 700;
-  fill: var(--brand-2);
-  dominant-baseline: middle;
-  alignment-baseline: middle;
-  pointer-events: none;
-  user-select: none;
-}
 /* Bible Quiz Styles */
 :root {
   --bg: #fef9c3;        /* light yellow background */
