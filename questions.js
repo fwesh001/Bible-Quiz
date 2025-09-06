@@ -67,7 +67,7 @@ const bibleQuestions = [
     category: "OLD TESTAMENT"
   },
   {
-    question: "What did Jehovah use to part the Red Sea?",
+    question: "What did Moses use to part the Red Sea?",
     options: ["A staff", "A wind", "An angel", "A cloud"],
     correct: 0,
     reference: "Exodus 14:21",
@@ -928,19 +928,11 @@ const bibleQuestions = [
     category: "NEW TESTAMENT"
   },
   {
-    question: "What city is described as coming down from heaven?",
-    options: ["New Jerusalem", "Bethlehem", "Nazareth", "Capernaum"],
-    correct: 0,
-    reference: "Revelation 21:2",
-    fact: "The holy city of God will descend from heaven, adorned like a bride.",
-    category: "NEW TESTAMENT"
-  },
-  {
     question: "What is the first thing John saw in Revelation?",
     options: ["A vision of Christ", "The throne of God", "Angels", "The 144,000"],
     correct: 0,
     reference: "Revelation 1:12–16",
-    fact: "John saw Christ standing among seven golden lampstands.",
+    fact: "John saw Jesus Christ standing among seven golden lampstands.",
     category: "NEW TESTAMENT"
   },
   {

@@ -622,9 +622,9 @@ function showResults() {
 }
 
 function encouragementFor(accuracy) {
-  if (accuracy >= 85) return { text: '“Well done, good and faithful servant”', ref: 'Matthew 25:21' };
-  if (accuracy >= 60) return { text: '“Grow in the grace and knowledge of our Lord”', ref: '2 Peter 3:18' };
-  return { text: '“I can do all things through Christ who strengthens me”', ref: 'Philippians 4:13' };
+  if (accuracy >= 85) return { text: '“.”', ref: '.' };
+  if (accuracy >= 60) return { text: '“.”', ref: '.' };
+  return { text: '“.”', ref: '.' };
 }
 
 function evaluateAchievements(accuracy) {
