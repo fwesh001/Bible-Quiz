@@ -108,14 +108,7 @@ const bibleQuestions = [
     fact: "Jehovah consecrated Aaron and his sons as priests to serve at the tabernacle.",
     category: "OLD TESTAMENT"
   },
-  {
-    question: "What was the purpose of the Day of Atonement?",
-    options: ["To celebrate the harvest", "To confess sins", "To remember the Exodus", "To honor the priesthood"],
-    correct: 1,
-    reference: "Leviticus 16:29–34",
-    fact: "The Day of Atonement was established for making atonement for the sins of the people.",
-    category: "OLD TESTAMENT"
-  },
+  
   {
     question: "What did Jehovah require for a sin offering?",
     options: ["A lamb", "A goat", "A bull", "A dove"],
@@ -752,14 +745,6 @@ const bibleQuestions = [
     category: "NEW TESTAMENT"
   },
   {
-    question: "Who was Jesus’ first disciple called by John the Baptist?",
-    options: ["Andrew", "Peter", "Philip", "Nathaniel"],
-    correct: 0,
-    reference: "John 1:40–41",
-    fact: "Andrew, Simon Peter’s brother, followed Jesus after John’s testimony.",
-    category: "NEW TESTAMENT"
-  },
-  {
     question: "What did Jesus say about the bread of life?",
     options: ["He gives eternal life", "He heals physically", "He teaches laws", "He judges"],
     correct: 0,
@@ -1104,15 +1089,24 @@ const bibleQuestions = [
   //NEW TESTAMENT "HARD"
   ////////////////////
   {
-    question: "Who was the second disciple Jesus called when gathering His followers?",
-    options: ["Andrew", "Peter", "John", "Philip"],
-    correct: 0,
-    reference: "John 1:40–42",
-    fact: "Andrew was the first disciple called by Jesus, and he then brought his brother Simon Peter to Him.",
-    category: "NEW TESTAMENT",
-    difficulty: "HARD"
-  },
-  {
+  question: "Who was the second disciple called by Jesus?",
+  options: ["Peter", "Andrew", "John", "Philip"],
+  correct: 1,
+  reference: "Matthew 10:2",
+  fact: "Andrew, Simon Peter’s brother, was the second disciple to follow Jesus.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who was the last disciple chosen by Jesus among the twelve apostles?",
+  options: ["Matthias", "Thomas", "Judas Iscariot", "Bartholomew"],
+  correct: 2,
+  reference: "Matthew 10:2-4; Luke 6:13-16",
+  fact: "Judas Iscariot is always listed last among the twelve apostles and was the one who later betrayed Jesus.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
     question: "Who said, 'Truly this man was the Son of God' at Jesus' execution on the stake?",
     options: ["Centurion", "Peter", "Mary Magdalene", "John"],
     correct: 0,
@@ -1301,6 +1295,312 @@ const bibleQuestions = [
     fact: "The name on Jesus’ robe and thigh is 'King of kings and Lord of lords.'",
     category: "NEW TESTAMENT",
     difficulty: "HARD"
-  }
+  },
+  {
+  question: "Which prophet was commanded by Jehovah to marry a prostitute as a symbol of Israel’s unfaithfulness?",
+  options: ["Isaiah", "Hosea", "Ezekiel", "Jeremiah"],
+  correct: 1,
+  reference: "Hosea 1:2-3",
+  fact: "Jehovah told Hosea to marry Gomer, a woman of prostitution, to illustrate Israel’s spiritual adultery.",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "For how many pieces of silver was Joseph sold by his brothers to the merchants?",
+  options: ["10", "20", "30", "40"],
+  correct: 1,
+  reference: "Genesis 37:28",
+  fact: "Joseph’s brothers sold him to the Ishmaelites for 20 pieces of silver, leading to his journey into Egypt.",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who was the last king of Judah before Babylon conquered Jerusalem?",
+  options: ["Jehoiakim", "Hezekiah", "Zedekiah", "Manasseh"],
+  correct: 2,
+  reference: "2 Kings 25:7",
+  fact: "Zedekiah was the last king of Judah before Jerusalem was destroyed by the Babylonians in 607 B.C.E.",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "What was the name of the prophet from Judah disobeyed Jehovah and was killed by a lion on his way back.?",
+  options: ["Elijah", "Amos", "Nahum", "None of the above"],
+  correct: 3,
+  reference: "1 Kings 13:20-24",
+  fact: "The Bible never mentions his name; it only calls him 'the man of the true God from Judah.'",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+{
+    question: "Who was the only woman to rule as queen over Judah?",
+    options: ["Deborah", "Athaliah", "Jezebel", "Esther"],
+    correct: 1,
+    reference: "2 Kings 11:1-3",
+    fact: "Athaliah seized power after her son Ahaziah died, making her the only woman to rule Judah.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Which prophet lay on his left side for 390 days and on his right side for 40 days to represent Israel’s sins?",
+    options: ["Isaiah", "Jeremiah", "Ezekiel", "Daniel"],
+    correct: 2,
+    reference: "Ezekiel 4:4-6",
+    fact: "Jehovah instructed Ezekiel to lie on each side to represent the years of Israel and Judah’s error.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Which judge of Israel made a rash vow that led to the sacrifice of his daughter?",
+    options: ["Samson", "Jephthah", "Gideon", "Abimelech"],
+    correct: 1,
+    reference: "Judges 11:30-40",
+    fact: "Jephthah vowed to offer up whatever came out of his house if Jehovah gave him victory, and it was his daughter.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who killed King Ahab’s seventy sons and put their heads in baskets at Jezreel?",
+    options: ["Jehu", "Jehoiada", "Jehoiakim", "Hoshea"],
+    correct: 0,
+    reference: "2 Kings 10:6-7",
+    fact: "Jehu carried out Jehovah’s judgment against Ahab’s house by ordering the execution of his 70 sons.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "What was the name of the king who saw the hand writing on the wall?",
+    options: ["Nebuchadnezzar", "Belshazzar", "Darius", "Cyrus"],
+    correct: 1,
+    reference: "Daniel 5:1, 22-28",
+    fact: "Belshazzar saw the hand write a message of judgment on the wall during a feast.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "What was the name of the prophet who confronted David about his sin with Bath-sheba?",
+    options: ["Gad", "Samuel", "Nathan", "Elijah"],
+    correct: 2,
+    reference: "2 Samuel 12:1-7",
+    fact: "Nathan boldly confronted David with a parable about a rich man and a poor man’s lamb, exposing his sin.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who fasted for 40 days and nights at Mount Horeb before receiving a vision of Jehovah?",
+    options: ["Moses", "Elijah", "Elisha", "Isaiah"],
+    correct: 1,
+    reference: "1 Kings 19:8-12",
+    fact: "Elijah traveled to Mount Horeb and fasted 40 days before Jehovah revealed Himself in a calm, low voice.",
+    category: "OLD TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+  question: "Who was the youngest king in the bible?",
+  options: ["Josiah", "Manasseh", "Jehoash", "Hezekiah"],
+  correct: 2,
+  reference: "2 Kings 11:21",
+  fact: "Jehoash (also called Joash) became king at 7 years old, making him the youngest king recorded in the Bible.",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who was the high priest that questioned Jesus during his trial?",
+  options: ["Annas", "Caiaphas", "Pilate", "Herod"],
+  correct: 1,
+  reference: "Matthew 26:57",
+  fact: "Caiaphas was the high priest who led the questioning of Jesus before the Sanhedrin.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+    question: "Which woman was the first to see Jesus after his resurrection?",
+    options: ["Martha", "Mary Magdalene", "Salome", "Joanna"],
+    correct: 1,
+    reference: "John 20:14-16",
+    fact: "Mary Magdalene was the first to see Jesus alive after his resurrection near the tomb.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Which couple died for lying to the apostles about the price of their land?",
+    options: ["Priscilla and Aquila", "Ananias and Sapphira", "Zechariah and Elizabeth", "None of the above"],
+    correct: 1,
+    reference: "Acts 5:1-10",
+    fact: "Ananias and Sapphira lied about the proceeds from their land sale and were struck dead.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+  },
+  {
+    question: "Who carried Jesus’ torture stake when he could no longer bear it?",
+    options: ["Peter", "John", "Simon of Cyrene", "Joseph of Arimathea"],
+    correct: 2,
+    reference: "Matthew 27:32",
+    fact: "Simon of Cyrene was compelled by Roman soldiers to carry Jesus’ torture stake.",
+    category: "NEW TESTAMENT",
+    difficulty: "HARD"
+},
+{
+  question: "Who climbed a sycamore tree to see Jesus as he passed by?",
+  options: ["Nicodemus", "Zacchaeus", "Caiaphas", "Joseph of Arimathea"],
+  correct: 1,
+  reference: "Luke 19:1-4",
+  fact: "Zacchaeus, a wealthy tax collector, climbed the tree because he was short and couldn’t see over the crowd.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Whose shadow was said to heal the sick when it passed over them?",
+  options: ["John", "Peter", "Paul", "Stephen"],
+  correct: 1,
+  reference: "Acts 5:15",
+  fact: "People carried the sick into the streets so that Peter’s shadow might fall on them and heal them.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Which sorcerer tried to buy the power of the holy spirit with money?",
+  options: ["Elymas", "Simon Magus", "Bar-Jesus", "Demetrius"],
+  correct: 1,
+  reference: "Acts 8:18-20",
+  fact: "Simon Magus offered the apostles money to give him the ability to impart holy spirit.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Paul was shipwrecked on an island where he was bitten by a viper but suffered no harm. What was the name of the island?",
+  options: ["Patmos", "Cyprus", "Malta", "Crete"],
+  correct: 2,
+  reference: "Acts 28:1-6",
+  fact: "Paul was shipwrecked on Malta, where the islanders showed unusual kindness and witnessed the miracle.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "During Paul’s trial, which Roman governor trembled when Paul spoke about righteousness, self-control, and judgment?",
+  options: ["Festus", "Felix", "Agrippa", "Gallio"],
+  correct: 1,
+  reference: "Acts 24:25",
+  fact: "Governor Felix trembled at Paul’s words but postponed making a decision about him.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "In Revelation, how many seals were on the scroll that no one could open except the Lamb?",
+  options: ["Four", "Seven", "Twelve", "Ten"],
+  correct: 1,
+  reference: "Revelation 5:1-5",
+  fact: "Only Jesus, the Lamb, was found worthy to open the seven seals of the scroll.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who was the young man that accompanied Paul and Barnabas but abandoned them on their first missionary journey?",
+  options: ["Timothy", "John Mark", "Silas", "Tychicus"],
+  correct: 1,
+  reference: "Acts 13:13; 15:37-38",
+  fact: "John Mark abandoned Paul and Barnabas, causing a later dispute between the two apostles.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "In Acts, who was struck blind for opposing Paul and Barnabas?",
+  options: ["Ananias", "Elymas", "Simon Magus", "Demetrius"],
+  correct: 1,
+  reference: "Acts 13:8-11",
+  fact: "Elymas the sorcerer was struck blind for trying to turn the proconsul away from the faith.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Which apostle was exiled to the island of Patmos?",
+  options: ["Peter", "Paul", "John", "James"],
+  correct: 2,
+  reference: "Revelation 1:9",
+  fact: "The apostle John was exiled to Patmos, where he received the visions recorded in Revelation.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who was the first Gentile household to receive the holy spirit?",
+  options: ["Cornelius", "Lydia", "Sergius Paulus", "The Philippian Jailer"],
+  correct: 0,
+  reference: "Acts 10:44-48",
+  fact: "Cornelius, a Roman centurion, and his household were the first Gentiles to receive the holy spirit.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Which king had John the Baptist beheaded?",
+  options: ["Herod Antipas", "Herod the Great", "Pontius Pilate", "Caesar Tiberius"],
+  correct: 0,
+  reference: "Mark 6:16-28",
+  fact: "Herod Antipas ordered John the Baptist beheaded after being manipulated by Herodias’ daughter.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Which Pharisee defended the apostles before the Sanhedrin, suggesting their work might be from God?",
+  options: ["Nicodemus", "Gamaliel", "Caiaphas", "Annas"],
+  correct: 1,
+  reference: "Acts 5:34-39",
+  fact: "Gamaliel, a respected Pharisee and teacher of the Law, advised the Sanhedrin to be cautious in opposing the apostles.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "In which city were Jesus’ followers first called 'Christians'?",
+  options: ["Jerusalem", "Corinth", "Antioch", "Ephesus"],
+  correct: 2,
+  reference: "Acts 11:26",
+  fact: "It was in Antioch that the disciples were first given the name 'Christians.'",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who was the first convert baptized in Europe?",
+  options: ["Lydia", "Phoebe", "Priscilla", "Dorcas"],
+  correct: 0,
+  reference: "Acts 16:14-15",
+  fact: "Lydia, a seller of purple cloth from Thyatira, became the first recorded convert in Europe.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "When Paul appealed his case, to which Roman Caesar did he appeal?",
+  options: ["Augustus", "Nero", "Tiberius", "Claudius"],
+  correct: 1,
+  reference: "Acts 25:11-12",
+  fact: "Paul appealed to Caesar Nero during his trial under Governor Festus.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Which disciple did Jesus call 'a true Israelite, in whom there is no deceit'?",
+  options: ["Bartholomew", "Nathanael", "Philip", "Thomas"],
+  correct: 1,
+  reference: "John 1:47",
+  fact: "Jesus gave this compliment to Nathanael when he approached Him after Philip’s invitation.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "What was the name of the young disciple whom Paul circumcised because of the Jews in those regions?",
+  options: ["Silas", "Timothy", "Titus", "Mark"],
+  correct: 1,
+  reference: "Acts 16:1-3",
+  fact: "Paul circumcised Timothy, whose mother was Jewish and father was Greek, to avoid hindrance among Jews.",
+  category: "NEW TESTAMENT",
+  difficulty: "HARD"
+},
+{
+  question: "Who did Elisha raise from the dead?",
+  options: ["The widow’s son at Zarephath", "The Shunammite woman’s son", "The widow’s son at Nain", "The centurion’s servant"],
+  correct: 1,
+  reference: "2 Kings 4:32-35",
+  fact: "Elisha raised the Shunammite woman’s son at Shunem after praying and stretching himself over the child.",
+  category: "OLD TESTAMENT",
+  difficulty: "HARD"
+}
 
 ]
