@@ -180,7 +180,8 @@ const els = {
   questionTimerBarFill: document.getElementById('question-timer-bar-fill'),
   questionTimerBarLabel: document.getElementById('question-timer-bar-label'),
   roundTimeInput: document.getElementById('round-time'),
-  questionTimeInput: document.getElementById('question-time')
+  questionTimeInput: document.getElementById('question-time'),
+  questionReviewList: document.getElementById('question-review-list')
 };
 
 // ========================
@@ -502,6 +503,9 @@ function showAnswer(chosenIndex) {
   const q = state.questions[state.index];
   const correctIdx = q.correct;
 
+  // Record user's answer for review (null for skipped)
+  q.userAnswer = chosenIndex;
+
   els.opts.forEach((btn, i) => {
     btn.classList.add('disabled');
     if (i === correctIdx) btn.classList.add('correct');
@@ -513,6 +517,8 @@ function showAnswer(chosenIndex) {
   // mark navigator status for this question
   if (chosenIndex === correctIdx) {
     markNav(state.index, 'correct');
+  } else if (chosenIndex === null) {
+    markNav(state.index, 'skipped');
   } else {
     markNav(state.index, 'wrong');
   }
@@ -529,16 +535,6 @@ function showAnswer(chosenIndex) {
     playCorrect();
   } else {
     state.streak = 0;
-    // Record missed question details (failed/timeout)
-    try {
-      state.missed.push({
-        index: state.index,
-        question: q.question,
-        correctAnswer: q.options[correctIdx],
-        reference: q.reference,
-        category: q.category
-      });
-    } catch {}
     playWrong();
   }
 
@@ -589,30 +585,62 @@ function showResults() {
   const earned = evaluateAchievements(accuracy);
   renderAchievements(earned);
 
-  // Missed questions list
-  if (els.missedList) {
-    els.missedList.innerHTML = '';
-    if (!state.missed || state.missed.length === 0) {
-      const div = document.createElement('div');
-      div.className = 'achievement';
-      div.innerHTML = `<div style="grid-column:1 / -1; color: var(--muted);">No missed questions</div>`;
-      els.missedList.appendChild(div);
-    } else {
-      state.missed.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'achievement';
-        div.innerHTML = `
-          <span class="status locked"></span>
-          <div>
-            <div style="font-weight:700;">${item.question}</div>
-            <div class="subtitle" style="margin:2px 0 0;">Answer: <span style="font-weight:700; color: var(--correct);">${item.correctAnswer}</span></div>
-            <div class="subtitle" style="margin:2px 0 0; color:#93c5fd;">${item.reference}</div>
-          </div>
-          <div style="color: var(--brand-2); font-weight:700; text-transform: capitalize;">${item.category || ''}</div>
-        `;
-        els.missedList.appendChild(div);
-      });
-    }
+
+  // Full question review list
+  if (els.questionReviewList) {
+    els.questionReviewList.innerHTML = '';
+    state.questions.forEach((q, idx) => {
+      // Determine user's answer
+      let userAnswer = null;
+      let wasCorrect = false;
+      let wasSkipped = false;
+      if (q.userAnswer !== undefined && q.userAnswer !== null) {
+        userAnswer = q.options[q.userAnswer];
+        wasCorrect = q.userAnswer === q.correct;
+        wasSkipped = false;
+      } else {
+        userAnswer = '<i>Skipped</i>';
+        wasSkipped = true;
+      }
+      // Correct: green, wrong/skipped: red
+      const item = document.createElement('div');
+      item.className = 'question-review-item ' + (wasCorrect ? 'correct' : 'wrong');
+      item.innerHTML = `
+        <div class="question-review-q">Q${idx+1}: ${q.question}</div>
+        <div class="question-review-category">Category: ${q.category || 'N/A'}</div>
+        <div class="question-review-user">Your answer: <span class="${wasCorrect ? 'question-review-correct' : 'question-review-wrong'}">${userAnswer}</span></div>
+        <div>Correct answer: <span class="question-review-correct">${q.options[q.correct]}</span></div>
+        <div class="question-review-fact">Fact: ${q.fact || ''}</div>
+        <div class="question-review-ref">Reference: ${q.reference || ''}</div>
+      `;
+      els.questionReviewList.appendChild(item);
+    });
+  }
+
+  // Full question review list
+  if (els.questionReviewList) {
+    els.questionReviewList.innerHTML = '';
+    state.questions.forEach((q, idx) => {
+      // Determine user's answer
+      let userAnswer = null;
+      let wasCorrect = false;
+      if (q.userAnswer !== undefined && q.userAnswer !== null) {
+        userAnswer = q.options[q.userAnswer];
+        wasCorrect = q.userAnswer === q.correct;
+      }
+      // If missed, highlight red; if correct, green
+      const item = document.createElement('div');
+      item.className = 'question-review-item ' + (wasCorrect ? 'correct' : 'wrong');
+      item.innerHTML = `
+        <div class="question-review-q">Q${idx+1}: ${q.question}</div>
+        <div class="question-review-category">Category: ${q.category || 'N/A'}</div>
+        <div class="question-review-user">Your answer: <span class="${wasCorrect ? 'question-review-correct' : 'question-review-wrong'}">${userAnswer !== null ? userAnswer : '<i>Skipped</i>'}</span></div>
+        <div>Correct answer: <span class="question-review-correct">${q.options[q.correct]}</span></div>
+        <div class="question-review-fact">Fact: ${q.fact || ''}</div>
+        <div class="question-review-ref">Reference: ${q.reference || ''}</div>
+      `;
+      els.questionReviewList.appendChild(item);
+    });
   }
 
   // Update welcome stats now (so returning home shows latest)
@@ -641,11 +669,9 @@ function evaluateAchievements(accuracy) {
   }
 
   // Always present these, mark earned if satisfied
-  if (state.longestStreak >= 10) gain('scripture_scholar', 'Scripture Scholar', '10 correct answers in a row');
-  else present('scripture_scholar', 'Scripture Scholar', '10 correct answers in a row');
+  if (state.longestStreak >= 10) gain('Bible student', 'Bible Student', '10 correct answers in a row');
+  else present('Bible student', 'Bible Student', '10 correct answers in a row');
 
-  if (state.correctCount === state.questions.length && state.questions.length > 0) gain('faithful_servant', 'Faithful Servant', 'Perfect score');
-  else present('faithful_servant', 'Faithful Servant', 'Perfect score');
 
   // Category mastery (earned when 80%+ in that category quiz of at least 8 Qs)
   const enoughQs = state.questions.length >= 8;
@@ -653,11 +679,11 @@ function evaluateAchievements(accuracy) {
   const inOT = sel === 'old testament' || (state.mode === 'daily' && state.questions.every(q => (q.category || '').toLowerCase() === 'old testament'));
   const inNT = sel === 'new testament' || (state.mode === 'daily' && state.questions.every(q => (q.category || '').toLowerCase() === 'new testament'));
 
-  if (enoughQs && inOT && accuracy >= 80) gain('ot_expert', 'Old Testament Expert', 'Score 80%+ on OT quiz (8+ questions)');
-  else present('ot_expert', 'Old Testament Expert', 'Score 80%+ on OT quiz (8+ questions)');
+  if (enoughQs && inOT && accuracy >= 80) gain('ot_expert', 'Hebrew Scripture Expert', 'Score 80%+ on OT quiz (8+ questions)');
+  else present('ot_expert', 'Hebrew Scripture Expert', 'Score 80%+ on OT quiz (8+ questions)');
 
-  if (enoughQs && inNT && accuracy >= 80) gain('nt_expert', 'New Testament Expert', 'Score 80%+ on NT quiz (8+ questions)');
-  else present('nt_expert', 'New Testament Expert', 'Score 80%+ on NT quiz (8+ questions)');
+  if (enoughQs && inNT && accuracy >= 80) gain('nt_expert', 'Greek scripture Expert', 'Score 80%+ on NT quiz (8+ questions)');
+  else present('nt_expert', 'Greek scripture Expert', 'Score 80%+ on NT quiz (8+ questions)');
 
   // Daily Challenger (complete a daily challenge)
   if (state.mode === 'daily') gain('daily_challenger', 'Daily Challenger', 'Complete a Daily Challenge');
@@ -831,4 +857,3 @@ toggleDarkmodeBtn.addEventListener('click', () => {
     console.error('Dark mode toggle error:', e);
   }
 });
- 
