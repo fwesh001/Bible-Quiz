@@ -38,6 +38,46 @@
   letter-spacing: 0.5px;
 }
 
+/* 🌞 Default Light Mode */
+:root {
+  --bg-color: #e5e7eb;         /* ash gray for light mode */
+  --text-color: #22223b;       /* deep slate, high contrast */
+  --card-bg: #ffffff;          /* pure white for cards/panels */
+  --brand-1: #2563eb;          /* vibrant blue */
+  --brand-2: #9333ea;          /* rich purple accent */
+  --sidebar-btn-hover: #4338ca;/* deep blue for hover */
+}
+
+/* 🌙 Dark Mode */
+.dark-mode {
+  --bg-color: #18181b;         /* near-black, not pure black */
+  --text-color: #f3f4f6;       /* very light gray for text */
+  --card-bg: #23233a;          /* deep blue-gray for cards */
+  --brand-1: #60a5fa;          /* lighter blue for buttons */
+  --brand-2: #a78bfa;          /* soft purple accent */
+  --sidebar-btn-hover: #6366f1;/* lighter blue for hover */
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+.sidebar-btn {
+  background: var(--brand-1);
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.sidebar-btn:hover {
+  background: var(--sidebar-btn-hover);
+}
+
+/* Ensure sidebar-btn text is visible in dark mode */
+.dark-mode .sidebar-btn {
+  color: #f3f4f6;
+}
+
 /* Bible Quiz Styles */
 :root {
   --bg: #fef9c3;        /* light yellow background */

@@ -207,7 +207,8 @@ function startQuiz(mode = 'normal') {
   state.mode = mode;
   state.category = els.category.value;
   state.difficulty = els.difficulty ? els.difficulty.value : 'All';
-  state.timerEnabled = els.enableTimer.checked;
+  // Use state.timerEnabled instead of els.enableTimer
+  state.timerEnabled = typeof state.timerEnabled === 'boolean' ? state.timerEnabled : true;
   state.timeLeft = state.timeLimit;
   state.index = 0;
   state.score = 0;
@@ -270,7 +271,7 @@ function startQuiz(mode = 'normal') {
       const n = parseInt(els.numQuestions.value, 10);
       if (!isNaN(n)) requested = n;
     }
-    requested = Math.max(1, Math.min(50, requested));
+    requested = Math.max(1, Math.min(100, requested));
     const count = Math.min(requested, pool.length);
     // Shuffle question order randomly, then randomize options randomly
     const picked = shuffle(pool).slice(0, count);
@@ -857,3 +858,19 @@ toggleDarkmodeBtn.addEventListener('click', () => {
     console.error('Dark mode toggle error:', e);
   }
 });
+
+// Timer toggle button logic
+const timerBtn = document.getElementById('enable-timer-btn');
+if (timerBtn) {
+  // Use els.enableTimerBtn for compatibility with game logic
+  els.enableTimerBtn = timerBtn;
+  // Default ON
+  state.timerEnabled = true;
+  timerBtn.textContent = state.timerEnabled ? 'Timer: ON' : 'Timer: OFF';
+  timerBtn.classList.toggle('active', state.timerEnabled);
+  timerBtn.addEventListener('click', () => {
+    state.timerEnabled = !state.timerEnabled;
+    timerBtn.textContent = state.timerEnabled ? 'Timer: ON' : 'Timer: OFF';
+    timerBtn.classList.toggle('active', state.timerEnabled);
+  });
+}
