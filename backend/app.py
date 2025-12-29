@@ -17,10 +17,20 @@ def init_db():
             question TEXT,
             option_a TEXT,
             option_b TEXT,
+            option_c TEXT,
+            option_d TEXT,
             correct_index INTEGER,
             status TEXT
         )
     ''')
+    conn.commit()
+    # Ensure older databases get the new columns if they were created without option_c/option_d
+    cursor.execute("PRAGMA table_info(pending_questions)")
+    cols = [row[1] for row in cursor.fetchall()]
+    if 'option_c' not in cols:
+        cursor.execute('ALTER TABLE pending_questions ADD COLUMN option_c TEXT')
+    if 'option_d' not in cols:
+        cursor.execute('ALTER TABLE pending_questions ADD COLUMN option_d TEXT')
     conn.commit()
     conn.close()
 
@@ -34,10 +44,16 @@ def add_question():
     # Save to the Pantry!
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
+    # Accept up to 4 options; fill missing with empty string
+    opts = data.get('options', [])
+    a = opts[0] if len(opts) > 0 else ''
+    b = opts[1] if len(opts) > 1 else ''
+    c = opts[2] if len(opts) > 2 else ''
+    d = opts[3] if len(opts) > 3 else ''
     cursor.execute('''
-        INSERT INTO pending_questions (question, option_a, option_b, correct_index, status)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (data['question'], data['options'][0], data['options'][1], data['correct'], 'PENDING'))
+        INSERT INTO pending_questions (question, option_a, option_b, option_c, option_d, correct_index, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ''', (data['question'], a, b, c, d, data.get('correct', 0), 'PENDING'))
     
     conn.commit()
     conn.close()
@@ -88,7 +104,7 @@ def get_live_questions():
         # We format it exactly like your original questions.js objects
         questions.append({
             "question": row['question'],
-            "options": [row['option_a'], row['option_b'], row['option_c'], row['option_d']],
+            "options": [row['option_a'] or '', row['option_b'] or '', row['option_c'] or '', row['option_d'] or ''],
             "correct": row['correct_index'],
             "category": "OLD TESTAMENT" # You can store this in DB too
         })
