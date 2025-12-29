@@ -164,7 +164,7 @@ const els = {
   encouragement: $('#encouragement'),
   restart: $('#btn-restart'),
   home: $('#btn-home'),
-  bestScore: $('#best-score'),
+  bestScore: $('#best-score'), 
   bestAcc: $('#best-accuracy'),
   bestStreak: $('#longest-streak-best'),
   achievementsBox: $('#achievements'),
@@ -786,133 +786,6 @@ if (els.modalSubmitConfirm) {
   });
 }
 
-// ===== Add Question modal & submission =====
-const btnOpenAddQuestion = document.getElementById('btn-open-add-question');
-const modalAddQuestion = document.getElementById('modal-add-question');
-const btnCancelAddQuestion = document.getElementById('btn-cancel-add-question');
-const btnSubmitAddQuestion = document.getElementById('btn-submit-add-question');
-const mailtoFallbackLink = document.getElementById('aq-mailto-fallback');
-
-function showAddQuestionModal(show) {
-  if (!modalAddQuestion) return;
-  if (show) {
-    modalAddQuestion.classList.add('show');
-    modalAddQuestion.setAttribute('aria-hidden', 'false');
-    const ta = document.getElementById('aq-question');
-    if (ta) ta.focus();
-  } else {
-    modalAddQuestion.classList.remove('show');
-    modalAddQuestion.setAttribute('aria-hidden', 'true');
-  }
-}
-
-function buildMailtoHref(data) {
-  const to = 'zabdielfwesh001@gmail.com';
-  const subject = encodeURIComponent('📜 Bible Quiz Question Contribution');
-  const bodyLines = [];
-  bodyLines.push('📌 Please fill in the details below and send:');
-  bodyLines.push('');
-  bodyLines.push('Question: ' + (data.question || ''));
-  bodyLines.push('Options:');
-  (data.options || []).forEach((o, i) => bodyLines.push(String.fromCharCode(65 + i) + ') ' + o));
-  bodyLines.push('Correct Answer: ' + (['A','B','C','D'][data.correct] || ''));
-  bodyLines.push('Reference: ' + (data.reference || ''));
-  bodyLines.push('Fact: ' + (data.fact || ''));
-  bodyLines.push('Category (Hebrew or Greek scriptures): ' + (data.category || ''));
-  bodyLines.push('Difficulty (Normal or Hard): ' + (data.difficulty || ''));
-  if (data.source_email) bodyLines.push('Contributor Email: ' + data.source_email);
-  const body = encodeURIComponent(bodyLines.join('\r\n'));
-  return `mailto:${to}?subject=${subject}&body=${body}`;
-}
-
-async function submitAddQuestion() {
-  const q = (document.getElementById('aq-question') || {}).value || '';
-  const o0 = (document.getElementById('aq-opt-0') || {}).value || '';
-  const o1 = (document.getElementById('aq-opt-1') || {}).value || '';
-  const o2 = (document.getElementById('aq-opt-2') || {}).value || '';
-  const o3 = (document.getElementById('aq-opt-3') || {}).value || '';
-  const correct = parseInt((document.getElementById('aq-correct') || {}).value || '0', 10);
-  const reference = (document.getElementById('aq-reference') || {}).value || '';
-  const fact = (document.getElementById('aq-fact') || {}).value || '';
-  const category = (document.getElementById('aq-category') || {}).value || '';
-  const difficulty = (document.getElementById('aq-difficulty') || {}).value || 'NORMAL';
-  const source_email = (document.getElementById('aq-email') || {}).value || '';
-
-  const options = [o0.trim(), o1.trim(), o2.trim(), o3.trim()].filter(s => s && s.length > 0);
-  if (!q.trim()) { alert('Please enter the question text.'); return; }
-  if (options.length < 2) { alert('Please provide at least two options.'); return; }
-  if (isNaN(correct) || correct < 0 || correct > 3 || !options[correct]) {
-    alert('Please choose a correct option that exists.');
-    return;
-  }
-
-  const payload = {
-    question: q.trim(),
-    options: options,
-    correct: correct,
-    reference: reference.trim(),
-    fact: fact.trim(),
-    category: category,
-    difficulty: difficulty,
-    source_email: source_email.trim() || undefined
-  };
-
-  // Update mailto fallback link in case network fails
-  if (mailtoFallbackLink) {
-    mailtoFallbackLink.setAttribute('href', buildMailtoHref(payload));
-  }
-
-  // Send to backend
-  try {
-    btnSubmitAddQuestion.disabled = true;
-    btnSubmitAddQuestion.textContent = 'Submitting...';
-    const resp = await fetch('http://127.0.0.1:8000/api/questions', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-    });
-    if (resp.ok) {
-      const json = await resp.json();
-      alert('Thanks — your question was submitted for review!');
-      // clear form
-      (document.getElementById('aq-question') || {}).value = '';
-      (document.getElementById('aq-opt-0') || {}).value = '';
-      (document.getElementById('aq-opt-1') || {}).value = '';
-      (document.getElementById('aq-opt-2') || {}).value = '';
-      (document.getElementById('aq-opt-3') || {}).value = '';
-      (document.getElementById('aq-reference') || {}).value = '';
-      (document.getElementById('aq-fact') || {}).value = '';
-      (document.getElementById('aq-email') || {}).value = '';
-      showAddQuestionModal(false);
-    } else {
-      const txt = await resp.text();
-      alert('Submission failed: ' + resp.status + ' ' + txt + '\nYou can send via email instead.');
-      // mailto fallback already set
-    }
-  } catch (e) {
-    console.error('Network error submitting question', e);
-    alert('Network error submitting question. You can send via email instead.');
-  } finally {
-    btnSubmitAddQuestion.disabled = false;
-    btnSubmitAddQuestion.textContent = 'Submit Question';
-  }
-}
-
-if (btnOpenAddQuestion) {
-  btnOpenAddQuestion.addEventListener('click', () => showAddQuestionModal(true));
-}
-if (btnCancelAddQuestion) {
-  btnCancelAddQuestion.addEventListener('click', () => showAddQuestionModal(false));
-}
-if (btnSubmitAddQuestion) {
-  btnSubmitAddQuestion.addEventListener('click', submitAddQuestion);
-}
-
-// Init
-// Ensure reference element is under the question (after fact)
-if (els.fact && els.ref && els.ref.parentElement && els.ref.parentElement.id === 'feedback') {
-  els.ref.classList.add('q-ref');
-  els.fact.insertAdjacentElement('afterend', els.ref);
-}
-updateWelcomeStats();
 
 const sidebar = document.getElementById('sidebar');
 const sidebarToggleBtn = document.getElementById('sidebar-toggle');
@@ -994,3 +867,41 @@ if (timerBtn) {
     timerBtn.classList.toggle('active', state.timerEnabled);
   });
 }
+
+// ========================
+// Add question logic
+// ========================
+
+// 1. Show the form when the "Add Question" button is clicked
+document.getElementById('addQuestionBtn').addEventListener('click', () => {
+    document.getElementById('questionModal').style.display = 'block';
+});
+
+// 2. Handle the actual submission
+document.getElementById('submitToBackend').addEventListener('click', () => {
+    // Grab the values from the input boxes
+    const questionData = {
+        question: document.getElementById('qText').value,
+        options: [
+            document.getElementById('qOptionA').value,
+            document.getElementById('qOptionB').value,
+            document.getElementById('qOptionC').value,
+            document.getElementById('qOptionD').value
+        ],
+        correct: 0, // You'll eventually want a dropdown for this
+        status: 'PENDING'
+    };
+
+    // Send it to the Python Kitchen!
+    fetch('http://127.0.0.1:5000/add-question', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(questionData)
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert("Server says: " + data.message);
+        document.getElementById('questionModal').style.display = 'none';
+    })
+    .catch(err => console.error("Error connecting to Python:", err));
+});

@@ -20,11 +20,26 @@
     </div>
     <div class="sidebar-item">
       <button id="toggle-darkmode">🌙 Dark Mode</button>
-    </div></button>
-    <div class="sidebar-item">
-      <button id="btn-open-add-question" class="sidebar-item" style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left; margin-top:0.5rem;" title="Submit a new Bible Quiz question">➕ Add Question</button>
     </div>
-    </div>
+    
+    <button 
+    id="addQuestionBtn"
+    class="sidebar-item" 
+    style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left; margin-top:0.5rem;"
+>
+    ➕ Add Question
+</button>
+
+<div id="questionModal" style="display:none; position:fixed; top:20%; left:30%; background:white; padding:20px; border:1px solid #ccc; color: black; z-index: 1000;">
+    <h3>Add a Scripture Question</h3>
+    <input type="text" id="qText" placeholder="Question Text"><br>
+    <input type="text" id="qOptionA" placeholder="Option A"><br>
+    <input type="text" id="qOptionB" placeholder="Option B"><br>
+    <input type="text" id="qOptionC" placeholder="Option C"><br>
+    <input type="text" id="qOptionD" placeholder="Option D"><br>
+    <button id="submitToBackend">Submit to Backend</button>
+    <button onclick="document.getElementById('questionModal').style.display='none'">Cancel</button>
+</div>
   </div>
 </div>
 
@@ -170,62 +185,6 @@
           <button id="btn-home" class="secondary">Home</button>
         </div>
       </section>
-      <div id="modal-add-question" class="modal" aria-hidden="true">
-        <div class="modal-backdrop"></div>
-        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="add-question-title">
-          <h3 id="add-question-title" style="margin:0">Submit a Question</h3>
-          <p class="subtitle" style="margin:8px 0 12px">Fill the form below to submit a question for review.</p>
-          <form id="form-add-question" style="display:block; gap:8px;">
-            <div class="controls" style="flex-direction:column; gap:8px;">
-              <label class="subtitle">Question</label>
-              <textarea id="aq-question" rows="3" style="width:100%"></textarea>
-
-              <label class="subtitle">Options (A - D)</label>
-              <input id="aq-opt-0" placeholder="Option A" style="width:100%" />
-              <input id="aq-opt-1" placeholder="Option B" style="width:100%" />
-              <input id="aq-opt-2" placeholder="Option C (optional)" style="width:100%" />
-              <input id="aq-opt-3" placeholder="Option D (optional)" style="width:100%" />
-
-              <label class="subtitle">Correct option</label>
-              <select id="aq-correct" style="width:100px">
-                <option value="0">A</option>
-                <option value="1">B</option>
-                <option value="2">C</option>
-                <option value="3">D</option>
-              </select>
-
-              <label class="subtitle">Reference (optional)</label>
-              <input id="aq-reference" placeholder="Genesis 1:1" style="width:100%" />
-
-              <label class="subtitle">Fact (optional)</label>
-              <input id="aq-fact" placeholder="Short fact or note" style="width:100%" />
-
-              <label class="subtitle">Category</label>
-              <select id="aq-category" style="width:100%">
-                <option value="Old Testament">Hebrew scriptures-(Old Testament)</option>
-                <option value="New Testament">Greek scriptures-(New Testament)</option>
-              </select>
-
-              <label class="subtitle">Difficulty</label>
-              <select id="aq-difficulty" style="width:100%">
-                <option value="NORMAL">Normal</option>
-                <option value="HARD">Hard</option>
-              </select>
-
-              <label class="subtitle">Your email (optional)</label>
-              <input id="aq-email" placeholder="you@example.com" style="width:100%" />
-            </div>
-            <div class="controls" style="justify-content:flex-end;margin-top:8px;">
-              <button type="button" id="btn-cancel-add-question" class="secondary">Cancel</button>
-              <button type="button" id="btn-submit-add-question" class="primary">Submit Question</button>
-            </div>
-            <div style="margin-top:8px; font-size:0.9rem; color:#555">
-              If the network fails you can <a id="aq-mailto-fallback" href="#">send via email</a> instead.
-            </div>
-          </form>
-        </div>
-      </div>
-
       <div id="modal-submit" class="modal" aria-hidden="true">
         <div class="modal-backdrop"></div>
         <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="submit-title">
