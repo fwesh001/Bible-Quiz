@@ -1,0 +1,25 @@
+<script>
+fetch('http://127.0.0.1:5000/admin/questions')
+  .then(res => res.json())
+  .then(data => {
+    const listDiv = document.getElementById('adminList');
+    data.forEach(q => {
+      listDiv.innerHTML += `
+        <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px;">
+          <p><strong>Question:</strong> ${q.question}</p>
+          <p><strong>Current Status:</strong> ${q.status}</p>
+          <button onclick="approve(${q.id})">✅ Approve Now</button>
+        </div>
+      `;
+    });
+  });
+
+function approve(id) {
+  fetch(`http://127.0.0.1:5000/admin/approve/${id}`, { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message);
+      location.reload();
+    });
+}
+</script>

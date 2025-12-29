@@ -44,5 +44,34 @@ def add_question():
     
     return jsonify({"status": "success", "message": "Saved to database!"}), 201
 
+
+@app.route('/admin/questions', methods=['GET'])
+def get_questions():
+    conn = sqlite3.connect(DB_NAME)
+    # This row_factory makes the data look like a Dictionary instead of a Tuple
+    conn.row_factory = sqlite3.Row 
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT * FROM pending_questions')
+    rows = cursor.fetchall()
+    
+    # Convert the database rows into a list of dictionaries so JS can read them
+    questions = [dict(row) for row in rows]
+    
+    conn.close()
+    return jsonify(questions)
+
+@app.route('/admin/approve/<int:q_id>', methods=['POST'])
+def approve_question(q_id):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.conn.cursor()
+    
+    # Change the status to APPROVED for this specific ID
+    cursor.execute('UPDATE pending_questions SET status = "APPROVED" WHERE id = ?', (q_id,))
+    
+    conn.commit()
+    conn.close()
+    return jsonify({"message": f"Question {q_id} approved!"})
+
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
