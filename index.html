@@ -190,15 +190,17 @@
           <button id="addQuestionBtn" style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left;">➕ Add Question</button>
         </div>
 
-        <div id="questionModal" style="display:none; position:fixed; top:20%; left:30%; background:white; padding:20px; border:1px solid #ccc; color: black; z-index: 1000;">
-            <h3>Add a Scripture Question</h3>
-            <input type="text" id="qText" placeholder="Question Text"><br>
-            <input type="text" id="qOptionA" placeholder="Option A"><br>
-            <input type="text" id="qOptionB" placeholder="Option B"><br>
-            <input type="text" id="qOptionC" placeholder="Option C"><br>
-            <input type="text" id="qOptionD" placeholder="Option D"><br>
-            <button id="submitToBackend">Submit to Backend</button>
-            <button onclick="document.getElementById('questionModal').style.display='none'">Cancel</button>
+        <div id="questionModal" class="question-modal" style="display:none;">
+            <h3 style="margin:0 0 8px">Add a Scripture Question</h3>
+            <input type="text" id="qText" placeholder="Question Text">
+            <input type="text" id="qOptionA" placeholder="Option A">
+            <input type="text" id="qOptionB" placeholder="Option B">
+            <input type="text" id="qOptionC" placeholder="Option C">
+            <input type="text" id="qOptionD" placeholder="Option D">
+            <div class="controls">
+              <button id="submitToBackend">Submit to Backend</button>
+              <button class="close-btn" onclick="closeQuestionModal()">Cancel</button>
+            </div>
         </div>
       </div>
     </div>

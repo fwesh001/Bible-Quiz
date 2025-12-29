@@ -890,8 +890,18 @@ if (timerBtn) {
 // ========================
 
 // 1. Show the form when the "Add Question" button is clicked
+const questionModal = document.getElementById('questionModal');
+function closeQuestionModal() {
+  if (!questionModal) return;
+  questionModal.classList.remove('show');
+  questionModal.style.display = 'none';
+}
+
 document.getElementById('addQuestionBtn').addEventListener('click', () => {
-    document.getElementById('questionModal').style.display = 'block';
+    if (!questionModal) return;
+    questionModal.style.display = 'block';
+    // trigger animated 'show' class
+    requestAnimationFrame(() => questionModal.classList.add('show'));
 });
 
 // 2. Handle the actual submission
@@ -917,8 +927,8 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
     })
     .then(res => res.json())
     .then(data => {
-        alert("Server says: " + data.message);
-        document.getElementById('questionModal').style.display = 'none';
+      alert("Server says: " + data.message);
+      closeQuestionModal();
     })
     .catch(err => console.error("Error connecting to Python:", err));
 });
@@ -930,11 +940,12 @@ document.addEventListener('click', (e) => {
     const anchor = e.target.closest && e.target.closest('a[href^="mailto:"]');
     if (!anchor) return;
     const href = anchor.getAttribute('href') || '';
-    if (href.startsWith('mailto:zabdielfwesh001@gmail.com')) {
+      if (href.startsWith('mailto:zabdielfwesh001@gmail.com')) {
       e.preventDefault();
       const modal = document.getElementById('questionModal');
       if (modal) {
         modal.style.display = 'block';
+        requestAnimationFrame(() => modal.classList.add('show'));
         const first = modal.querySelector('input, textarea, button');
         if (first && typeof first.focus === 'function') first.focus();
       }

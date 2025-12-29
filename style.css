@@ -566,6 +566,53 @@ body.dark-mode .sidebar {
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
+/* Add Question modal (themed + animated) */
+.question-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.98);
+  width: min(520px, 92vw);
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border, rgba(0,0,0,0.08));
+  border-radius: 12px;
+  padding: 18px;
+  z-index: 1200;
+  box-shadow: 0 30px 80px rgba(2,6,23,0.32);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .22s ease;
+}
+.question-modal.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+  animation: modal-enter .26s cubic-bezier(.2,.9,.2,1);
+}
+
+@keyframes modal-enter {
+  from { opacity: 0; transform: translate(-50%, -46%) scale(0.98); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.question-modal input[type="text"], .question-modal input[type="number"], .question-modal textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  margin: 8px 0;
+  background: var(--panel-2);
+  color: var(--text);
+}
+.question-modal .controls { display:flex; gap:10px; justify-content:flex-end; margin-top:8px }
+.question-modal button#submitToBackend { background: linear-gradient(180deg, var(--brand), #5b21b6); color:#fff; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; }
+.question-modal button.close-btn { background: transparent; color: var(--text); border:1px solid rgba(0,0,0,0.08); padding:8px 10px; border-radius:8px; cursor:pointer; }
+
+@media (max-width: 600px) {
+  .question-modal { width: 92vw; left:50%; top:50%; transform: translate(-50%,-50%); }
+}
+
 @media (max-width: 600px) {
   .quiz-grid { grid-template-columns: 1fr; }
   .quiz-head { grid-template-columns: 1fr; }
