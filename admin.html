@@ -11,33 +11,53 @@
   <div id="adminList">Loading…</div>
 
   <script>
-  fetch('http://127.0.0.1:5000/admin/questions')
-    .then(res => res.json())
-    .then(data => {
-      const listDiv = document.getElementById('adminList');
-      listDiv.innerHTML = '';
-      if (!Array.isArray(data) || data.length === 0) {
-        listDiv.textContent = 'No pending questions.';
-        return;
-      }
-      data.forEach(q => {
-        listDiv.innerHTML += `
-          <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px; background: #fff;">
-            <p><strong>Question:</strong> ${q.question}</p>
-            <p><strong>Current Status:</strong> ${q.status}</p>
-            <button onclick="approve(${q.id})">✅ Approve Now</button>
-          </div>`;
-      });
-    })
-    .catch(err => {
-      const listDiv = document.getElementById('adminList');
-      listDiv.textContent = 'Error loading questions: ' + err.message;
-      console.error(err);
-    });
+  // Prompt admin for password before loading dashboard
+  const adminPassword = prompt("Enter Admin Password:");
+  if (adminPassword === "hacking") {
+    loadAdminDashboard();
+  } else {
+    alert("Access Denied");
+    // send them back to the main quiz
+    window.location.href = "index.html";
+  }
 
-  function approve(id) {
-    fetch(`http://127.0.0.1:5000/admin/approve/${id}`, { method: 'POST' })
+  // Load and render pending questions (called only after correct password)
+  function loadAdminDashboard() {
+    fetch('http://127.0.0.1:5000/admin/questions')
       .then(res => res.json())
+      .then(data => {
+        const listDiv = document.getElementById('adminList');
+        listDiv.innerHTML = '';
+        if (!Array.isArray(data) || data.length === 0) {
+          listDiv.textContent = 'No pending questions.';
+          return;
+        }
+        data.forEach(q => {
+          listDiv.innerHTML += `
+            <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px; background: #fff;">
+              <p><strong>Question:</strong> ${q.question}</p>
+              <p><strong>Current Status:</strong> ${q.status}</p>
+              <button onclick="approve(${q.id})">✅ Approve Now</button>
+            </div>`;
+        });
+      })
+      .catch(err => {
+        const listDiv = document.getElementById('adminList');
+        listDiv.textContent = 'Error loading questions: ' + err.message;
+        console.error(err);
+      });
+  }
+
+  // Approve a question; include Admin-Key header with the password entered above
+  function approve(id) {
+    fetch(`http://127.0.0.1:5000/admin/approve/${id}`, { 
+      method: 'POST',
+      headers: { 'Admin-Key': adminPassword }
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Server returned ' + res.status);
+        return res.json();
+      })
       .then(data => {
         alert(data.message || 'Approved');
         location.reload();

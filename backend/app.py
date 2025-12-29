@@ -79,6 +79,11 @@ def get_questions():
 
 @app.route('/admin/approve/<int:q_id>', methods=['POST'])
 def approve_question(q_id):
+    # Check the "Admin-Key" header
+    admin_key = request.headers.get('Admin-Key')
+    if admin_key != "hacking":
+        return jsonify({"message": "Unauthorized"}), 401
+
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     
