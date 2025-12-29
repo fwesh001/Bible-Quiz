@@ -75,11 +75,4 @@ Questions are stored in `questions.js` in the `bibleQuestions` array. Each quest
 Send question submissions or feedback to: zabdielfwesh001@gmail.com
 
 ---
-
-## 📄 License
-
-This repository does not include a license file. If you want this project to be open-source, consider adding a `LICENSE` (e.g., MIT) and updating the README accordingly.
-
----
-
 Made with care for learning Scripture. 🙏
