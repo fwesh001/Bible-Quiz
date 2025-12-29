@@ -1,25 +1,49 @@
-<script>
-fetch('http://127.0.0.1:5000/admin/questions')
-  .then(res => res.json())
-  .then(data => {
-    const listDiv = document.getElementById('adminList');
-    data.forEach(q => {
-      listDiv.innerHTML += `
-        <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px;">
-          <p><strong>Question:</strong> ${q.question}</p>
-          <p><strong>Current Status:</strong> ${q.status}</p>
-          <button onclick="approve(${q.id})">✅ Approve Now</button>
-        </div>
-      `;
-    });
-  });
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard - Pending Questions</title>
+  <style>body{font-family:system-ui,Segoe UI,Roboto,Arial;margin:18px} #adminList>div{background:#fff}</style>
+</head>
+<body>
+  <h1>Admin Dashboard - Pending Questions</h1>
+  <div id="adminList">Loading…</div>
 
-function approve(id) {
-  fetch(`http://127.0.0.1:5000/admin/approve/${id}`, { method: 'POST' })
+  <script>
+  fetch('http://127.0.0.1:5000/admin/questions')
     .then(res => res.json())
     .then(data => {
-      alert(data.message);
-      location.reload();
+      const listDiv = document.getElementById('adminList');
+      listDiv.innerHTML = '';
+      if (!Array.isArray(data) || data.length === 0) {
+        listDiv.textContent = 'No pending questions.';
+        return;
+      }
+      data.forEach(q => {
+        listDiv.innerHTML += `
+          <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px; background: #fff;">
+            <p><strong>Question:</strong> ${q.question}</p>
+            <p><strong>Current Status:</strong> ${q.status}</p>
+            <button onclick="approve(${q.id})">✅ Approve Now</button>
+          </div>`;
+      });
+    })
+    .catch(err => {
+      const listDiv = document.getElementById('adminList');
+      listDiv.textContent = 'Error loading questions: ' + err.message;
+      console.error(err);
     });
-}
-</script>
+
+  function approve(id) {
+    fetch(`http://127.0.0.1:5000/admin/approve/${id}`, { method: 'POST' })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message || 'Approved');
+        location.reload();
+      })
+      .catch(err => { alert('Approve failed: ' + err.message); console.error(err); });
+  }
+  </script>
+</body>
+</html>

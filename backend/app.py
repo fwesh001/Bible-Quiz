@@ -64,7 +64,7 @@ def get_questions():
 @app.route('/admin/approve/<int:q_id>', methods=['POST'])
 def approve_question(q_id):
     conn = sqlite3.connect(DB_NAME)
-    cursor = conn.conn.cursor()
+    cursor = conn.cursor()
     
     # Change the status to APPROVED for this specific ID
     cursor.execute('UPDATE pending_questions SET status = "APPROVED" WHERE id = ?', (q_id,))
