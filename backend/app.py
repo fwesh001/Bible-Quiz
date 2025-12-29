@@ -73,5 +73,28 @@ def approve_question(q_id):
     conn.close()
     return jsonify({"message": f"Question {q_id} approved!"})
 
+@app.route('/questions/live', methods=['GET'])
+def get_live_questions():
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    # Only grab the ones you clicked "Approve" on!
+    cursor.execute('SELECT * FROM pending_questions WHERE status = "APPROVED"')
+    rows = cursor.fetchall()
+    
+    questions = []
+    for row in rows:
+        # We format it exactly like your original questions.js objects
+        questions.append({
+            "question": row['question'],
+            "options": [row['option_a'], row['option_b'], row['option_c'], row['option_d']],
+            "correct": row['correct_index'],
+            "category": "OLD TESTAMENT" # You can store this in DB too
+        })
+    
+    conn.close()
+    return jsonify(questions)
+
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
