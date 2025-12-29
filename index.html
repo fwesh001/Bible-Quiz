@@ -9,40 +9,6 @@
 <body>
   <header>
     <h1>📜 Bible Quiz</h1>
-<!-- Sidebar -->
-<div id="sidebar" class="sidebar">
-  <div class="sidebar-header">
-    <h3>Menu</h3>
-  </div>
-  <div class="sidebar-content">
-    <div class="sidebar-item">
-      <button id="toggle-mute"> 🔇 Mute </button>
-    </div>
-    <div class="sidebar-item">
-      <button id="toggle-darkmode">🌙 Dark Mode</button>
-    </div>
-    
-    <button 
-    id="addQuestionBtn"
-    class="sidebar-item" 
-    style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left; margin-top:0.5rem;"
->
-    ➕ Add Question
-</button>
-
-<div id="questionModal" style="display:none; position:fixed; top:20%; left:30%; background:white; padding:20px; border:1px solid #ccc; color: black; z-index: 1000;">
-    <h3>Add a Scripture Question</h3>
-    <input type="text" id="qText" placeholder="Question Text"><br>
-    <input type="text" id="qOptionA" placeholder="Option A"><br>
-    <input type="text" id="qOptionB" placeholder="Option B"><br>
-    <input type="text" id="qOptionC" placeholder="Option C"><br>
-    <input type="text" id="qOptionD" placeholder="Option D"><br>
-    <button id="submitToBackend">Submit to Backend</button>
-    <button onclick="document.getElementById('questionModal').style.display='none'">Cancel</button>
-</div>
-  </div>
-</div>
-
 <!-- Sidebar Toggle Button -->
 <button id="sidebar-toggle" class="sidebar-open-btn">☰
 
@@ -213,25 +179,26 @@
         </button>
       </div>
       <div class="sidebar-content">
-        <div class="s-item">
-          <div class="s-text">
-            <div class="s-title">Dark Mode</div>
-            <div class="s-sub">Switch between light and dark themes</div>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="toggle-dark" />
-            <span class="slider"></span>
-          </label>
+        <!-- Moved header controls here so they appear inside the sidebar -->
+        <div class="sidebar-item">
+          <button id="toggle-mute-btn">🔇 Mute</button>
         </div>
-        <div class="s-item">
-          <div class="s-text">
-            <div class="s-title">Mute Sounds</div>
-            <div class="s-sub">Mute/unmute sound effects globally</div>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="toggle-mute" />
-            <span class="slider"></span>
-          </label>
+        <div class="sidebar-item">
+          <button id="toggle-darkmode">🌙 Dark Mode</button>
+        </div>
+        <div class="sidebar-item">
+          <button id="addQuestionBtn" style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left;">➕ Add Question</button>
+        </div>
+
+        <div id="questionModal" style="display:none; position:fixed; top:20%; left:30%; background:white; padding:20px; border:1px solid #ccc; color: black; z-index: 1000;">
+            <h3>Add a Scripture Question</h3>
+            <input type="text" id="qText" placeholder="Question Text"><br>
+            <input type="text" id="qOptionA" placeholder="Option A"><br>
+            <input type="text" id="qOptionB" placeholder="Option B"><br>
+            <input type="text" id="qOptionC" placeholder="Option C"><br>
+            <input type="text" id="qOptionD" placeholder="Option D"><br>
+            <button id="submitToBackend">Submit to Backend</button>
+            <button onclick="document.getElementById('questionModal').style.display='none'">Cancel</button>
         </div>
       </div>
     </div>

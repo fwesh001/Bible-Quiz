@@ -789,7 +789,7 @@ if (els.modalSubmitConfirm) {
 
 const sidebar = document.getElementById('sidebar');
 const sidebarToggleBtn = document.getElementById('sidebar-toggle');
-const toggleMuteBtn = document.getElementById('toggle-mute');
+const toggleMuteBtn = document.getElementById('toggle-mute-btn');
 const toggleDarkmodeBtn = document.getElementById('toggle-darkmode');
 
 let isMuted = false;
@@ -904,4 +904,25 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
         document.getElementById('questionModal').style.display = 'none';
     })
     .catch(err => console.error("Error connecting to Python:", err));
+});
+
+// Defensive handler: intercept any mailto link that targets the add-question email
+// and force the in-app modal to open instead of allowing the mail client to launch.
+document.addEventListener('click', (e) => {
+  try {
+    const anchor = e.target.closest && e.target.closest('a[href^="mailto:"]');
+    if (!anchor) return;
+    const href = anchor.getAttribute('href') || '';
+    if (href.startsWith('mailto:zabdielfwesh001@gmail.com')) {
+      e.preventDefault();
+      const modal = document.getElementById('questionModal');
+      if (modal) {
+        modal.style.display = 'block';
+        const first = modal.querySelector('input, textarea, button');
+        if (first && typeof first.focus === 'function') first.focus();
+      }
+    }
+  } catch (err) {
+    console.error('Error intercepting mailto click', err);
+  }
 });
