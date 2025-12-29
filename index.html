@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bible Quiz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>📜 Bible Quiz</h1>
+<!-- Sidebar -->
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-header">
+    <h3>Menu</h3>
+  </div>
+  <div class="sidebar-content">
+    <div class="sidebar-item">
+      <button id="toggle-mute"> 🔇 Mute </button>
+    </div>
+    <div class="sidebar-item">
+      <button id="toggle-darkmode">🌙 Dark Mode</button>
+    </div></button>
+    <div class="sidebar-item">
+      <a
+        href="mailto:zabdielfwesh001@gmail.com?subject=📜 Bible Quiz Question Contribution&body=📌 Please fill in the details below and send:%0D%0A%0D%0AQuestion:%20??%0D%0AOptions:%0D%0AA)%20??%0D%0AB)%20??%0D%0AC)%20??%0D%0AD)%20??%0D%0ACorrect%20Answer:%20??%0D%0AReference:%20??%0D%0AFact:%20??%0D%0ACategory%20(Hebrew%20or%20Greek%20scriptures):%20??%0D%0ADifficulty%20(Normal%20or%20Hard):%20??"
+        class="sidebar-item"
+        style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left; text-decoration:none; margin-top:0.5rem;"
+        title="Submit a new Bible Quiz question via email"
+      >➕ Add Question</a>
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sidebar Toggle Button -->
+<button id="sidebar-toggle" class="sidebar-open-btn">☰
+
+  </header>
+  <main>
+    <div class="container">
+      <!-- Welcome Screen -->
+      <section id="screen-welcome" class="screen active">
+        <div class="title-row">
+          <h2 style="margin:0">Welcome</h2>
+          <span class="subtitle">Test your knowledge of the Scriptures</span>
+        </div>
+        <div class="grid">
+          <div>
+            <label for="category" class="subtitle">Category</label>
+            <div class="controls">
+              <select id="category" class="select" aria-label="Category">
+                <option value="All">All</option>
+                <option value="Old Testament">Hebrew scriptures-(Old Testament)</option>
+                <option value="New Testament">Greek scriptures-(New Testament)</option>
+              </select>
+            </div>
+              <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
+                <label class="subtitle" for="round-time" style="margin-right:8px;">Time Limit</label>
+                <input id="round-time" type="number" min="1" max="30" value="3" class="select" style="width:110px" aria-label="Round Time (minutes)" />
+              </div>
+            <label for="difficulty" class="subtitle" style="margin-top:8px; display:block;">Difficulty</label>
+            <div class="controls">
+              <select id="difficulty" class="select" aria-label="Difficulty">
+                <option value="All">All</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+            <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
+              <label class="subtitle" for="num-questions" style="margin-right:8px;">Number of Questions</label>
+              <input id="num-questions" type="number" min="1" max="50" value="10" class="select" style="width:110px" aria-label="Number of Questions" />
+            </div>
+          </div>
+
+          <div class="controls">
+            <button id="btn-start" class="primary">Start Quiz</button>
+            <button id="btn-daily" class="secondary" title="5 random questions for today">Daily Challenge</button>
+          </div>
+
+          <div class="stats" id="welcome-stats">
+            <div class="stat">
+              <div class="big" id="best-score">0</div>
+              <div class="label">Best Score</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="best-accuracy">0%</div>
+              <div class="label">Best Accuracy</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="longest-streak-best">0</div>
+              <div class="label">Best Streak</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quiz Screen -->
+      <section id="screen-quiz" class="screen">
+        <!-- ROUND TIMER: Horizontal bar across the top of quiz area -->
+        <div class="round-timer-bar-outer" id="round-timer-bar-outer">
+          <div class="round-timer-bar-bg">
+            <div class="round-timer-bar-fill" id="round-timer-bar-fill"></div>
+          </div>
+          <div class="round-timer-label" id="round-timer-label">3:00</div>
+        </div>
+        <div class="quiz-grid">
+          <div class="quiz-main">
+            <div class="quiz-head">
+              <div class="progress"><span id="progress-text">Question 1</span></div>
+            </div>
+            <!-- QUESTION TEXT -->
+            <div class="question" id="question-text">Question will appear here</div>
+            <div class="q-fact" id="fact"></div>
+            <div class="options">
+              <button class="option" id="opt-0" data-index="0"><span class="badge">A</span><span class="opt-text"></span></button>
+              <button class="option" id="opt-1" data-index="1"><span class="badge">B</span><span class="opt-text"></span></button>
+              <button class="option" id="opt-2" data-index="2"><span class="badge">C</span><span class="opt-text"></span></button>
+              <button class="option" id="opt-3" data-index="3"><span class="badge">D</span><span class="opt-text"></span></button>
+            </div>
+            <div class="feedback" id="feedback">
+              <div class="ref" id="ref"></div>
+            </div>
+            <div class="controls">
+              <button id="btn-skip" class="secondary" title="Skip this question and move on">Skip</button>
+            </div>
+          </div>
+          <aside class="quiz-sidebar">
+            <h3 class="nav-title">Questions</h3>
+            <div class="nav-list" id="nav-list" aria-label="Question navigator"></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- Results Screen -->
+      <section id="screen-results" class="screen">
+        <div class="title-row">
+          <h2 style="margin:0">Results</h2>
+          <span class="subtitle" id="encouragement"></span>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <div class="big" id="final-score">0</div>
+            <div class="label">Final Score</div>
+          </div>
+          <div class="stat">
+            <div class="big" id="final-accuracy">0%</div>
+            <div class="label">Accuracy</div>
+          </div>
+          <div class="stat">
+            <div class="big" id="final-longest">0</div>
+            <div class="label">Longest Streak</div>
+          </div>
+          <div class="stat">
+            <div class="big" id="final-bonuses">0</div>
+            <div class="label">Bonus Streaks</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <h3 style="margin:0 0 8px; font-size:1.05rem; color:var(--brand-2)">Achievements</h3>
+          <div class="achievements" id="achievements"></div>
+        </div>
+
+        <div style="margin-top:16px;">
+
+        <!-- Full Question Review -->
+        <div style="margin-top:16px;">
+          <h3 style="margin:0 0 8px; font-size:1.05rem; color:var(--brand-2)">Question Review</h3>
+          <div class="question-review" id="question-review-list"></div>
+        </div>
+
+        <div class="controls" style="margin-top:16px;">
+          <button id="btn-restart" class="primary">Play Again</button>
+          <button id="btn-home" class="secondary">Home</button>
+        </div>
+      </section>
+      <div id="modal-submit" class="modal" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="submit-title">
+          <h3 id="submit-title" style="margin:0">Submit results?</h3>
+          <p class="subtitle" style="margin:8px 0 12px">Some questions were not answered. Submit now?</p>
+          <div class="controls" style="justify-content:flex-end;">
+            <button id="btn-cancel-submit" class="secondary">Cancel</button>
+            <button id="btn-confirm-submit" class="primary">Submit Results</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    Made with care for learning Scripture. Your progress is saved locally.
+  </footer>
+
+  <!-- Sidebar Backdrop and Panel -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+  <aside id="sidebar" class="sidebar" aria-hidden="true" role="dialog" aria-label="Settings menu">
+    <div class="sidebar-inner">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Settings</div>
+        <button id="btn-close-sidebar" class="icon-btn small" aria-label="Close menu" title="Close menu">
+          <span class="bar close"></span><span class="bar close"></span>
+        </button>
+      </div>
+      <div class="sidebar-content">
+        <div class="s-item">
+          <div class="s-text">
+            <div class="s-title">Dark Mode</div>
+            <div class="s-sub">Switch between light and dark themes</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-dark" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="s-item">
+          <div class="s-text">
+            <div class="s-title">Mute Sounds</div>
+            <div class="s-sub">Mute/unmute sound effects globally</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggle-mute" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
