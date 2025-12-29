@@ -184,6 +184,23 @@ const els = {
   questionReviewList: document.getElementById('question-review-list')
 };
 
+  // Ensure `bibleQuestions` exists (may be defined in questions.js). If not, initialize empty.
+  if (typeof bibleQuestions === 'undefined') {
+    bibleQuestions = [];
+  }
+
+  // Go get the approved questions from the kitchen
+  fetch('http://127.0.0.1:5000/questions/live')
+    .then(res => res.json())
+    .then(data => {
+      bibleQuestions = data; 
+      console.log("Quiz Loaded with", bibleQuestions.length, "questions!");
+      // Now you can call your function to start the quiz
+    })
+    .catch(err => {
+      console.error('Failed to load live questions:', err);
+    });
+
 // ========================
 // Screen Navigation
 // ========================
