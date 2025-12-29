@@ -36,6 +36,8 @@
           listDiv.innerHTML += `
             <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px; background: #fff;">
               <p><strong>Question:</strong> ${q.question}</p>
+              <p><strong>Options:</strong> A) ${q.option_a} | B) ${q.option_b} | C) ${q.option_c} | D) ${q.option_d}</p>
+              <p><strong>Answer:</strong> ${q.answer}</p>
               <p><strong>Current Status:</strong> ${q.status}</p>
               <button onclick="approve(${q.id})">✅ Approve Now</button>
             </div>`;
