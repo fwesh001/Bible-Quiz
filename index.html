@@ -200,6 +200,23 @@
             <input type="text" id="qOptionB" placeholder="Option B">
             <input type="text" id="qOptionC" placeholder="Option C">
             <input type="text" id="qOptionD" placeholder="Option D">
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <label class="subtitle" for="qCorrect" style="margin:0">Correct:</label>
+              <select id="qCorrect" aria-label="Correct option">
+                <option value="0">A</option>
+                <option value="1">B</option>
+                <option value="2">C</option>
+                <option value="3">D</option>
+              </select>
+              <label class="subtitle" for="qCategory" style="margin:0 0 0 12px">Category:</label>
+              <select id="qCategory" aria-label="Question category">
+                <option value="All">All</option>
+                <option value="New Testament">New Testament</option>
+                <option value="Old Testament">Old Testament</option>
+              </select>
+            </div>
+            <input type="text" id="qReference" placeholder="Reference (e.g. John 3:16)" style="margin-top:8px;" />
+            <textarea id="qFact" placeholder="Fact (optional)" style="margin-top:8px; width:100%; min-height:60px"></textarea>
             <div class="controls">
               <button id="submitToBackend">Submit to Backend</button>
               <button class="close-btn" onclick="closeQuestionModal()">Cancel</button>

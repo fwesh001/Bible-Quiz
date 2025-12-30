@@ -36,3 +36,20 @@ button[onclick]:hover{transform:translateY(-2px);filter:brightness(1.06)}
 
 /* accessibility focus */
 button:focus{outline:2px solid rgba(0,229,255,0.12);outline-offset:2px}
+
+/* Table and form elements for admin UI */
+#questions-table { width: 100%; border-collapse: collapse; color: #e6eef8; }
+#questions-table thead th { text-align: left; padding: 8px 10px; color: var(--accent); font-weight:700; border-bottom:1px solid var(--border); }
+#questions-table tbody td { padding: 8px 10px; border-bottom: 1px dashed rgba(255,255,255,0.03); vertical-align: top; }
+#questions-table input, #questions-table textarea, #questions-table select { width:100%; padding:8px; border-radius:6px; border:1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); color: #dbeafe; }
+#questions-table textarea { min-height:48px; }
+#questions-table button { padding:6px 10px; border-radius:6px; cursor:pointer; border:none; }
+#questions-table button[data-action="save"] { background: linear-gradient(90deg,var(--accent),#7c3aed); color:#041022; }
+#questions-table button[data-action="approve"] { background: linear-gradient(90deg,#22c55e,#16a34a); color:#041022; }
+#questions-table button[data-action="del"] { background: linear-gradient(90deg,#ef4444,#dc2626); color:#041022; }
+
+/* Page-level buttons */
+button.primary { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color: #041022; padding:8px 12px; border-radius:8px; }
+button.secondary { background: transparent; color: var(--accent-2); border:1px solid rgba(255,255,255,0.04); padding:8px 12px; border-radius:8px; }
+
+@media (max-width:800px){ #questions-table thead { display:none } #questions-table tbody td { display:block; } }

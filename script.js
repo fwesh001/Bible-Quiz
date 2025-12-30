@@ -895,6 +895,13 @@ function closeQuestionModal() {
   if (!questionModal) return;
   questionModal.classList.remove('show');
   questionModal.style.display = 'none';
+  // clear fields
+  try {
+    const ids = ['qText','qOptionA','qOptionB','qOptionC','qOptionD','qReference','qFact'];
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    const sel = document.getElementById('qCorrect'); if (sel) sel.value = '0';
+    const cat = document.getElementById('qCategory'); if (cat) cat.value = 'All';
+  } catch (e) { /* ignore */ }
 }
 
 document.getElementById('addQuestionBtn').addEventListener('click', () => {
@@ -908,15 +915,18 @@ document.getElementById('addQuestionBtn').addEventListener('click', () => {
 document.getElementById('submitToBackend').addEventListener('click', () => {
     // Grab the values from the input boxes
     const questionData = {
-        question: document.getElementById('qText').value,
-        options: [
-            document.getElementById('qOptionA').value,
-            document.getElementById('qOptionB').value,
-            document.getElementById('qOptionC').value,
-            document.getElementById('qOptionD').value
-        ],
-        correct: 0, // You'll eventually want a dropdown for this
-        status: 'PENDING'
+      question: document.getElementById('qText').value,
+      options: [
+        document.getElementById('qOptionA').value,
+        document.getElementById('qOptionB').value,
+        document.getElementById('qOptionC').value,
+        document.getElementById('qOptionD').value
+      ],
+      correct: parseInt(document.getElementById('qCorrect')?.value || '0', 10),
+      category: document.getElementById('qCategory')?.value || 'All',
+      reference: document.getElementById('qReference')?.value || '',
+      fact: document.getElementById('qFact')?.value || '',
+      status: 'PENDING'
     };
 
     // Send it to the Python Kitchen!
@@ -928,6 +938,7 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
     .then(res => res.json())
     .then(data => {
       alert("Server says: " + data.message);
+      // clear and close
       closeQuestionModal();
     })
     .catch(err => console.error("Error connecting to Python:", err));
