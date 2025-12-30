@@ -1034,7 +1034,7 @@ if (adminLoginBtn) {
     if (adminClickTimer) clearTimeout(adminClickTimer);
     // reset click count after 10s of inactivity
     adminClickTimer = setTimeout(resetAdminClicks, 10000);
-    if (adminClickCount >= 2) {
+    if (adminClickCount >= 5) {
       resetAdminClicks();
       // Open the admin login modal and close the sidebar
       showAdminLogin(true);
