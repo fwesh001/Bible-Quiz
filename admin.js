@@ -13,6 +13,29 @@
     return sessionStorage.getItem('adminKey') || null;
   }
 
+  // Local toast helper (mirrors main app)
+  function showToast(message, type='info', timeout=3500) {
+    try {
+      // Try to find toast container on page, otherwise create minimal toast using alert fallback
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+      }
+      const t = document.createElement('div');
+      t.className = 'toast ' + (type || 'info');
+      t.textContent = message;
+      container.appendChild(t);
+      const removeAfter = Math.max(800, timeout);
+      setTimeout(() => {
+        t.style.animation = 'toast-out 240ms ease-in forwards';
+        setTimeout(() => { try { container.removeChild(t); } catch(e){} }, 260);
+      }, removeAfter);
+    } catch (e) { try { alert(message); } catch(e){} }
+  }
+
   function setAdminKey(k){
     if(k) sessionStorage.setItem('adminKey', k);
     else sessionStorage.removeItem('adminKey');
@@ -127,7 +150,7 @@
       });
       if(!res.ok) throw new Error('Save failed');
       const j = await res.json();
-      alert(j.message || 'Saved');
+      showToast(j.message || 'Saved', 'success');
       loadQuestions();
     }catch(err){ alert('Save error: '+err.message); }
   }
@@ -137,7 +160,7 @@
       const res = await fetch(`${API_BASE}/admin/approve/${id}`, { method: 'POST', headers: {'Admin-Key': getAdminKey()} });
       if(!res.ok) throw new Error('Approve failed');
       const j = await res.json();
-      alert(j.message || 'Approved');
+      showToast(j.message || 'Approved', 'success');
       loadQuestions();
     }catch(err){ alert('Approve error: '+err.message); }
   }
@@ -148,7 +171,7 @@
       const res = await fetch(`${API_BASE}/admin/edit/${id}`, { method: 'POST', headers: {'Content-Type':'application/json','Admin-Key': getAdminKey()}, body: JSON.stringify({status: 'DELETED'}) });
       if(!res.ok) throw new Error('Delete failed');
       const j = await res.json();
-      alert(j.message || 'Deleted');
+      showToast(j.message || 'Deleted', 'success');
       loadQuestions();
     }catch(err){ alert('Delete error: '+err.message); }
   }

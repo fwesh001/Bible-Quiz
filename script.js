@@ -1,7 +1,6 @@
 // Bible Quiz Game Logic
 
 // ========================
-// Utilities
 // ========================
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
@@ -126,6 +125,29 @@ function loadHigh() {
   catch { return { bestScore: 0, bestAccuracy: 0, bestStreak: 0 }; }
 }
 function saveHigh(obj) { localStorage.setItem(STORAGE_KEYS.HIGH, JSON.stringify(obj)); }
+
+// ========================
+// Toast helper
+// ========================
+function showToast(message, type = 'info', timeout = 3500) {
+  try {
+    const container = document.getElementById('toast-container');
+    if (!container) return; // no-op if missing
+    const t = document.createElement('div');
+    t.className = 'toast ' + (type || 'info');
+    t.textContent = message;
+    container.appendChild(t);
+    // Auto-remove after timeout with fade-out
+    const removeAfter = Math.max(800, timeout);
+    setTimeout(() => {
+      t.style.animation = 'toast-out 240ms ease-in forwards';
+      setTimeout(() => { try { container.removeChild(t); } catch(e){} }, 260);
+    }, removeAfter);
+  } catch (err) {
+    // Fallback to console if toast creation fails
+    try { console.warn('Toast failed:', message, err); } catch(e){}
+  }
+}
 
 function loadAch() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.ACH)) || {}; }
@@ -266,7 +288,7 @@ function startQuiz(mode = 'normal') {
   }
   // Fallback if no questions match
   if (state.mode === 'normal' && pool.length === 0) {
-    alert('No questions match the selected Category and Difficulty. Showing all difficulties instead.');
+    showToast('No questions match the selected Category and Difficulty. Showing all difficulties instead.', 'warn', 4500);
     state.difficulty = 'All';
     if (els.difficulty) els.difficulty.value = 'All';
     pool = bibleQuestions;
@@ -964,7 +986,7 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
     })
     .then(res => res.json())
     .then(data => {
-      alert("Server says: " + data.message);
+      showToast("Server says: " + (data.message || ''), 'success');
       // clear and close
       closeQuestionModal();
     })
@@ -1047,7 +1069,7 @@ if (adminCancelBtn) adminCancelBtn.addEventListener('click', () => showAdminLogi
 
 if (adminSubmitBtn) adminSubmitBtn.addEventListener('click', () => {
   const pwd = adminPasswordInput ? adminPasswordInput.value : '';
-  if (!pwd) return alert('Enter password');
+  if (!pwd) { showToast('Enter password', 'warn'); return; }
 
   fetch('http://127.0.0.1:5000/admin/login', {
     method: 'POST',
@@ -1063,5 +1085,5 @@ if (adminSubmitBtn) adminSubmitBtn.addEventListener('click', () => {
     sessionStorage.setItem('adminKey', data.admin_key); 
     window.location.href = 'admin.html';
   })
-  .catch(err => alert(err.message));
+  .catch(err => showToast(err.message || 'Error', 'error'));
 });
