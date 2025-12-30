@@ -119,9 +119,3 @@ def get_live_questions():
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
-
-if __name__ == '__main__':
-    # Render provides a PORT environment variable
-    import os
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)

@@ -190,7 +190,7 @@ const els = {
   }
 
   // Go get the approved questions from the kitchen
-  fetch('https://bible-quiz-9lqy.onrender.com/questions/live')
+  fetch('http://127.0.0.1:5000/questions/live')
     .then(res => res.json())
     .then(data => {
       bibleQuestions = data; 
@@ -920,7 +920,7 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
     };
 
     // Send it to the Python Kitchen!
-    fetch('https://bible-quiz-9lqy.onrender.com/add-question', {
+    fetch('http://127.0.0.1:5000/add-question', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(questionData)
