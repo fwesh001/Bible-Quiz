@@ -170,6 +170,7 @@ const els = {
   achievementsBox: $('#achievements'),
   missedList: $('#missed-list'),
   navList: $('#nav-list'),
+  submitDuring: $('#btn-submit-quiz'),
   modalSubmit: $('#modal-submit'),
   modalSubmitConfirm: $('#btn-confirm-submit'),
   modalSubmitCancel: $('#btn-cancel-submit'),
@@ -349,8 +350,8 @@ function buildNavigator() {
     btn.textContent = String(i + 1);
     btn.dataset.index = String(i);
     btn.addEventListener('click', () => {
-      if (!state.accepting) return;
-      stopTimer();
+      // Allow navigation even if current question is locked; stop timers and jump.
+      stopQuestionTimer();
       state.streak = 0; // jumping breaks streak
       state.index = i;
       renderQuestion();
@@ -390,6 +391,25 @@ function renderQuestion() {
   els.fact.textContent = '';
   if (els.ref) els.ref.classList.remove('show');
   if (els.fact) els.fact.classList.remove('show');
+
+  // If this question was already answered, lock the options and show feedback
+  if (typeof q.userAnswer !== 'undefined' && q.userAnswer !== null) {
+    const correctIdx = q.correct;
+    els.opts.forEach((btn, i) => {
+      btn.classList.add('disabled');
+      if (i === correctIdx) btn.classList.add('correct');
+      if (q.userAnswer !== null && i === q.userAnswer && q.userAnswer !== correctIdx) btn.classList.add('wrong');
+      btn.disabled = true;
+    });
+    // show saved fact/reference
+    els.ref.textContent = q.reference || '';
+    if (els.ref) els.ref.classList.add('show');
+    els.fact.textContent = q.fact || '';
+    if (els.fact) els.fact.classList.add('show');
+    state.accepting = false;
+    updateNavigator();
+    return;
+  }
 
   els.progress.textContent = `Question ${state.index + 1} of ${state.questions.length}`;
   updateNavigator();
@@ -508,7 +528,7 @@ function stopRoundTimer() {
 
 // (Legacy timer functions kept for fallback, but not used)
 function startTimer() {}
-function stopTimer() {}
+function stopTimer() { stopQuestionTimer(); }
 
 function handleAnswerTimeout() {
   if (!state.accepting) return;
@@ -756,11 +776,18 @@ function showSubmitModal(show) {
 els.start.addEventListener('click', () => startQuiz('normal'));
 els.daily.addEventListener('click', () => startQuiz('daily'));
 
+if (els.submitDuring) {
+  els.submitDuring.addEventListener('click', () => {
+    // Show the submit confirmation modal during the quiz
+    showSubmitModal(true);
+  });
+}
+
 // Skip current question (does not affect score or accuracy; breaks streak)
 els.skip.addEventListener('click', () => {
   if (!state.accepting) return;
   state.accepting = false;
-  stopTimer();
+  stopQuestionTimer();
   const isLast = state.index === state.questions.length - 1;
   // On last question, prompt to submit
   if (isLast) {
@@ -777,7 +804,7 @@ els.opts.forEach(btn => {
   btn.addEventListener('click', () => {
     if (!state.accepting) return;
     state.accepting = false;
-    stopTimer();
+    stopQuestionTimer();
     const idx = parseInt(btn.dataset.index, 10);
     showAnswer(idx);
   });
