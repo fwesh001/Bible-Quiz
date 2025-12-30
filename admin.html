@@ -3,74 +3,54 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Dashboard - Pending Questions</title>
+  <title>Admin — Bible Quiz</title>
   <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Admin Dashboard - Pending Questions</h1>
-  <div id="adminList">Loading…</div>
+  <header>
+    <h1>Admin — Pending Questions</h1>
+    <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+      <button id="btn-back" class="secondary">Back</button>
+      <div id="admin-login-area" style="margin-left:12px;"></div>
+    </div>
+  </header>
 
-  <script>
-  // Prompt admin for password before loading dashboard
-  const adminKey = sessionStorage.getItem('adminKey');
+  <main style="padding:16px;">
+    <section id="login" style="margin-bottom:12px; display:none;">
+      <label class="subtitle">Admin Password</label>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input id="adminPassword" type="password" placeholder="Password" />
+        <button id="btn-do-login" class="primary">Login</button>
+      </div>
+      <div id="login-msg" class="subtitle" style="color:var(--wrong);"></div>
+    </section>
 
-if (!adminKey) {
-    alert("Access Denied: Please login from the home page.");
-    window.location.href = "index.html";
-} else {
-    loadAdminDashboard();
-}
+    <section id="controls" style="margin:10px 0; display:flex; gap:8px; align-items:center;">
+      <button id="btn-refresh" class="primary">Refresh</button>
+      <button id="btn-approve-all" class="secondary">Approve All</button>
+    </section>
 
-  // Load and render pending questions (called only after correct password)
-  function loadAdminDashboard() {
-    fetch('http://127.0.0.1:5000/admin/questions')
-      .then(res => res.json())
-      .then(data => {
-        const listDiv = document.getElementById('adminList');
-        listDiv.innerHTML = '';
-        if (!Array.isArray(data) || data.length === 0) {
-          listDiv.textContent = 'No pending questions.';
-          return;
-        }
-data.forEach(q => {
-  // Map the correct_index to a readable letter
-  const letters = ['A', 'B', 'C', 'D'];
-  const correctLetter = letters[q.correct_index] || 'N/A';
+    <section id="list">
+      <table id="questions-table" style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="text-align:left">ID</th>
+            <th style="text-align:left">Question</th>
+            <th>Options</th>
+            <th>Correct</th>
+            <th>Category</th>
+            <th>Reference</th>
+            <th>Fact</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="questions-body"></tbody>
+      </table>
+    </section>
+  </main>
 
-  listDiv.innerHTML += `
-    <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px; background: #fff; color: #333;">
-      <p><strong>Question:</strong> ${q.question}</p>
-      <p><strong>Options:</strong> A) ${q.option_a} | B) ${q.option_b} | C) ${q.option_c} | D) ${q.option_d}</p>
-      <p><strong>Correct Answer:</strong> ${correctLetter}</p>
-      <p><strong>Category:</strong> ${q.category}</p>
-      <p><strong>Status:</strong> <span style="color: ${q.status === 'APPROVED' ? 'green' : 'orange'}">${q.status}</span></p>
-      <button onclick="approve(${q.id})">✅ Approve Now</button>
-    </div>`;
-});  
-    })
-      .catch(err => {
-        const listDiv = document.getElementById('adminList');
-        listDiv.textContent = 'Error loading questions: ' + err.message;
-        console.error(err);
-      });
-  }
-
-  // Approve a question; include Admin-Key header with the password entered above
-function approve(id) {
-    fetch(`http://127.0.0.1:5000/admin/approve/${id}`, { 
-      method: 'POST',
-      headers: { 'Admin-Key': adminKey } // Use the key from storage
-    })
-          .then(res => {
-        if (!res.ok) throw new Error('Server returned ' + res.status);
-        return res.json();
-      })
-      .then(data => {
-        alert(data.message || 'Approved');
-        location.reload();
-      })
-      .catch(err => { alert('Approve failed: ' + err.message); console.error(err); });
-  }
-  </script>
+  <script src="admin.js"></script>
 </body>
 </html>

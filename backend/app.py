@@ -105,6 +105,49 @@ def approve_question(q_id):
     return jsonify({"message": f"Question {q_id} approved!"})
 
 
+@app.route('/admin/edit/<int:q_id>', methods=['POST', 'PUT', 'PATCH'])
+def edit_question(q_id):
+    # Require Admin-Key header for authentication
+    admin_key = request.headers.get('Admin-Key')
+    if not admin_key or admin_key != ADMIN_KEY:
+        return jsonify({"message": "Unauthorized"}), 401
+
+    data = request.json or {}
+    # Allowed fields that can be updated and their DB column names
+    allowed = {
+        'question': 'question',
+        'option_a': 'option_a',
+        'option_b': 'option_b',
+        'option_c': 'option_c',
+        'option_d': 'option_d',
+        'correct_index': 'correct_index',
+        'category': 'category',
+        'reference': 'reference',
+        'fact': 'fact',
+        'status': 'status'
+    }
+
+    updates = []
+    params = []
+    for key, col in allowed.items():
+        if key in data:
+            updates.append(f"{col} = ?")
+            params.append(data[key])
+
+    if not updates:
+        return jsonify({"message": "No valid fields provided"}), 400
+
+    params.append(q_id)
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    sql = f"UPDATE pending_questions SET {', '.join(updates)} WHERE id = ?"
+    cursor.execute(sql, params)
+    conn.commit()
+    conn.close()
+
+    return jsonify({"message": f"Question {q_id} updated."})
+
+
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
     data = request.json or {}
