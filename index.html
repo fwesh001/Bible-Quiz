@@ -189,6 +189,9 @@
         <div class="sidebar-item">
           <button id="addQuestionBtn" style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left;">➕ Add Question</button>
         </div>
+        <div class="sidebar-item">
+          <button id="adminLoginBtn">🔒 Admin</button>
+        </div>
 
         <div id="questionModal" class="question-modal" style="display:none;">
             <h3 style="margin:0 0 8px">Add a Scripture Question</h3>
@@ -202,11 +205,29 @@
               <button class="close-btn" onclick="closeQuestionModal()">Cancel</button>
             </div>
         </div>
+
+        <!-- Admin Login Modal placed inside sidebar for context with controls -->
+        <div id="adminLoginModal" class="modal" aria-hidden="true">
+          <div class="modal-backdrop"></div>
+          <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-login-title" style="max-width:400px;">
+            <h3 id="admin-login-title">Admin Login</h3>
+            <p class="subtitle">Enter admin password to view pending questions.</p>
+            <input id="adminPasswordInput" type="password" placeholder="Password" />
+            <div class="controls modal-controls">
+              <button id="adminCancelBtn" class="secondary">Cancel</button>
+              <button id="adminSubmitBtn" class="primary">Login</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </aside>
 
   <script src="questions.js"></script>
   <script src="script.js"></script>
+
+  <!-- Admin Login Modal (moved into sidebar) -->
+
+  <!-- adminSection removed: admin flow now uses hidden modal and redirects to admin.html -->
 </body>
 </html>

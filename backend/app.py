@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -7,10 +8,13 @@ CORS(app)
 
 DB_NAME = "quiz_data.db"
 
+# Admin credentials read from environment for safety
+ADMIN_KEY = os.environ.get('ADMIN_KEY', 'hacking')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'hacking')
+
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    # Create the table if it doesn't exist
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS pending_questions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -20,6 +24,9 @@ def init_db():
             option_c TEXT,
             option_d TEXT,
             correct_index INTEGER,
+            category TEXT,
+            reference TEXT,
+            fact TEXT,
             status TEXT
         )
     ''')
@@ -40,26 +47,29 @@ init_db()
 @app.route('/add-question', methods=['POST'])
 def add_question():
     data = request.json
-    
-    # Save to the Pantry!
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    # Accept up to 4 options; fill missing with empty string
-    opts = data.get('options', [])
-    a = opts[0] if len(opts) > 0 else ''
-    b = opts[1] if len(opts) > 1 else ''
-    c = opts[2] if len(opts) > 2 else ''
-    d = opts[3] if len(opts) > 3 else ''
-    cursor.execute('''
-        INSERT INTO pending_questions (question, option_a, option_b, option_c, option_d, correct_index, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    ''', (data['question'], a, b, c, d, data.get('correct', 0), 'PENDING'))
     
+    opts = data.get('options', [])
+    cursor.execute('''
+        INSERT INTO pending_questions 
+        (question, option_a, option_b, option_c, option_d, correct_index, category, reference, fact, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (
+        data['question'], 
+        opts[0] if len(opts) > 0 else '', 
+        opts[1] if len(opts) > 1 else '', 
+        opts[2] if len(opts) > 2 else '', 
+        opts[3] if len(opts) > 3 else '', 
+        data.get('correct', 0),
+        data.get('category', 'ALL'),
+        data.get('reference', ''),
+        data.get('fact', ''),
+        'PENDING'
+    ))
     conn.commit()
     conn.close()
-    
     return jsonify({"status": "success", "message": "Saved to database!"}), 201
-
 
 @app.route('/admin/questions', methods=['GET'])
 def get_questions():
@@ -81,7 +91,7 @@ def get_questions():
 def approve_question(q_id):
     # Check the "Admin-Key" header
     admin_key = request.headers.get('Admin-Key')
-    if admin_key != "hacking":
+    if not admin_key or admin_key != ADMIN_KEY:
         return jsonify({"message": "Unauthorized"}), 401
 
     conn = sqlite3.connect(DB_NAME)
@@ -93,6 +103,15 @@ def approve_question(q_id):
     conn.commit()
     conn.close()
     return jsonify({"message": f"Question {q_id} approved!"})
+
+
+@app.route('/admin/login', methods=['POST'])
+def admin_login():
+    data = request.json or {}
+    password = data.get('password', '')
+    if password == ADMIN_PASSWORD:
+        return jsonify({"ok": True, "admin_key": ADMIN_KEY})
+    return jsonify({"ok": False, "message": "Invalid password"}), 401
 
 @app.route('/questions/live', methods=['GET'])
 def get_live_questions():
@@ -109,7 +128,7 @@ def get_live_questions():
         # We format it exactly like your original questions.js objects
         questions.append({
             "question": row['question'],
-            "options": [row['option_a'] or '', row['option_b'] or '', row['option_c'] or '', row['option_d'] or ''],
+            "options": [row['option_a'] or '', row['option_b'] or '', row['option_c'] or '', row['option_d']],
             "correct": row['correct_index'],
             "category": "OLD TESTAMENT" # You can store this in DB too
         })

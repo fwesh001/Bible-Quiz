@@ -566,6 +566,24 @@ body.dark-mode .sidebar {
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
+/* Admin modal inputs and controls (moved from inline styles) */
+.modal-dialog input[type="password"],
+.modal-dialog input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.modal .modal-controls {
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 /* Add Question modal (themed + animated) */
 .question-modal {
   position: fixed;

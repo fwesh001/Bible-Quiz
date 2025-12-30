@@ -12,14 +12,14 @@
 
   <script>
   // Prompt admin for password before loading dashboard
-  const adminPassword = prompt("Enter Admin Password:");
-  if (adminPassword === "hacking") {
-    loadAdminDashboard();
-  } else {
-    alert("Access Denied");
-    // send them back to the main quiz
+  const adminKey = sessionStorage.getItem('adminKey');
+
+if (!adminKey) {
+    alert("Access Denied: Please login from the home page.");
     window.location.href = "index.html";
-  }
+} else {
+    loadAdminDashboard();
+}
 
   // Load and render pending questions (called only after correct password)
   function loadAdminDashboard() {
@@ -32,17 +32,22 @@
           listDiv.textContent = 'No pending questions.';
           return;
         }
-        data.forEach(q => {
-          listDiv.innerHTML += `
-            <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px; background: #fff;">
-              <p><strong>Question:</strong> ${q.question}</p>
-              <p><strong>Options:</strong> A) ${q.option_a} | B) ${q.option_b} | C) ${q.option_c} | D) ${q.option_d}</p>
-              <p><strong>Answer:</strong> ${q.answer}</p>
-              <p><strong>Current Status:</strong> ${q.status}</p>
-              <button onclick="approve(${q.id})">✅ Approve Now</button>
-            </div>`;
-        });
-      })
+data.forEach(q => {
+  // Map the correct_index to a readable letter
+  const letters = ['A', 'B', 'C', 'D'];
+  const correctLetter = letters[q.correct_index] || 'N/A';
+
+  listDiv.innerHTML += `
+    <div style="border:1px solid #ddd; margin:10px; padding:10px; border-radius:8px; background: #fff; color: #333;">
+      <p><strong>Question:</strong> ${q.question}</p>
+      <p><strong>Options:</strong> A) ${q.option_a} | B) ${q.option_b} | C) ${q.option_c} | D) ${q.option_d}</p>
+      <p><strong>Correct Answer:</strong> ${correctLetter}</p>
+      <p><strong>Category:</strong> ${q.category}</p>
+      <p><strong>Status:</strong> <span style="color: ${q.status === 'APPROVED' ? 'green' : 'orange'}">${q.status}</span></p>
+      <button onclick="approve(${q.id})">✅ Approve Now</button>
+    </div>`;
+});  
+    })
       .catch(err => {
         const listDiv = document.getElementById('adminList');
         listDiv.textContent = 'Error loading questions: ' + err.message;
@@ -51,12 +56,12 @@
   }
 
   // Approve a question; include Admin-Key header with the password entered above
-  function approve(id) {
+function approve(id) {
     fetch(`http://127.0.0.1:5000/admin/approve/${id}`, { 
       method: 'POST',
-      headers: { 'Admin-Key': adminPassword }
+      headers: { 'Admin-Key': adminKey } // Use the key from storage
     })
-      .then(res => {
+          .then(res => {
         if (!res.ok) throw new Error('Server returned ' + res.status);
         return res.json();
       })

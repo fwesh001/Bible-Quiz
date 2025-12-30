@@ -954,3 +954,76 @@ document.addEventListener('click', (e) => {
     console.error('Error intercepting mailto click', err);
   }
 });
+
+// ========================
+// Admin unlock: 5-click secret -> password modal -> redirect to admin.html
+// ========================
+
+const adminLoginBtn = document.getElementById('adminLoginBtn');
+// ========================
+// Admin login modal: open on single click -> password modal -> redirect to admin.html
+
+const adminLoginModal = document.getElementById('adminLoginModal');
+const adminPasswordInput = document.getElementById('adminPasswordInput');
+const adminSubmitBtn = document.getElementById('adminSubmitBtn');
+const adminCancelBtn = document.getElementById('adminCancelBtn');
+
+function showAdminLogin(show) {
+  if (!adminLoginModal) return;
+  if (show) {
+    adminLoginModal.style.display = 'block';
+    adminLoginModal.classList.add('show');
+    adminLoginModal.setAttribute('aria-hidden', 'false');
+    if (adminPasswordInput) adminPasswordInput.focus();
+  } else {
+    adminLoginModal.style.display = 'none';
+    adminLoginModal.classList.remove('show');
+    adminLoginModal.setAttribute('aria-hidden', 'true');
+    if (adminPasswordInput) adminPasswordInput.value = '';
+  }
+}
+
+let adminClickCount = 0;
+let adminClickTimer = null;
+function resetAdminClicks() {
+  adminClickCount = 0;
+  if (adminClickTimer) { clearTimeout(adminClickTimer); adminClickTimer = null; }
+}
+
+if (adminLoginBtn) {
+  adminLoginBtn.addEventListener('click', () => {
+    adminClickCount++;
+    if (adminClickTimer) clearTimeout(adminClickTimer);
+    // reset click count after 10s of inactivity
+    adminClickTimer = setTimeout(resetAdminClicks, 10000);
+    if (adminClickCount >= 2) {
+      resetAdminClicks();
+      // Open the admin login modal and close the sidebar
+      showAdminLogin(true);
+      if (sidebar) sidebar.classList.remove('active');
+    }
+  });
+}
+
+if (adminCancelBtn) adminCancelBtn.addEventListener('click', () => showAdminLogin(false));
+
+if (adminSubmitBtn) adminSubmitBtn.addEventListener('click', () => {
+  const pwd = adminPasswordInput ? adminPasswordInput.value : '';
+  if (!pwd) return alert('Enter password');
+
+  fetch('http://127.0.0.1:5000/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: pwd })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Invalid Password');
+    return res.json();
+  })
+  .then(data => {
+    // SAVE the key and password for the next page to use
+    sessionStorage.setItem('adminKey', data.admin_key); 
+    window.location.href = 'admin.html';
+  })
+  .catch(err => alert(err.message));
+});
