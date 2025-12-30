@@ -15,7 +15,7 @@ html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -app
 body{padding:28px; display:flex; justify-content:center;}
 
 /* Root container to center the dashboard and reuse site panel color */
-#admin-root{ width: min(1100px, 96vw); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: 0 20px 60px rgba(0,0,0,0.45);}
+#admin-root{ width: min(1100px, 96vw); max-width:1100px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid var(--border); border-radius:12px; padding:18px; box-shadow: 0 20px 60px rgba(0,0,0,0.45); max-height: 90vh; overflow: auto; }
 
 h1{font-weight:600;margin:0 0 18px;color:var(--accent)}
 
