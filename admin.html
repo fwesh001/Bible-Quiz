@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin — Bible Quiz</title>
   <link rel="stylesheet" href="admin.css" />
-  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>Admin — Pending Questions</h1>
-    <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
-      <button id="btn-back" class="secondary">Back</button>
-      <div id="admin-login-area" style="margin-left:12px;"></div>
+  <div id="admin-root">
+    <div class="admin-header">
+      <h1>Admin — Pending Questions</h1>
+      <div class="admin-controls">
+        <button id="btn-back" class="secondary">Back</button>
+        <div id="admin-login-area"></div>
+      </div>
     </div>
-  </header>
 
-  <main style="padding:16px;">
+    <main>
     <section id="login" style="margin-bottom:12px; display:none;">
       <label class="subtitle">Admin Password</label>
       <div style="display:flex; gap:8px; align-items:center;">
@@ -26,7 +26,7 @@
       <div id="login-msg" class="subtitle" style="color:var(--wrong);"></div>
     </section>
 
-    <section id="controls" style="margin:10px 0; display:flex; gap:8px; align-items:center;">
+    <section id="controls" class="admin-controls" style="margin:10px 0;">
       <button id="btn-refresh" class="primary">Refresh</button>
       <button id="btn-approve-all" class="secondary">Approve All</button>
     </section>
@@ -49,7 +49,8 @@
         <tbody id="questions-body"></tbody>
       </table>
     </section>
-  </main>
+    </main>
+  </div>
 
   <script src="admin.js"></script>
 </body>

@@ -609,6 +609,14 @@ body.dark-mode .sidebar {
   animation: modal-enter .26s cubic-bezier(.2,.9,.2,1);
 }
 
+/* Constrain modals: max width/height and scroll when content overflows */
+.question-modal,
+.modal-dialog {
+  max-width: 720px;
+  max-height: 80vh;
+  overflow: auto;
+}
+
 @keyframes modal-enter {
   from { opacity: 0; transform: translate(-50%, -46%) scale(0.98); }
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
