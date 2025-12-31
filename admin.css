@@ -112,20 +112,308 @@ button[onclick]:hover {
   align-items: center
 }
 
-/* Responsive */
-@media (max-width:640px) {
-  body {
-    padding: 14px
+/* Responsive styles for tablets and small laptops */
+@media (max-width: 960px) {
+  #admin-root {
+    width: 94vw;
+    padding: 16px;
   }
 
-  #adminList {
-    gap: 10px
+  .admin-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
   }
 
-  #adminList>div {
-    padding: 12px
+  .admin-controls {
+    justify-content: space-between;
   }
 }
+
+/* Responsive styles for mobile devices (412px - 768px) */
+@media (max-width: 768px) {
+  body {
+    padding: 14px;
+  }
+
+  #admin-root {
+    padding: 14px;
+    max-height: 92vh;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    margin-bottom: 14px;
+  }
+
+  /* Make table scrollable on mobile */
+  #questions-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #questions-table thead,
+  #questions-table tbody,
+  #questions-table tr {
+    display: block;
+  }
+
+  #questions-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  #questions-table thead th {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
+  #questions-table tbody tr {
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  #questions-table tbody td {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: none;
+    align-items: start;
+  }
+
+  #questions-table tbody td:before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 0.85rem;
+  }
+
+  #questions-table td.controls {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  #questions-table td.controls button {
+    width: 100%;
+    margin: 4px 0;
+  }
+
+  #questions-table input,
+  #questions-table textarea,
+  #questions-table select {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  #questions-table textarea {
+    min-height: 60px;
+  }
+
+  /* Button adjustments */
+  button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .admin-controls button {
+    padding: 8px 10px;
+  }
+}
+
+/* Mobile devices - 412px to 600px */
+@media (max-width: 600px) {
+  body {
+    padding: 8px;
+  }
+
+  #admin-root {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    max-height: 94vh;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .admin-header {
+    gap: 8px;
+  }
+
+  .admin-controls {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .admin-controls button {
+    width: 100%;
+    padding: 10px 12px;
+  }
+
+  /* Table card-style layout for very small screens */
+  #questions-table tbody td {
+    grid-template-columns: 1fr;
+  }
+
+  #questions-table tbody td:before {
+    margin-bottom: 4px;
+  }
+
+  #questions-table input,
+  #questions-table textarea,
+  #questions-table select {
+    width: 100%;
+    font-size: 16px;
+    /* Prevents iOS zoom on focus */
+  }
+
+  /* Modal adjustments */
+  .modal-box {
+    width: 94%;
+    padding: 16px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-box h3 {
+    font-size: 1.1rem;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-actions button {
+    width: 100%;
+    min-width: auto;
+  }
+
+  /* Toast notifications */
+  .toast-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .toast {
+    min-width: auto;
+    font-size: 0.85rem;
+  }
+}
+
+/* Very small mobile devices - up to 412px */
+@media (max-width: 412px) {
+  #admin-root {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+  }
+
+  #questions-table tbody tr {
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+
+  #questions-table tbody td {
+    padding: 4px 0;
+  }
+
+  #questions-table tbody td:before {
+    font-size: 0.8rem;
+  }
+
+  #questions-table input,
+  #questions-table textarea,
+  #questions-table select {
+    font-size: 16px;
+    padding: 6px 8px;
+  }
+
+  button {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+
+  .status-badge {
+    font-size: 0.75em;
+    padding: 3px 6px;
+  }
+}
+
+/* Landscape orientation for mobile */
+@media (max-width: 915px) and (orientation: landscape) {
+  #admin-root {
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+
+  .admin-header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .admin-controls {
+    flex-direction: row;
+  }
+
+  #questions-table {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* Touch-friendly enhancements */
+@media (hover: none) and (pointer: coarse) {
+
+  /* Larger tap targets for touch devices */
+  button {
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+
+  #questions-table button {
+    min-height: 40px;
+  }
+
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+  }
+
+  /* Prevent double-tap zoom */
+  * {
+    touch-action: manipulation;
+  }
+}
+
+/* High pixel density screens */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+
+  button,
+  input,
+  textarea,
+  select {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
 
 /* subtle glow for approved state */
 .approved {

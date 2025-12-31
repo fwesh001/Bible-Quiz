@@ -676,16 +676,327 @@ body.dark-mode .sidebar {
 .question-modal button#submitToBackend { background: linear-gradient(180deg, var(--brand), #5b21b6); color:#fff; border:none; padding:10px 12px; border-radius:8px; cursor:pointer; }
 .question-modal button.close-btn { background: transparent; color: var(--text); border:1px solid rgba(0,0,0,0.08); padding:8px 10px; border-radius:8px; cursor:pointer; }
 
-@media (max-width: 600px) {
-  .question-modal { width: 92vw; left:50%; top:50%; transform: translate(-50%,-50%); }
+/* Mobile Responsive Styles - For screens around 412x915 and similar */
+
+/* Tablets and smaller laptops */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .quiz-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .nav-list {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
+/* Mobile devices - 412px to 600px */
 @media (max-width: 600px) {
-  .quiz-grid { grid-template-columns: 1fr; }
-  .quiz-head { grid-template-columns: 1fr; }
-  .timer { width: 100%; height: 10px; }
-  .badge { width: 24px; height: 24px; }
-  .quiz-sidebar { position: static; }
-  .nav-list { grid-template-columns: repeat(8, 1fr); }
-  .modal-dialog { width: 92vw; }
+  body {
+    padding: 0;
+  }
+  
+  header {
+    padding: 16px 12px 0;
+  }
+  
+  header h1 {
+    font-size: 1.5rem;
+  }
+  
+  main {
+    padding: 12px;
+  }
+  
+  .container {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  
+  /* Quiz grid - single column on mobile */
+  .quiz-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  /* Quiz sidebar becomes horizontal navigator */
+  .quiz-sidebar {
+    position: static;
+    order: -1; /* Move to top */
+    width: 100%;
+  }
+  
+  .nav-title {
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+  }
+  
+  .nav-list {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+  }
+  
+  .nav-item {
+    height: 28px;
+    font-size: 0.85rem;
+  }
+  
+  /* Question and options */
+  .question {
+    padding: 12px;
+    font-size: 1.05rem;
+    line-height: 1.4;
+  }
+  
+  .options {
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .option {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+  
+  .badge {
+    width: 24px;
+    height: 24px;
+    font-size: 0.85rem;
+  }
+  
+  /* Round timer adjustments */
+  .round-timer-bar-outer {
+    margin-bottom: 12px;
+    height: 24px;
+  }
+  
+  .round-timer-bar-bg {
+    height: 10px;
+  }
+  
+  .round-timer-label {
+    font-size: 0.95rem;
+    min-width: 42px;
+    margin-left: 8px;
+  }
+  
+  /* Controls and buttons */
+  .controls {
+    gap: 8px;
+    margin: 10px 0;
+  }
+  
+  button.primary,
+  button.secondary {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    width: 100%;
+  }
+  
+  .select {
+    padding: 9px 10px;
+    font-size: 0.95rem;
+  }
+  
+  /* Stats grid */
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .stat {
+    padding: 10px;
+  }
+  
+  .stat .big {
+    font-size: 1.4rem;
+  }
+  
+  .stat .label {
+    font-size: 0.8rem;
+  }
+  
+  /* Modal adjustments */
+  .modal-dialog {
+    width: 94vw;
+    padding: 14px;
+    max-height: 85vh;
+  }
+  
+  .question-modal {
+    width: 94vw;
+    padding: 14px;
+    max-height: 85vh;
+  }
+  
+  .question-modal input,
+  .question-modal textarea,
+  .question-modal select {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Sidebar adjustments */
+  .sidebar {
+    width: 280px;
+    right: -280px;
+  }
+  
+  .sidebar.active {
+    right: 0;
+  }
+  
+  /* Toast notifications */
+  .toast-container {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+  }
+  
+  .toast {
+    min-width: auto;
+    max-width: 100%;
+    font-size: 0.9rem;
+  }
+  
+  /* Achievement cards */
+  .achievement {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  
+  /* Question review */
+  .question-review-item {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .question-review-q {
+    font-size: 0.95rem;
+  }
+  
+  /* Footer */
+  footer {
+    padding: 12px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Very small mobile devices - 320px to 412px */
+@media (max-width: 412px) {
+  header h1 {
+    font-size: 1.3rem;
+  }
+  
+  .container {
+    padding: 12px;
+    border-radius: 10px;
+  }
+  
+  .question {
+    font-size: 1rem;
+    padding: 10px;
+  }
+  
+  .option {
+    padding: 9px 10px;
+    font-size: 0.9rem;
+    gap: 8px;
+  }
+  
+  .badge {
+    width: 22px;
+    height: 22px;
+    font-size: 0.8rem;
+  }
+  
+  .nav-list {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+  }
+  
+  .nav-item {
+    height: 26px;
+    font-size: 0.8rem;
+  }
+  
+  .stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .stat .big {
+    font-size: 1.3rem;
+  }
+  
+  button.primary,
+  button.secondary {
+    padding: 9px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .round-timer-label {
+    font-size: 0.9rem;
+    min-width: 38px;
+  }
+  
+  .modal-dialog,
+  .question-modal {
+    padding: 12px;
+  }
+}
+
+/* Landscape mode for mobile devices */
+@media (max-width: 915px) and (orientation: landscape) {
+  .container {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  header {
+    padding: 12px 12px 0;
+  }
+  
+  header h1 {
+    font-size: 1.3rem;
+  }
+  
+  main {
+    padding: 8px;
+  }
+  
+  .quiz-grid {
+    grid-template-columns: 1fr 200px;
+  }
+  
+  .quiz-sidebar {
+    position: sticky;
+    top: 8px;
+    height: fit-content;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  .nav-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* High pixel density screens (Retina displays) */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .option,
+  .nav-item,
+  button {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
