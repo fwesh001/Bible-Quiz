@@ -1,11 +1,13 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin — Bible Quiz</title>
   <link rel="stylesheet" href="admin.css" />
 </head>
+
 <body>
   <div id="admin-root">
     <div class="admin-header">
@@ -17,43 +19,57 @@
     </div>
 
     <main>
-    <section id="login" style="margin-bottom:12px; display:none;">
-      <label class="subtitle">Admin Password</label>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <input id="adminPassword" type="password" placeholder="Password" />
-        <button id="btn-do-login" class="primary">Login</button>
-      </div>
-      <div id="login-msg" class="subtitle" style="color:var(--wrong);"></div>
-    </section>
+      <section id="login" style="margin-bottom:12px; display:none;">
+        <label class="subtitle">Admin Password</label>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input id="adminPassword" type="password" placeholder="Password" />
+          <button id="btn-do-login" class="primary">Login</button>
+        </div>
+        <div id="login-msg" class="subtitle" style="color:var(--wrong);"></div>
+      </section>
 
-    <section id="controls" class="admin-controls" style="margin:10px 0;">
-      <button id="btn-refresh" class="primary">Refresh</button>
-      <button id="btn-approve-selected" class="secondary">Approve Selected</button>
-      <button id="btn-delete-selected" class="danger" style="background:var(--wrong);color:white;border:none;">Delete Selected</button>
-    </section>
+      <section id="controls" class="admin-controls" style="margin:10px 0;">
+        <button id="btn-refresh" class="primary">Refresh</button>
+        <button id="btn-approve-selected" class="secondary">Approve Selected</button>
+        <button id="btn-delete-selected" class="danger" style="background:var(--wrong);color:white;border:none;">Delete
+          Selected</button>
+      </section>
 
-    <section id="list">
-      <table id="questions-table" style="width:100%; border-collapse:collapse;">
-        <thead>
-          <tr>
-            <th style="width:32px"><input type="checkbox" id="select-all" /></th>
-            <th style="text-align:left">ID</th>
-            <th style="text-align:left">Question</th>
-            <th>Options</th>
-            <th>Correct</th>
-            <th>Category</th>
-            <th>Reference</th>
-            <th>Fact</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="questions-body"></tbody>
-      </table>
-    </section>
+      <section id="list">
+        <table id="questions-table" style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="width:32px"><input type="checkbox" id="select-all" /></th>
+              <th style="text-align:left">ID</th>
+              <th style="text-align:left">Question</th>
+              <th>Options</th>
+              <th>Correct</th>
+              <th>Category</th>
+              <th>Reference</th>
+              <th>Fact</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="questions-body"></tbody>
+        </table>
+      </section>
     </main>
+  </div>
+
+  <!-- Custom Modal -->
+  <div id="custom-modal" class="modal-overlay" style="display:none">
+    <div class="modal-box">
+      <h3 id="modal-title">Confirm Action</h3>
+      <p id="modal-msg"></p>
+      <div class="modal-actions">
+        <button id="modal-cancel">Cancel</button>
+        <button id="modal-confirm" class="primary">Confirm</button>
+      </div>
+    </div>
   </div>
 
   <script src="admin.js"></script>
 </body>
+
 </html>
