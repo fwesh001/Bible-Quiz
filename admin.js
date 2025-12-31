@@ -43,6 +43,34 @@
     else sessionStorage.removeItem('adminKey');
   }
 
+  // Custom Confirm Modal Helper
+  function showConfirm(msg) {
+    return new Promise((resolve) => {
+      const modal = document.getElementById('custom-modal');
+      const titleEl = document.getElementById('modal-title');
+      const msgEl = document.getElementById('modal-msg');
+      const btnCancel = document.getElementById('modal-cancel');
+      const btnConfirm = document.getElementById('modal-confirm');
+
+      titleEl.textContent = 'Please Confirm'; // Default title
+      msgEl.textContent = msg;
+
+      modal.style.display = 'flex'; // Show modal using flex for centering
+
+      const cleanup = () => {
+        modal.style.display = 'none';
+        btnCancel.removeEventListener('click', onCancel);
+        btnConfirm.removeEventListener('click', onConfirm);
+      };
+
+      const onConfirm = () => { cleanup(); resolve(true); };
+      const onCancel = () => { cleanup(); resolve(false); };
+
+      btnCancel.addEventListener('click', onCancel);
+      btnConfirm.addEventListener('click', onConfirm);
+    });
+  }
+
   function requireAuthUI() {
     const key = getAdminKey();
     if (!key) {
@@ -152,7 +180,10 @@
 
   async function deleteQuestion(id, reload = true) {
     // hard delete via new DELETE endpoint
-    if (reload && !confirm('Are you sure you want to permanently delete this question?')) return;
+    if (reload) {
+      const confirmed = await showConfirm('Are you sure you want to permanently delete this question?');
+      if (!confirmed) return;
+    }
     try {
       const res = await fetch(`${API_BASE}/admin/delete/${id}`, { method: 'DELETE', headers: { 'Admin-Key': getAdminKey() } });
       if (!res.ok) throw new Error('Delete failed');
@@ -165,7 +196,9 @@
   async function approveSelected() {
     const checkboxes = Array.from(document.querySelectorAll('.q-select:checked'));
     if (checkboxes.length === 0) { showToast('No items selected', 'warning'); return; }
-    if (!confirm(`Approve ${checkboxes.length} items?`)) return;
+
+    const confirmed = await showConfirm(`Approve ${checkboxes.length} items?`);
+    if (!confirmed) return;
 
     for (const cb of checkboxes) {
       const id = cb.dataset.id;
@@ -177,7 +210,9 @@
   async function deleteSelected() {
     const checkboxes = Array.from(document.querySelectorAll('.q-select:checked'));
     if (checkboxes.length === 0) { showToast('No items selected', 'warning'); return; }
-    if (!confirm(`Permanently delete ${checkboxes.length} items? This cannot be undone.`)) return;
+
+    const confirmed = await showConfirm(`Permanently delete ${checkboxes.length} items? This cannot be undone.`);
+    if (!confirmed) return;
 
     for (const cb of checkboxes) {
       const id = cb.dataset.id;

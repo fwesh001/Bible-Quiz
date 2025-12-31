@@ -1625,4 +1625,18 @@ const bibleQuestions = [
   difficulty: "HARD"
 },
 
+,
+  {
+  "question": "What did the Isaac do when he was the Angel",
+  "options": [
+    "Made Eba for him",
+    "On Gen for him",
+    "Took him to kitchen 54",
+    "Fought with him"
+  ],
+  "correct": 3,
+  "reference": "Genesis ",
+  "fact": "He wanted a blessing for his potatoes to grow on Friday ",
+  "category": "Old Testament"
+}
 ]
