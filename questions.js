@@ -1624,5 +1624,4 @@ const bibleQuestions = [
   category: "NEW TESTAMENT",
   difficulty: "HARD"
 },
-
 ]

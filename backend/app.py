@@ -1,5 +1,6 @@
 import os
 import sqlite3
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -95,14 +96,65 @@ def approve_question(q_id):
         return jsonify({"message": "Unauthorized"}), 401
 
     conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
-    # Change the status to APPROVED for this specific ID
-    cursor.execute('UPDATE pending_questions SET status = "APPROVED" WHERE id = ?', (q_id,))
-    
-    conn.commit()
-    conn.close()
-    return jsonify({"message": f"Question {q_id} approved!"})
+
+    # Fetch the pending question
+    cursor.execute('SELECT * FROM pending_questions WHERE id = ?', (q_id,))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        return jsonify({"message": "Question not found"}), 404
+
+    # Build the JS object to append (match questions.js structure)
+    new_entry = {
+        "question": row['question'] or '',
+        "options": [row['option_a'] or '', row['option_b'] or '', row['option_c'] or '', row['option_d'] or ''],
+        "correct": row['correct_index'] if row['correct_index'] is not None else 0,
+        "reference": row['reference'] or '',
+        "fact": row['fact'] or '',
+        "category": row['category'] or 'ALL'
+    }
+
+    # Path to questions.js (project root)
+    qpath = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'questions.js'))
+
+    try:
+        with open(qpath, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Find last closing bracket of the array (the final ] )
+        stripped = content.rstrip()
+        last_bracket = stripped.rfind(']')
+        if last_bracket == -1:
+            raise Exception('Could not find closing bracket in questions.js')
+
+        prefix = stripped[:last_bracket]
+        closing = stripped[last_bracket:]
+
+        # Determine whether we need a leading comma before adding the new object
+        needs_comma = not prefix.rstrip().endswith('[')
+
+        # Prepare JS-friendly string of the object using JSON (valid JS object literal)
+        js_obj_str = json.dumps(new_entry, indent=2, ensure_ascii=False)
+
+        to_write = prefix
+        if needs_comma:
+            to_write += ','
+        to_write += '\n  ' + js_obj_str + '\n' + closing
+
+        with open(qpath, 'w', encoding='utf-8') as f:
+            f.write(to_write)
+
+        # Mark as approved in DB so it doesn't show in admin anymore
+        cursor.execute('UPDATE pending_questions SET status = "APPROVED" WHERE id = ?', (q_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Saved to questions.js and Database!"})
+
+    except Exception as e:
+        conn.close()
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/admin/edit/<int:q_id>', methods=['POST', 'PUT', 'PATCH'])
