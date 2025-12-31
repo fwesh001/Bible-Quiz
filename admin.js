@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = 'http://127.0.0.1:5000';
+  const API_BASE = ''; // Use relative URLs for both local and production
   const body = document.getElementById('questions-body');
   const btnRefresh = document.getElementById('btn-refresh');
   const btnApproveSelected = document.getElementById('btn-approve-selected');
