@@ -7,6 +7,8 @@ A lightweight, browser-based quiz game to test and learn knowledge of the Script
 ## 🔧 Features
 
 - Multiple-choice Bible questions with references and short facts
+- **Responsive Design**: Optimized for mobile devices and tablets (including 412x915 screens)
+- **Deployment Ready**: Configured for seamless deployment on Render with Flask serving static files
 - Category filter: Old Testament / New Testament / All
 - Difficulty filter (Normal / Hard / All)
 - **Visual Timers**: Round Timer (bar) and Question Timer (circular countdown)
@@ -22,6 +24,8 @@ A lightweight, browser-based quiz game to test and learn knowledge of the Script
 
 ## 🚀 Quick Start
 
+### Local Development
+
 1. Clone or download the project files.
 
 2. (Optional but recommended) Create and activate a Python virtual environment, then install backend dependencies:
@@ -32,22 +36,26 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-3. Run the backend (optional — only needed if you want to use the admin panel or serve questions from the live DB):
+3. Run the backend (required for API features):
 
 ```powershell
 # from project root
-python backend/app.py
+cd backend
+python app.py
 ```
 
-The backend will create a local SQLite DB file `quiz_data.db` automatically.
+4. Open the frontend:
+   - Visit `http://localhost:5000` in your browser
+   - The app works on both desktop and mobile screens
 
-4. Open the frontend by opening [index.html](index.html) in a browser, or serve the folder with a simple static server for better compatibility:
+### Deployment (Render)
 
-```powershell
-# from project root
-python -m http.server 8000
-# then open http://localhost:8000
-```
+The app is configured to deploy easily on Render:
+1. Push code to GitHub
+2. Create a new Web Service on Render linked to your repo
+3. Set Build Command: `pip install -r requirements.txt`
+4. Set Start Command: `gunicorn --chdir backend app:app`
+5. Your app will automatically serve the frontend from the root URL!
 
 ---
 
