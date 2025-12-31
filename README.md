@@ -11,6 +11,7 @@ A lightweight, browser-based quiz game to test and learn knowledge of the Script
 - Difficulty filter (Normal / Hard / All)
 - **Visual Timers**: Round Timer (bar) and Question Timer (circular countdown)
 - **Immersive Audio**: WebAudio feedback for correct/wrong answers
+- **Keyboard Shortcuts**: Press Enter to submit quiz or confirm admin actions
 - Daily Challenge (deterministic 5-question set)
 - **Achievements**: Unlock titles like "Bible Student", "Hebrew Scripture Expert", and "Daily Challenger"
 - Local high score & achievements saved to localStorage
@@ -59,25 +60,34 @@ python -m http.server 8000
 
 ---
 
-## 🛡 Admin Panel & Backend (Progress)
+## 🛡 Admin Panel & Backend
 
 An admin interface is included to collect, review, and approve submitted questions. Files for the admin UI are: [admin.html](admin.html), [admin.js](admin.js), and [admin.css](admin.css).
 
-Backend summary (in `backend/app.py`):
+### Admin Dashboard Features
+- **Bulk Actions**: Select multiple questions with checkboxes; "Approve Selected" and "Delete Selected" buttons
+- **Custom Modals**: Styled confirmation dialogs instead of browser alerts
+- **Status Badges**: Color-coded indicators (🟡 Pending, 🟢 Approved)
+- **Hard Delete**: Permanently remove questions from the database
+- **Keyboard Support**: Press Enter to login or confirm modal actions
+- **Structured Logging**: All admin actions are logged with timestamps
+
+### Backend Summary (in `backend/app.py`)
 
 - Built with Flask and `flask-cors`.
 - Creates/uses `quiz_data.db` (SQLite) and a `pending_questions` table.
 - **File System Sync**: The `approve_question` endpoint writes directly to the local `questions.js` file, keeping the static frontend updated.
 - Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD`. Defaults are set in the code for local testing but change them in production.
 
-Key endpoints:
+### Key Endpoints
 
-- `POST /add-question` — Save a submitted question into `pending_questions` (status=\"PENDING\").
-- `GET /admin/questions` — Return all pending questions (for the admin UI).
-- `POST /admin/approve/<id>` — Mark a question as `APPROVED` (requires `Admin-Key` header).
-- `POST /admin/edit/<id>` — Edit question fields (requires `Admin-Key`).
-- `POST /admin/login` — Simple password check, returns `admin_key` on success.
-- `GET /questions/live` — Returns approved questions in the same format as `questions.js` for the frontend to consume.
+- `POST /add-question` — Save a submitted question into `pending_questions` (status="PENDING")
+- `GET /admin/questions` — Return all pending questions (for the admin UI)
+- `POST /admin/approve/<id>` — Mark a question as `APPROVED` and sync to `questions.js` (requires `Admin-Key` header)
+- `DELETE /admin/delete/<id>` — Permanently delete a question from the database (requires `Admin-Key` header)
+- `POST /admin/edit/<id>` — Edit question fields (requires `Admin-Key`)
+- `POST /admin/login` — Simple password check, returns `admin_key` on success
+- `GET /questions/live` — Returns approved questions in the same format as `questions.js` for the frontend to consume
 
 Environment example (Windows PowerShell):
 
