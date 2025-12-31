@@ -1,8 +1,17 @@
 import os
 import sqlite3
 import json
+import logging
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+
+# Configure structured logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(asctime)s] [%(levelname)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
@@ -41,6 +50,7 @@ def init_db():
         cursor.execute('ALTER TABLE pending_questions ADD COLUMN option_d TEXT')
     conn.commit()
     conn.close()
+    logger.info("Database initialized successfully.")
 
 # Initialize the pantry when the script starts
 init_db()
@@ -70,6 +80,7 @@ def add_question():
     ))
     conn.commit()
     conn.close()
+    logger.info(f"New question submitted: {data.get('question', 'Unknown')[:30]}...")
     return jsonify({"status": "success", "message": "Saved to database!"}), 201
 
 @app.route('/admin/questions', methods=['GET'])
@@ -86,6 +97,7 @@ def get_questions():
     questions = [dict(row) for row in rows]
     
     conn.close()
+    # logger.info(f"Admin fetched {len(questions)} pending questions.") # Optional: uncomment if too noisy
     return jsonify(questions)
 
 @app.route('/admin/approve/<int:q_id>', methods=['POST'])
@@ -150,10 +162,12 @@ def approve_question(q_id):
         cursor.execute('UPDATE pending_questions SET status = "APPROVED" WHERE id = ?', (q_id,))
         conn.commit()
         conn.close()
+        logger.info(f"Question {q_id} approved and synced to questions.js.")
         return jsonify({"message": "Saved to questions.js and Database!"})
 
     except Exception as e:
         conn.close()
+        logger.error(f"Error approving question {q_id}: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -162,6 +176,7 @@ def edit_question(q_id):
     # Require Admin-Key header for authentication
     admin_key = request.headers.get('Admin-Key')
     if not admin_key or admin_key != ADMIN_KEY:
+        logger.warning(f"Unauthorized edit attempt for QID {q_id}")
         return jsonify({"message": "Unauthorized"}), 401
 
     data = request.json or {}
@@ -197,6 +212,7 @@ def edit_question(q_id):
     conn.commit()
     conn.close()
 
+    logger.info(f"Question {q_id} updated via Admin.")
     return jsonify({"message": f"Question {q_id} updated."})
 
 
@@ -205,7 +221,9 @@ def admin_login():
     data = request.json or {}
     password = data.get('password', '')
     if password == ADMIN_PASSWORD:
+        logger.info("Admin login successful.")
         return jsonify({"ok": True, "admin_key": ADMIN_KEY})
+    logger.warning("Admin login failed: Incorrect password.")
     return jsonify({"ok": False, "message": "Invalid password"}), 401
 
 @app.route('/questions/live', methods=['GET'])
@@ -229,7 +247,9 @@ def get_live_questions():
         })
     
     conn.close()
+    # logger.info(f"Live questions fetched. Count: {len(questions)}") # Optional noise reduction
     return jsonify(questions)
 
 if __name__ == '__main__':
+    logger.info("Starting Bible Quiz Backend on port 5000...")
     app.run(port=5000, debug=True)
