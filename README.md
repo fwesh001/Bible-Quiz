@@ -9,8 +9,10 @@ A lightweight, browser-based quiz game to test and learn knowledge of the Script
 - Multiple-choice Bible questions with references and short facts
 - Category filter: Old Testament / New Testament / All
 - Difficulty filter (Normal / Hard / All)
-- Round timer and per-question timer (configurable)
+- **Visual Timers**: Round Timer (bar) and Question Timer (circular countdown)
+- **Immersive Audio**: WebAudio feedback for correct/wrong answers
 - Daily Challenge (deterministic 5-question set)
+- **Achievements**: Unlock titles like "Bible Student", "Hebrew Scripture Expert", and "Daily Challenger"
 - Local high score & achievements saved to localStorage
 - Dark Mode and mute controls
 - Question review and simple navigation
@@ -65,6 +67,7 @@ Backend summary (in `backend/app.py`):
 
 - Built with Flask and `flask-cors`.
 - Creates/uses `quiz_data.db` (SQLite) and a `pending_questions` table.
+- **File System Sync**: The `approve_question` endpoint writes directly to the local `questions.js` file, keeping the static frontend updated.
 - Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD`. Defaults are set in the code for local testing but change them in production.
 
 Key endpoints:
