@@ -250,6 +250,27 @@ def get_live_questions():
     # logger.info(f"Live questions fetched. Count: {len(questions)}") # Optional noise reduction
     return jsonify(questions)
 
+@app.route('/admin/delete/<int:q_id>', methods=['DELETE'])
+def delete_question(q_id):
+    # Require Admin-Key header for authentication
+    admin_key = request.headers.get('Admin-Key')
+    if not admin_key or admin_key != ADMIN_KEY:
+        logger.warning(f"Unauthorized delete attempt for QID {q_id}")
+        return jsonify({"message": "Unauthorized"}), 401
+    
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM pending_questions WHERE id = ?', (q_id,))
+    # Check if a row was actually deleted
+    if cursor.rowcount == 0:
+        conn.close()
+        return jsonify({"message": "Question not found"}), 404
+    
+    conn.commit()
+    conn.close()
+    logger.info(f"Question {q_id} permanently deleted via Admin.")
+    return jsonify({"message": f"Question {q_id} deleted."})
+
 if __name__ == '__main__':
     logger.info("Starting Bible Quiz Backend on port 5000...")
     app.run(port=5000, debug=True)

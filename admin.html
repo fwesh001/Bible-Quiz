@@ -28,13 +28,15 @@
 
     <section id="controls" class="admin-controls" style="margin:10px 0;">
       <button id="btn-refresh" class="primary">Refresh</button>
-      <button id="btn-approve-all" class="secondary">Approve All</button>
+      <button id="btn-approve-selected" class="secondary">Approve Selected</button>
+      <button id="btn-delete-selected" class="danger" style="background:var(--wrong);color:white;border:none;">Delete Selected</button>
     </section>
 
     <section id="list">
       <table id="questions-table" style="width:100%; border-collapse:collapse;">
         <thead>
           <tr>
+            <th style="width:32px"><input type="checkbox" id="select-all" /></th>
             <th style="text-align:left">ID</th>
             <th style="text-align:left">Question</th>
             <th>Options</th>
