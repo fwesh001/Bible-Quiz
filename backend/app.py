@@ -2,7 +2,7 @@ import os
 import sqlite3
 import json
 import logging
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 # Configure structured logging
@@ -13,7 +13,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+# Get the parent directory (project root) to serve static files
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+app = Flask(__name__, static_folder=parent_dir, static_url_path='')
 CORS(app)
 
 DB_NAME = "quiz_data.db"
@@ -54,6 +57,20 @@ def init_db():
 
 # Initialize the pantry when the script starts
 init_db()
+
+@app.route('/')
+def index():
+    """Serve the main index.html page"""
+    return send_from_directory(parent_dir, 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve static files from the project root"""
+    try:
+        return send_from_directory(parent_dir, path)
+    except FileNotFoundError:
+        # If file not found, let Flask handle 404
+        return "File not found", 404
 
 @app.route('/add-question', methods=['POST'])
 def add_question():
