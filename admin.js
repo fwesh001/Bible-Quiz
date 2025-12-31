@@ -102,11 +102,8 @@
         <td><input data-field="reference" data-id="${q.id}" value="${escapeHtml(q.reference || '')}" /></td>
         <td><input data-field="fact" data-id="${q.id}" value="${escapeHtml(q.fact || '')}" /></td>
         <td>
-          <select data-field="status" data-id="${q.id}">
-            <option value="PENDING" ${q.status === 'PENDING' ? 'selected' : ''}>PENDING</option>
-            <option value="APPROVED" ${q.status === 'APPROVED' ? 'selected' : ''}>APPROVED</option>
-            <option value="DELETED" ${q.status === 'DELETED' ? 'selected' : ''}>DELETED</option>
-          </select>
+        <td>
+          <span class="status-badge status-${(q.status || 'PENDING').toLowerCase()}">${q.status || 'PENDING'}</span>
         </td>
         <td class="controls">
           <button data-action="approve" data-id="${q.id}">Approve</button>
@@ -130,7 +127,7 @@
 
   function collectFieldsFor(id) {
     const rowFields = {};
-    const selectors = ['question', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_index', 'category', 'reference', 'fact', 'status'];
+    const selectors = ['question', 'option_a', 'option_b', 'option_c', 'option_d', 'correct_index', 'category', 'reference', 'fact'];
     selectors.forEach(f => {
       const el = document.querySelector(`[data-field="${f}"][data-id="${id}"]`);
       if (!el) return;

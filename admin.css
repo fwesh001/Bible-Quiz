@@ -42,6 +42,12 @@ button[onclick]:hover{transform:translateY(-2px);filter:brightness(1.06)}
 /* subtle glow for approved state */
 .approved{border-color: rgba(0,229,255,0.12);box-shadow:0 10px 26px rgba(0,229,255,0.05) inset}
 
+/* Status Badges */
+.status-badge { display:inline-block; padding:4px 8px; border-radius:4px; font-size:0.85em; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+.status-pending { background: rgba(250, 204, 21, 0.15); color: #facc15; border:1px solid rgba(250, 204, 21, 0.2); }
+.status-approved { background: rgba(34, 197, 94, 0.15); color: #22c55e; border:1px solid rgba(34, 197, 94, 0.2); }
+.status-deleted { background: rgba(239, 68, 68, 0.15); color: #ef4444; border:1px solid rgba(239, 68, 68, 0.2); }
+
 /* accessibility focus */
 button:focus{outline:2px solid rgba(0,229,255,0.12);outline-offset:2px}
 
