@@ -986,7 +986,7 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
     })
     .then(res => res.json())
     .then(data => {
-      showToast("Server says: " + (data.message || ''), 'success');
+      showToast("Thanks!: " + (data.message || ''), 'success');
       // clear and close
       closeQuestionModal();
     })
