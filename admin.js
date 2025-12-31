@@ -44,7 +44,14 @@
   }
 
   // Custom Confirm Modal Helper
-  function showConfirm(msg) {
+  function showConfirm(msg) { // Add Enter key handling for modal
+    document.addEventListener('keydown', (e) => {
+      const modal = document.getElementById('custom-modal');
+      if (e.key === 'Enter' && modal && modal.style.display !== 'none') {
+        e.preventDefault();
+        document.getElementById('modal-confirm').click();
+      }
+    });
     return new Promise((resolve) => {
       const modal = document.getElementById('custom-modal');
       const titleEl = document.getElementById('modal-title');
@@ -83,6 +90,13 @@
   async function doLogin() {
     loginMsg.textContent = '';
     const pwd = pwdInput.value || '';
+    // Trigger login on Enter key press
+    pwdInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        btnDoLogin.click();
+      }
+    });
     if (!pwd) { loginMsg.textContent = 'Enter password'; return; }
     try {
       const res = await fetch(API_BASE + '/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pwd }) });

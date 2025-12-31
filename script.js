@@ -15,7 +15,7 @@ function shuffle(arr) {
 }
 
 function mulberry32(seed) {
-  return function() {
+  return function () {
     let t = seed += 0x6D2B79F5;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
@@ -141,11 +141,11 @@ function showToast(message, type = 'info', timeout = 3500) {
     const removeAfter = Math.max(800, timeout);
     setTimeout(() => {
       t.style.animation = 'toast-out 240ms ease-in forwards';
-      setTimeout(() => { try { container.removeChild(t); } catch(e){} }, 260);
+      setTimeout(() => { try { container.removeChild(t); } catch (e) { } }, 260);
     }, removeAfter);
   } catch (err) {
     // Fallback to console if toast creation fails
-    try { console.warn('Toast failed:', message, err); } catch(e){}
+    try { console.warn('Toast failed:', message, err); } catch (e) { }
   }
 }
 
@@ -186,7 +186,7 @@ const els = {
   encouragement: $('#encouragement'),
   restart: $('#btn-restart'),
   home: $('#btn-home'),
-  bestScore: $('#best-score'), 
+  bestScore: $('#best-score'),
   bestAcc: $('#best-accuracy'),
   bestStreak: $('#longest-streak-best'),
   achievementsBox: $('#achievements'),
@@ -207,22 +207,22 @@ const els = {
   questionReviewList: document.getElementById('question-review-list')
 };
 
-  // Ensure `bibleQuestions` exists (may be defined in questions.js). If not, initialize empty.
-  if (typeof bibleQuestions === 'undefined') {
-    bibleQuestions = [];
-  }
+// Ensure `bibleQuestions` exists (may be defined in questions.js). If not, initialize empty.
+if (typeof bibleQuestions === 'undefined') {
+  bibleQuestions = [];
+}
 
-  // Go get the approved questions from the kitchen
-  fetch('http://127.0.0.1:5000/questions/live')
-    .then(res => res.json())
-    .then(data => {
-      bibleQuestions = data; 
-      console.log("Quiz Loaded with", bibleQuestions.length, "questions!");
-      // Now you can call your function to start the quiz
-    })
-    .catch(err => {
-      console.error('Failed to load live questions:', err);
-    });
+// Go get the approved questions from the kitchen
+fetch('http://127.0.0.1:5000/questions/live')
+  .then(res => res.json())
+  .then(data => {
+    bibleQuestions = data;
+    console.log("Quiz Loaded with", bibleQuestions.length, "questions!");
+    // Now you can call your function to start the quiz
+  })
+  .catch(err => {
+    console.error('Failed to load live questions:', err);
+  });
 
 // ========================
 // Screen Navigation
@@ -300,7 +300,7 @@ function startQuiz(mode = 'normal') {
 
   if (state.mode === 'daily') {
     const today = new Date();
-    const seed = parseInt(`${today.getFullYear()}${(today.getMonth()+1).toString().padStart(2,'0')}${today.getDate().toString().padStart(2,'0')}`);
+    const seed = parseInt(`${today.getFullYear()}${(today.getMonth() + 1).toString().padStart(2, '0')}${today.getDate().toString().padStart(2, '0')}`);
     // Pick questions deterministically and also shuffle options deterministically
     const picked = seededPick(bibleQuestions, 5, seed);
     state.questions = randomizeOptionsForQuestions(picked, seed);
@@ -525,7 +525,7 @@ function updateQuestionTimerCircle() {
   else if (pct <= 0.4) color = '#facc15';
   els.questionTimerArc.setAttribute('stroke', color);
   // Set SVG <text> value
-  console.log('Timer update:', {questionTimeLeft, pct, label: els.questionTimerLabel});
+  console.log('Timer update:', { questionTimeLeft, pct, label: els.questionTimerLabel });
   if (typeof els.questionTimerLabel.textContent !== 'undefined') {
     els.questionTimerLabel.textContent = Math.ceil(questionTimeLeft);
     console.log('Set timer label to', Math.ceil(questionTimeLeft));
@@ -549,7 +549,7 @@ function stopRoundTimer() {
 }
 
 // (Legacy timer functions kept for fallback, but not used)
-function startTimer() {}
+function startTimer() { }
 function stopTimer() { stopQuestionTimer(); }
 
 function handleAnswerTimeout() {
@@ -666,7 +666,7 @@ function showResults() {
       const item = document.createElement('div');
       item.className = 'question-review-item ' + (wasCorrect ? 'correct' : 'wrong');
       item.innerHTML = `
-        <div class="question-review-q">Q${idx+1}: ${q.question}</div>
+        <div class="question-review-q">Q${idx + 1}: ${q.question}</div>
         <div class="question-review-category">Category: ${q.category || 'N/A'}</div>
         <div class="question-review-user">Your answer: <span class="${wasCorrect ? 'question-review-correct' : 'question-review-wrong'}">${userAnswer}</span></div>
         <div>Correct answer: <span class="question-review-correct">${q.options[q.correct]}</span></div>
@@ -692,7 +692,7 @@ function showResults() {
       const item = document.createElement('div');
       item.className = 'question-review-item ' + (wasCorrect ? 'correct' : 'wrong');
       item.innerHTML = `
-        <div class="question-review-q">Q${idx+1}: ${q.question}</div>
+        <div class="question-review-q">Q${idx + 1}: ${q.question}</div>
         <div class="question-review-category">Category: ${q.category || 'N/A'}</div>
         <div class="question-review-user">Your answer: <span class="${wasCorrect ? 'question-review-correct' : 'question-review-wrong'}">${userAnswer !== null ? userAnswer : '<i>Skipped</i>'}</span></div>
         <div>Correct answer: <span class="question-review-correct">${q.options[q.correct]}</span></div>
@@ -778,7 +778,7 @@ function updateWelcomeStats() {
 }
 
 // updateTimerUI is now a no-op, as timer updates are handled by updateRoundTimerBar and updateQuestionTimerCircle
-function updateTimerUI() {}
+function updateTimerUI() { }
 
 function showSubmitModal(show) {
   if (!els.modalSubmit) return;
@@ -802,6 +802,17 @@ if (els.submitDuring) {
   els.submitDuring.addEventListener('click', () => {
     // Show the submit confirmation modal during the quiz
     showSubmitModal(true);
+  });
+  // Global Enter key handling for quiz submit
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const modal = document.getElementById('custom-modal');
+      // Only trigger if no modal is visible
+      if (!modal || modal.style.display === 'none') {
+        e.preventDefault();
+        els.submitDuring.click();
+      }
+    }
   });
 }
 
@@ -880,8 +891,8 @@ function setMute(mute) {
 // Patch playCorrect and playWrong to respect mute
 const origPlayCorrect = playCorrect;
 const origPlayWrong = playWrong;
-playCorrect = function() { if (!isMuted) origPlayCorrect(); };
-playWrong = function() { if (!isMuted) origPlayWrong(); };
+playCorrect = function () { if (!isMuted) origPlayCorrect(); };
+playWrong = function () { if (!isMuted) origPlayWrong(); };
 
 // Open/close sidebar
 sidebarToggleBtn.addEventListener('click', () => {
@@ -946,7 +957,7 @@ function closeQuestionModal() {
   questionModal.style.display = 'none';
   // clear fields
   try {
-    const ids = ['qText','qOptionA','qOptionB','qOptionC','qOptionD','qReference','qFact'];
+    const ids = ['qText', 'qOptionA', 'qOptionB', 'qOptionC', 'qOptionD', 'qReference', 'qFact'];
     ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     const sel = document.getElementById('qCorrect'); if (sel) sel.value = '0';
     const cat = document.getElementById('qCategory'); if (cat) cat.value = 'All';
@@ -954,36 +965,36 @@ function closeQuestionModal() {
 }
 
 document.getElementById('addQuestionBtn').addEventListener('click', () => {
-    if (!questionModal) return;
-    questionModal.style.display = 'block';
-    // trigger animated 'show' class
-    requestAnimationFrame(() => questionModal.classList.add('show'));
+  if (!questionModal) return;
+  questionModal.style.display = 'block';
+  // trigger animated 'show' class
+  requestAnimationFrame(() => questionModal.classList.add('show'));
 });
 
 // 2. Handle the actual submission
 document.getElementById('submitToBackend').addEventListener('click', () => {
-    // Grab the values from the input boxes
-    const questionData = {
-      question: document.getElementById('qText').value,
-      options: [
-        document.getElementById('qOptionA').value,
-        document.getElementById('qOptionB').value,
-        document.getElementById('qOptionC').value,
-        document.getElementById('qOptionD').value
-      ],
-      correct: parseInt(document.getElementById('qCorrect')?.value || '0', 10),
-      category: document.getElementById('qCategory')?.value || 'All',
-      reference: document.getElementById('qReference')?.value || '',
-      fact: document.getElementById('qFact')?.value || '',
-      status: 'PENDING'
-    };
+  // Grab the values from the input boxes
+  const questionData = {
+    question: document.getElementById('qText').value,
+    options: [
+      document.getElementById('qOptionA').value,
+      document.getElementById('qOptionB').value,
+      document.getElementById('qOptionC').value,
+      document.getElementById('qOptionD').value
+    ],
+    correct: parseInt(document.getElementById('qCorrect')?.value || '0', 10),
+    category: document.getElementById('qCategory')?.value || 'All',
+    reference: document.getElementById('qReference')?.value || '',
+    fact: document.getElementById('qFact')?.value || '',
+    status: 'PENDING'
+  };
 
-    // Send it to the Python Kitchen!
-    fetch('http://127.0.0.1:5000/add-question', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(questionData)
-    })
+  // Send it to the Python Kitchen!
+  fetch('http://127.0.0.1:5000/add-question', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(questionData)
+  })
     .then(res => res.json())
     .then(data => {
       showToast("Thanks!: " + (data.message || ''), 'success');
@@ -1000,7 +1011,7 @@ document.addEventListener('click', (e) => {
     const anchor = e.target.closest && e.target.closest('a[href^="mailto:"]');
     if (!anchor) return;
     const href = anchor.getAttribute('href') || '';
-      if (href.startsWith('mailto:zabdielfwesh001@gmail.com')) {
+    if (href.startsWith('mailto:zabdielfwesh001@gmail.com')) {
       e.preventDefault();
       const modal = document.getElementById('questionModal');
       if (modal) {
@@ -1076,14 +1087,14 @@ if (adminSubmitBtn) adminSubmitBtn.addEventListener('click', () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: pwd })
   })
-  .then(res => {
-    if (!res.ok) throw new Error('Invalid Password');
-    return res.json();
-  })
-  .then(data => {
-    // SAVE the key and password for the next page to use
-    sessionStorage.setItem('adminKey', data.admin_key); 
-    window.location.href = 'admin.html';
-  })
-  .catch(err => showToast(err.message || 'Error', 'error'));
+    .then(res => {
+      if (!res.ok) throw new Error('Invalid Password');
+      return res.json();
+    })
+    .then(data => {
+      // SAVE the key and password for the next page to use
+      sessionStorage.setItem('adminKey', data.admin_key);
+      window.location.href = 'admin.html';
+    })
+    .catch(err => showToast(err.message || 'Error', 'error'));
 });
