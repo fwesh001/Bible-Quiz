@@ -167,7 +167,7 @@
 
   async function approveSelected() {
     const checkboxes = Array.from(document.querySelectorAll('.q-select:checked'));
-    if (checkboxes.length === 0) { alert('No items selected'); return; }
+    if (checkboxes.length === 0) { showToast('No items selected', 'warning'); return; }
     if (!confirm(`Approve ${checkboxes.length} items?`)) return;
 
     for (const cb of checkboxes) {
@@ -179,7 +179,7 @@
 
   async function deleteSelected() {
     const checkboxes = Array.from(document.querySelectorAll('.q-select:checked'));
-    if (checkboxes.length === 0) { alert('No items selected'); return; }
+    if (checkboxes.length === 0) { showToast('No items selected', 'warning'); return; }
     if (!confirm(`Permanently delete ${checkboxes.length} items? This cannot be undone.`)) return;
 
     for (const cb of checkboxes) {
