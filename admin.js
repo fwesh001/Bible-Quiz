@@ -129,8 +129,7 @@
         <td><input data-field="category" data-id="${q.id}" value="${escapeHtml(q.category || '')}" /></td>
         <td><input data-field="reference" data-id="${q.id}" value="${escapeHtml(q.reference || '')}" /></td>
         <td><input data-field="fact" data-id="${q.id}" value="${escapeHtml(q.fact || '')}" /></td>
-        <td>
-        <td>
+        <td class="status-col">
           <span class="status-badge status-${(q.status || 'PENDING').toLowerCase()}">${q.status || 'PENDING'}</span>
         </td>
         <td class="controls">

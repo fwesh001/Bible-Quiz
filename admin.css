@@ -269,7 +269,16 @@ button.secondary {
 /* narrow actions column */
 #questions-table td.controls {
   white-space: nowrap;
-  width: 160px
+  width: 160px;
+  text-align: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.status-col {
+  text-align: center;
 }
 
 
