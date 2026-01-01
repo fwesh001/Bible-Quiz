@@ -277,6 +277,8 @@
 
   // Expose these to global scope so onclick handlers work
   window.resolveReport = async function (id) {
+    const confirmed = await showConfirm('Are you sure you want to resolve this report?');
+    if (!confirmed) return;
     try {
       const res = await fetch(`${API_BASE}/admin/resolve-report/${id}`, { method: 'POST', headers: { 'Admin-Key': getAdminKey() } });
       if (!res.ok) throw new Error('Failed');
@@ -286,7 +288,8 @@
   };
 
   window.deleteReport = async function (id) {
-    if (!confirm('Delete this report?')) return;
+    const confirmed = await showConfirm('Delete this report? This action cannot be undone.');
+    if (!confirmed) return;
     try {
       const res = await fetch(`${API_BASE}/admin/delete-report/${id}`, { method: 'DELETE', headers: { 'Admin-Key': getAdminKey() } });
       if (!res.ok) throw new Error('Failed');
