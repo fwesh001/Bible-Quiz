@@ -404,22 +404,61 @@
 
   function renderReports(list) {
     if (!reportsBody) return;
-    if (!list || list.length === 0) { reportsBody.innerHTML = '<tr><td colspan="6">No reports.</td></tr>'; return; }
+    if (!list || list.length === 0) { reportsBody.innerHTML = '<tr><td colspan="4">No reports.</td></tr>'; return; }
     reportsBody.innerHTML = '';
     list.forEach(r => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
+      const summary = document.createElement('tr');
+      summary.className = 'r-summary';
+      const shortQ = (r.question_text || '').length > 180 ? (r.question_text || '').slice(0, 177) + '...' : (r.question_text || 'Unknown');
+      summary.innerHTML = `
         <td data-label="ID">${r.id}</td>
-        <td data-label="Question">${escapeHtml(r.question_text || 'Unknown')}</td>
-        <td data-label="Reason">${escapeHtml(r.reason || 'No reason')}</td>
+        <td data-label="Reported Question"><div class="q-text">${escapeHtml(shortQ)}</div></td>
         <td data-label="Status"><span class="status-badge status-${(r.status || 'OPEN').toLowerCase()}">${r.status}</span></td>
-        <td data-label="Time">${new Date(r.created_at).toLocaleString()}</td>
-        <td data-label="Actions" class="controls">
-          ${r.status !== 'RESOLVED' ? `<button class="primary" onclick="resolveReport(${r.id})">Resolve</button>` : ''}
-          <button class="danger" onclick="deleteReport(${r.id})">Delete</button>
+        <td data-label="Expand" class="controls"><button data-action="toggle-report" data-id="${r.id}" class="expand-btn">▾</button></td>
+      `;
+
+      const details = document.createElement('tr');
+      details.className = 'expanded-row';
+      details.style.display = 'none';
+      details.innerHTML = `
+        <td colspan="4">
+          <div class="expanded-grid">
+            <div class="col left">
+              <label class="subtitle">Full Question</label>
+              <div style="white-space:pre-wrap; background:transparent; color:var(--text);">${escapeHtml(r.question_text || 'Unknown')}</div>
+              <div style="margin-top:12px;"><label class="subtitle">Reason</label><div style="white-space:pre-wrap; color:var(--muted);">${escapeHtml(r.reason || 'No reason')}</div></div>
+            </div>
+            <div class="col right">
+              <label class="subtitle">Reported At</label>
+              <div class="subtitle">${new Date(r.created_at).toLocaleString()}</div>
+              <div style="margin-top:12px; display:flex; gap:8px;">
+                ${r.status !== 'RESOLVED' ? `<button data-action="resolve" data-id="${r.id}" class="primary">Resolve</button>` : ''}
+                <button data-action="del-report" data-id="${r.id}" class="danger">Delete</button>
+              </div>
+            </div>
+          </div>
         </td>
       `;
-      reportsBody.appendChild(tr);
+
+      // Toggle handler
+      summary.querySelectorAll('button[data-action="toggle-report"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const open = details.style.display !== 'none';
+          details.style.display = open ? 'none' : 'table-row';
+          btn.textContent = open ? '▾' : '▴';
+        });
+      });
+
+      reportsBody.appendChild(summary);
+      reportsBody.appendChild(details);
+
+      // Attach action handlers for this item's buttons
+      details.querySelectorAll('button[data-action]').forEach(b => {
+        const act = b.dataset.action;
+        const id = b.dataset.id;
+        if (act === 'resolve') b.addEventListener('click', () => { window.resolveReport(id); });
+        if (act === 'del-report') b.addEventListener('click', () => { window.deleteReport(id); });
+      });
     });
   }
 
