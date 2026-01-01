@@ -262,12 +262,12 @@
     list.forEach(r => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${r.id}</td>
-        <td>${escapeHtml(r.question_text || '')}</td>
-        <td>${escapeHtml(r.reason || '')}</td>
-        <td class="text-center"><span class="status-badge status-${(r.status || 'OPEN').toLowerCase()}">${r.status}</span></td>
-        <td>${new Date(r.created_at).toLocaleString()}</td>
-        <td>
+        <td data-label="ID">${r.id}</td>
+        <td data-label="Reported Question">${escapeHtml(r.question_text || '')}</td>
+        <td data-label="Reason">${escapeHtml(r.reason || '')}</td>
+        <td data-label="Status" class="text-center"><span class="status-badge status-${(r.status || 'OPEN').toLowerCase()}">${r.status}</span></td>
+        <td data-label="Time">${new Date(r.created_at).toLocaleString()}</td>
+        <td data-label="Actions">
            <div class="controls">
              ${r.status !== 'RESOLVED' ? `<button class="btn-resolve" onclick="resolveReport(${r.id})">Resolve</button>` : ''}
              <button class="btn-delete" onclick="deleteReport(${r.id})">Delete</button>

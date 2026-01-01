@@ -173,8 +173,9 @@ button.btn-delete:hover {
     margin-bottom: 14px;
   }
 
-  /* Make table scrollable on mobile */
-  #questions-table {
+  /* Make tables scrollable on mobile */
+  #questions-table,
+  #reports-table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -182,22 +183,24 @@ button.btn-delete:hover {
 
   #questions-table thead,
   #questions-table tbody,
-  #questions-table tr {
+  #questions-table tr,
+  #reports-table thead,
+  #reports-table tbody,
+  #reports-table tr {
     display: block;
   }
 
-  #questions-table thead {
+  #questions-table thead,
+  #reports-table thead {
     position: sticky;
     top: 0;
     z-index: 10;
+    /* Hide headers visually but keep for access if needed, or just hide entirely since we use data-labels */
+    display: none;
   }
 
-  #questions-table thead th {
-    padding: 8px 10px;
-    font-size: 0.85rem;
-  }
-
-  #questions-table tbody tr {
+  #questions-table tbody tr,
+  #reports-table tbody tr {
     margin-bottom: 16px;
     display: grid;
     grid-template-columns: 1fr;
@@ -208,7 +211,8 @@ button.btn-delete:hover {
     padding: 12px;
   }
 
-  #questions-table tbody td {
+  #questions-table tbody td,
+  #reports-table tbody td {
     display: grid;
     grid-template-columns: 100px 1fr;
     gap: 8px;
@@ -217,26 +221,32 @@ button.btn-delete:hover {
     align-items: start;
   }
 
-  #questions-table tbody td:before {
+  #questions-table tbody td:before,
+  #reports-table tbody td:before {
     content: attr(data-label);
     font-weight: 700;
     color: var(--accent);
     font-size: 0.85rem;
   }
 
-  #questions-table td.controls {
+  #questions-table td.controls,
+  #reports-table td.controls {
     grid-template-columns: 1fr;
     width: 100%;
   }
 
-  #questions-table td.controls button {
+  #questions-table td.controls button,
+  #reports-table td.controls button {
     width: 100%;
     margin: 4px 0;
   }
 
   #questions-table input,
+  #reports-table input,
   #questions-table textarea,
-  #questions-table select {
+  #reports-table textarea,
+  #questions-table select,
+  #reports-table select {
     font-size: 14px;
     padding: 8px;
   }
