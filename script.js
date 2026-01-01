@@ -2,8 +2,14 @@
 
 // ========================
 // ========================
+// ========================
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+// Determine API base URL: default to localhost:5000 for local dev, or empty string (relative) for production
+const API_BASE = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
+  ? 'http://localhost:5000'
+  : '';
 
 function shuffle(arr) {
   const a = arr.slice();
@@ -227,7 +233,7 @@ if (typeof bibleQuestions === 'undefined') {
 }
 
 // Go get the approved questions from the kitchen
-fetch('http://localhost:5000/questions/live')
+fetch(API_BASE + '/questions/live')
   .then(res => res.json())
   .then(data => {
     bibleQuestions = data;
@@ -1037,7 +1043,7 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
   };
 
   // Send it to the Python Kitchen!
-  fetch('http://localhost:5000/add-question', {
+  fetch(API_BASE + '/add-question', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(questionData)
@@ -1129,7 +1135,7 @@ if (adminSubmitBtn) adminSubmitBtn.addEventListener('click', () => {
   const pwd = adminPasswordInput ? adminPasswordInput.value : '';
   if (!pwd) { showToast('Enter password', 'warn'); return; }
 
-  fetch('http://localhost:5000/admin/login', {
+  fetch(API_BASE + '/admin/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: pwd })
@@ -1247,7 +1253,7 @@ function renderBookmarks() {
 }
 
 function submitReport(q, reason, containerToClose) {
-  fetch('http://localhost:5000/report-question', {
+  fetch(API_BASE + '/report-question', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

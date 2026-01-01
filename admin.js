@@ -1,5 +1,8 @@
 (function () {
-  const API_BASE = 'http://localhost:5000'; // Target python backend explicitly
+  // Determine API base URL: default to localhost:5000 for local dev, or empty string (relative) for production
+  const API_BASE = (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost')
+    ? 'http://localhost:5000'
+    : '';
   const body = document.getElementById('questions-body');
   const reportsBody = document.getElementById('reports-body');
   const btnRefresh = document.getElementById('btn-refresh');
