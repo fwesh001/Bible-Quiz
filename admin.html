@@ -28,30 +28,58 @@
         <div id="login-msg" class="subtitle" style="color:var(--wrong);"></div>
       </section>
 
-      <section id="controls" class="admin-controls" style="margin:10px 0;">
-        <button id="btn-refresh" class="primary">Refresh</button>
-        <button id="btn-approve-selected" class="secondary">Approve Selected</button>
-        <button id="btn-delete-selected" class="danger" style="background:var(--wrong);color:white;border:none;">Delete
-          Selected</button>
+      <section id="nav-tabs" style="margin:16px 0; border-bottom:1px solid var(--border);">
+        <button id="tab-questions" class="secondary active"
+          style="border-bottom-left-radius:0; border-bottom-right-radius:0;">Pending Questions</button>
+        <button id="tab-reports" class="secondary"
+          style="border-bottom-left-radius:0; border-bottom-right-radius:0;">Reports</button>
       </section>
 
-      <section id="list">
-        <table id="questions-table" style="width:100%; border-collapse:collapse;">
+      <section id="questions-section">
+        <section id="controls" class="admin-controls" style="margin:10px 0;">
+          <button id="btn-refresh" class="primary">Refresh</button>
+          <button id="btn-approve-selected" class="secondary">Approve Selected</button>
+          <button id="btn-delete-selected" class="danger"
+            style="background:var(--wrong);color:white;border:none;">Delete Selected</button>
+        </section>
+
+        <section id="list">
+          <table id="questions-table" style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="width:32px"><input type="checkbox" id="select-all" /></th>
+                <th style="text-align:left">ID</th>
+                <th style="text-align:left">Question</th>
+                <th>Options</th>
+                <th>Correct</th>
+                <th>Category</th>
+                <th>Reference</th>
+                <th>Fact</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="questions-body"></tbody>
+          </table>
+        </section>
+      </section>
+
+      <section id="reports-section" style="display:none;">
+        <div class="admin-controls" style="margin:10px 0;">
+          <button id="btn-refresh-reports" class="primary">Refresh Reports</button>
+        </div>
+        <table style="width:100%; border-collapse:collapse;">
           <thead>
             <tr>
-              <th style="width:32px"><input type="checkbox" id="select-all" /></th>
-              <th style="text-align:left">ID</th>
-              <th style="text-align:left">Question</th>
-              <th>Options</th>
-              <th>Correct</th>
-              <th>Category</th>
-              <th>Reference</th>
-              <th>Fact</th>
-              <th class="text-center">Status</th>
-              <th class="text-center">Actions</th>
+              <th>ID</th>
+              <th>Reported Question</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Time</th>
+              <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="questions-body"></tbody>
+          <tbody id="reports-body"></tbody>
         </table>
       </section>
     </main>

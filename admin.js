@@ -1,7 +1,9 @@
 (function () {
   const API_BASE = ''; // Use relative URLs for both local and production
   const body = document.getElementById('questions-body');
+  const reportsBody = document.getElementById('reports-body');
   const btnRefresh = document.getElementById('btn-refresh');
+  const btnRefreshReports = document.getElementById('btn-refresh-reports');
   const btnApproveSelected = document.getElementById('btn-approve-selected');
   const btnDeleteSelected = document.getElementById('btn-delete-selected');
   const selectAllBox = document.getElementById('select-all');
@@ -102,7 +104,12 @@
       const res = await fetch(API_BASE + '/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pwd }) });
       if (!res.ok) throw new Error('Login failed');
       const j = await res.json();
-      if (j.admin_key) { setAdminKey(j.admin_key); loginSection.style.display = 'none'; loadQuestions(); }
+      if (j.admin_key) {
+        setAdminKey(j.admin_key);
+        loginSection.style.display = 'none';
+        loadQuestions();
+        loadReports();
+      }
       else throw new Error(j.message || 'Invalid response');
     } catch (err) { loginMsg.textContent = err.message; }
   }
@@ -234,13 +241,69 @@
     loadQuestions();
   }
 
+  async function loadReports() {
+    if (!reportsBody) return;
+    reportsBody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
+    try {
+      const res = await fetch(API_BASE + '/admin/reports', { headers: { 'Admin-Key': getAdminKey() } });
+      if (!res.ok) throw new Error('Failed to load reports');
+      const list = await res.json();
+      renderReports(list || []);
+    } catch (err) { reportsBody.innerHTML = `<tr><td colspan="6">Error: ${err.message}</td></tr>`; }
+  }
+
+  function renderReports(list) {
+    if (!reportsBody) return;
+    if (!list || list.length === 0) { reportsBody.innerHTML = '<tr><td colspan="6">No reports.</td></tr>'; return; }
+    reportsBody.innerHTML = '';
+    list.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${r.id}</td>
+        <td>${escapeHtml(r.question_text || '')}</td>
+        <td>${escapeHtml(r.reason || '')}</td>
+        <td><span class="status-badge status-${(r.status || 'OPEN').toLowerCase()}">${r.status}</span></td>
+        <td>${new Date(r.created_at).toLocaleString()}</td>
+        <td>
+           ${r.status !== 'RESOLVED' ? `<button class="primary" onclick="resolveReport(${r.id})">Resolve</button>` : ''}
+           <button class="danger" onclick="deleteReport(${r.id})">Delete</button>
+        </td>
+      `;
+      reportsBody.appendChild(tr);
+    });
+  }
+
+  // Expose these to global scope so onclick handlers work
+  window.resolveReport = async function (id) {
+    try {
+      const res = await fetch(`${API_BASE}/admin/resolve-report/${id}`, { method: 'POST', headers: { 'Admin-Key': getAdminKey() } });
+      if (!res.ok) throw new Error('Failed');
+      showToast('Resolved', 'success');
+      loadReports();
+    } catch (e) { showToast(e.message, 'error'); }
+  };
+
+  window.deleteReport = async function (id) {
+    if (!confirm('Delete this report?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/delete-report/${id}`, { method: 'DELETE', headers: { 'Admin-Key': getAdminKey() } });
+      if (!res.ok) throw new Error('Failed');
+      showToast('Deleted', 'success');
+      loadReports();
+    } catch (e) { showToast(e.message, 'error'); }
+  };
+
   function escapeHtml(str) {
+
     if (!str) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
   // Wire UI
+  // Wire UI
   btnRefresh.addEventListener('click', () => loadQuestions());
+  if (btnRefreshReports) btnRefreshReports.addEventListener('click', () => loadReports());
+
 
   if (selectAllBox) {
     selectAllBox.addEventListener('change', (e) => {
@@ -255,7 +318,29 @@
   btnBack.addEventListener('click', () => { window.location.href = 'index.html'; });
   btnDoLogin.addEventListener('click', doLogin);
 
+  // Tabs
+  const tabQ = document.getElementById('tab-questions');
+  const tabR = document.getElementById('tab-reports');
+  const secQ = document.getElementById('questions-section');
+  const secR = document.getElementById('reports-section');
+
+  if (tabQ && tabR) {
+    tabQ.addEventListener('click', () => {
+      tabQ.classList.add('active'); tabR.classList.remove('active');
+      secQ.style.display = 'block'; secR.style.display = 'none';
+    });
+    tabR.addEventListener('click', () => {
+      tabR.classList.add('active'); tabQ.classList.remove('active');
+      secQ.style.display = 'none'; secR.style.display = 'block';
+      loadReports();
+    });
+  }
+
   // initial
   requireAuthUI();
-  if (getAdminKey()) loadQuestions();
+  if (getAdminKey()) {
+    loadQuestions();
+    loadReports();
+  }
+
 })();

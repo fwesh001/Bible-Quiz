@@ -109,7 +109,8 @@ const state = {
   accepting: true,
   mode: 'normal', // 'normal' | 'daily'
   category: 'All',
-  difficulty: 'All'
+  difficulty: 'All',
+  bookmarks: [] // list of question objects or IDs
 };
 
 // ========================
@@ -117,8 +118,10 @@ const state = {
 // ========================
 const STORAGE_KEYS = {
   HIGH: 'bibleQuizHighScore',
-  ACH: 'bibleQuizAchievements'
+  ACH: 'bibleQuizAchievements',
+  BOOKMARKS: 'bibleQuizBookmarks'
 };
+
 
 function loadHigh() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.HIGH)) || { bestScore: 0, bestAccuracy: 0, bestStreak: 0 }; }
@@ -154,6 +157,13 @@ function loadAch() {
   catch { return {}; }
 }
 function saveAch(obj) { localStorage.setItem(STORAGE_KEYS.ACH, JSON.stringify(obj)); }
+
+function loadBookmarks() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.BOOKMARKS)) || []; }
+  catch { return []; }
+}
+function saveBookmarks(arr) { localStorage.setItem(STORAGE_KEYS.BOOKMARKS, JSON.stringify(arr)); }
+
 
 // ========================
 // DOM Refs
@@ -204,7 +214,11 @@ const els = {
   questionTimerBarLabel: document.getElementById('question-timer-bar-label'),
   roundTimeInput: document.getElementById('round-time'),
   questionTimeInput: document.getElementById('question-time'),
-  questionReviewList: document.getElementById('question-review-list')
+  questionReviewList: document.getElementById('question-review-list'),
+  bookmarkView: document.getElementById('bookmark-view'),
+  btnShowBookmarks: document.getElementById('btn-show-bookmarks'),
+  btnShowResultsMsg: document.getElementById('btn-show-results-msg'), // toggle back to stats
+  btnBookmarkCurrent: document.getElementById('btn-bookmark-current')
 };
 
 // Ensure `bibleQuestions` exists (may be defined in questions.js). If not, initialize empty.
@@ -260,6 +274,8 @@ function startQuiz(mode = 'normal') {
   state.bonuses5 = 0;
   state.missed = [];
   state.accepting = true;
+  state.bookmarks = loadBookmarks(); // Load bookmarks on start
+
 
   // Set round and per-question timer from user input
   // Get round time from input (in minutes), default 3
@@ -412,7 +428,17 @@ function renderQuestion() {
   els.ref.textContent = '';
   els.fact.textContent = '';
   if (els.ref) els.ref.classList.remove('show');
+  if (els.ref) els.ref.classList.remove('show');
   if (els.fact) els.fact.classList.remove('show');
+
+  // Update bookmark button state
+  if (els.btnBookmarkCurrent) {
+    const qKey = getQuestionKey(q);
+    const isBookmarked = state.bookmarks.some(b => getQuestionKey(b) === qKey);
+    els.btnBookmarkCurrent.textContent = isBookmarked ? '★' : '☆';
+    els.btnBookmarkCurrent.classList.toggle('active', isBookmarked);
+    els.btnBookmarkCurrent.title = isBookmarked ? 'Remove Bookmark' : 'Bookmark for later';
+  }
 
   // If this question was already answered, lock the options and show feedback
   if (typeof q.userAnswer !== 'undefined' && q.userAnswer !== null) {
@@ -691,17 +717,38 @@ function showResults() {
       // If missed, highlight red; if correct, green
       const item = document.createElement('div');
       item.className = 'question-review-item ' + (wasCorrect ? 'correct' : 'wrong');
+
+      // Bookmark button state
+      // Use question text + correct index + options[0] as unique key fallback if no ID
+      const qKey = getQuestionKey(q);
+      const isBookmarked = state.bookmarks.some(b => getQuestionKey(b) === qKey);
+
       item.innerHTML = `
-        <div class="question-review-q">Q${idx + 1}: ${q.question}</div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div class="question-review-q">Q${idx + 1}: ${q.question}</div>
+          <button class="bookmark-btn ${isBookmarked ? 'active' : ''}" title="${isBookmarked ? 'Remove Bookmark' : 'Bookmark for later'}" data-idx="${idx}">
+            ${isBookmarked ? '★' : '☆'}
+          </button>
+        </div>
         <div class="question-review-category">Category: ${q.category || 'N/A'}</div>
         <div class="question-review-user">Your answer: <span class="${wasCorrect ? 'question-review-correct' : 'question-review-wrong'}">${userAnswer !== null ? userAnswer : '<i>Skipped</i>'}</span></div>
         <div>Correct answer: <span class="question-review-correct">${q.options[q.correct]}</span></div>
         <div class="question-review-fact">Fact: ${q.fact || ''}</div>
         <div class="question-review-ref">Reference: ${q.reference || ''}</div>
       `;
+
+      // Attach click handler for bookmark
+      item.querySelector('.bookmark-btn').addEventListener('click', (e) => {
+        const btn = e.currentTarget;
+        const qIdx = parseInt(btn.dataset.idx, 10);
+        const question = state.questions[qIdx];
+        toggleBookmark(question, btn);
+      });
+
       els.questionReviewList.appendChild(item);
     });
   }
+
 
   // Update welcome stats now (so returning home shows latest)
   updateWelcomeStats();
@@ -832,6 +879,14 @@ els.skip.addEventListener('click', () => {
     nextQuestion();
   }
 });
+
+// Bookmark current button
+if (els.btnBookmarkCurrent) {
+  els.btnBookmarkCurrent.addEventListener('click', () => {
+    const q = state.questions[state.index];
+    if (q) toggleBookmark(q, els.btnBookmarkCurrent);
+  });
+}
 
 els.opts.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -1098,3 +1153,158 @@ if (adminSubmitBtn) adminSubmitBtn.addEventListener('click', () => {
     })
     .catch(err => showToast(err.message || 'Error', 'error'));
 });
+
+
+// ========================
+// Bookmark & Reporting Logic
+// ========================
+
+function getQuestionKey(q) {
+  // Generate a reasonably unique signature for a question without ID
+  // (Assuming question text is mostly unique)
+  return (q.question || '') + '|' + (q.correct || 0);
+}
+
+function toggleBookmark(q, btnEl) {
+  state.bookmarks = loadBookmarks();
+  const key = getQuestionKey(q);
+  const existingIdx = state.bookmarks.findIndex(b => getQuestionKey(b) === key);
+
+  if (existingIdx !== -1) {
+    // Remove
+    state.bookmarks.splice(existingIdx, 1);
+    if (btnEl) {
+      btnEl.textContent = '☆';
+      btnEl.classList.remove('active');
+      btnEl.title = 'Bookmark for later';
+    }
+    showToast('Bookmark removed');
+  } else {
+    // Add
+    state.bookmarks.push(q);
+    if (btnEl) {
+      btnEl.textContent = '★';
+      btnEl.classList.add('active');
+      btnEl.title = 'Remove Bookmark';
+    }
+    showToast('Bookmark added');
+  }
+  saveBookmarks(state.bookmarks);
+  // If we are currently viewing bookmarks, refresh the list
+  if (els.bookmarkView && els.bookmarkView.classList.contains('active')) {
+    renderBookmarks();
+  }
+}
+
+function renderBookmarks() {
+  if (!els.bookmarkView) return;
+  state.bookmarks = loadBookmarks();
+  els.bookmarkView.innerHTML = '';
+
+  if (state.bookmarks.length === 0) {
+    els.bookmarkView.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-2)">No bookmarks yet.</div>';
+    return;
+  }
+
+  state.bookmarks.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'bookmark-item';
+    div.innerHTML = `
+      <div class="bookmark-header">
+        <div class="bookmark-q-text">${i + 1}. ${q.question}</div>
+        <button class="bookmark-btn active" title="Remove Bookmark">★</button>
+      </div>
+      <div class="bookmark-meta">Category: ${q.category || 'General'}</div>
+      <div class="bookmark-meta">Correct: ${(q.options && q.options[q.correct]) ? q.options[q.correct] : 'Unknown'}</div>
+      <div class="bookmark-actions">
+        <button class="small secondary btn-report-toggle">⚠️ Report Issue</button>
+      </div>
+      <div class="report-box">
+         <input type="text" class="report-input" placeholder="Reason for reporting (e.g. wrong answer, typo)..." />
+         <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button class="small secondary btn-cancel-report">Cancel</button>
+            <button class="small primary btn-submit-report">Submit</button>
+         </div>
+      </div>
+    `;
+
+    // Remove handler
+    div.querySelector('.bookmark-btn').addEventListener('click', () => toggleBookmark(q, null));
+
+    // Report toggle
+    const reportBox = div.querySelector('.report-box');
+    div.querySelector('.btn-report-toggle').addEventListener('click', () => {
+      reportBox.classList.toggle('show');
+      if (reportBox.classList.contains('show')) {
+        reportBox.querySelector('.report-input').focus();
+      }
+    });
+
+    // Cancel report
+    div.querySelector('.btn-cancel-report').addEventListener('click', () => reportBox.classList.remove('show'));
+
+    // Submit report
+    div.querySelector('.btn-submit-report').addEventListener('click', () => {
+      const reason = reportBox.querySelector('.report-input').value.trim();
+      if (!reason) { showToast('Please enter a reason', 'warn'); return; }
+      submitReport(q, reason, reportBox);
+    });
+
+    els.bookmarkView.appendChild(div);
+  });
+}
+
+function submitReport(q, reason, containerToClose) {
+  fetch('/report-question', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      question_text: q.question,
+      reason: reason,
+      id: q.id || 0 // pass ID if available
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      showToast(data.message || 'Report submitted', 'success');
+      if (containerToClose) containerToClose.classList.remove('show');
+    })
+    .catch(err => {
+      console.error(err);
+      showToast('Failed to submit report', 'error');
+    });
+}
+
+// Result page toggle logic
+if (els.btnShowBookmarks) {
+  els.btnShowBookmarks.addEventListener('click', () => {
+    // Hide stats and review list
+    document.querySelector('#screen-results .stats').style.display = 'none';
+    document.getElementById('achievements').parentElement.style.display = 'none';
+    document.getElementById('question-review-list').parentElement.style.display = 'none';
+
+    // Show bookmarks view
+    renderBookmarks();
+    if (els.bookmarkView) els.bookmarkView.classList.add('active');
+
+    // Toggle buttons
+    els.btnShowBookmarks.style.display = 'none';
+    if (els.btnShowResultsMsg) els.btnShowResultsMsg.style.display = 'inline-block';
+  });
+}
+
+if (els.btnShowResultsMsg) {
+  els.btnShowResultsMsg.addEventListener('click', () => {
+    // Show stats and review list
+    document.querySelector('#screen-results .stats').style.display = 'flex';
+    document.getElementById('achievements').parentElement.style.display = 'block';
+    document.getElementById('question-review-list').parentElement.style.display = 'block';
+
+    // Hide bookmarks view
+    if (els.bookmarkView) els.bookmarkView.classList.remove('active');
+
+    // Toggle buttons
+    if (els.btnShowBookmarks) els.btnShowBookmarks.style.display = 'inline-block';
+    els.btnShowResultsMsg.style.display = 'none';
+  });
+}

@@ -43,6 +43,16 @@ def init_db():
             status TEXT
         )
     ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            question_id INTEGER,
+            question_text TEXT,
+            reason TEXT,
+            status TEXT DEFAULT 'OPEN',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     conn.commit()
     # Ensure older databases get the new columns if they were created without option_c/option_d
     cursor.execute("PRAGMA table_info(pending_questions)")
@@ -287,6 +297,73 @@ def delete_question(q_id):
     conn.close()
     logger.info(f"Question {q_id} permanently deleted via Admin.")
     return jsonify({"message": f"Question {q_id} deleted."})
+
+@app.route('/report-question', methods=['POST'])
+def report_question():
+    data = request.json or {}
+    q_text = data.get('question_text', 'Unknown')
+    q_reason = data.get('reason', 'No reason provided')
+    # Optional: if you have a stable question ID from questions.js, store it. 
+    # Since questions.js items don't strictly have DB IDs unless they came from recent approvals, 
+    # we might just rely on text or an index if stable. 
+    # We'll store a loose 'question_id' if sent, otherwise 0.
+    q_id = data.get('id', 0)
+
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO reports (question_id, question_text, reason, status) VALUES (?, ?, ?, ?)', 
+                   (q_id, q_text, q_reason, 'OPEN'))
+    conn.commit()
+    conn.close()
+    
+    logger.info(f"New Report received for: {q_text[:30]}...")
+    return jsonify({"message": "Report received. Thank you!"})
+
+@app.route('/admin/reports', methods=['GET'])
+def get_reports():
+    # Require Admin-Key header for authentication (optional, but consistent)
+    # admin_key = request.headers.get('Admin-Key')
+    # if not admin_key or admin_key != ADMIN_KEY:
+    #    return jsonify({"message": "Unauthorized"}), 401
+
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    
+    # Get all reports, newest first
+    cursor.execute('SELECT * FROM reports ORDER BY id DESC')
+    rows = cursor.fetchall()
+    
+    reports = [dict(row) for row in rows]
+    conn.close()
+    return jsonify(reports)
+
+@app.route('/admin/resolve-report/<int:r_id>', methods=['POST'])
+def resolve_report(r_id):
+    admin_key = request.headers.get('Admin-Key')
+    if not admin_key or admin_key != ADMIN_KEY:
+        return jsonify({"message": "Unauthorized"}), 401
+        
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE reports SET status = "RESOLVED" WHERE id = ?', (r_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Report resolved"})
+
+@app.route('/admin/delete-report/<int:r_id>', methods=['DELETE'])
+def delete_report(r_id):
+    admin_key = request.headers.get('Admin-Key')
+    if not admin_key or admin_key != ADMIN_KEY:
+        return jsonify({"message": "Unauthorized"}), 401
+        
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM reports WHERE id = ?', (r_id,))
+    conn.commit()
+    conn.close()
+    return jsonify({"message": "Report deleted"})
+
 
 if __name__ == '__main__':
     logger.info("Starting Bible Quiz Backend on port 5000...")

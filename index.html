@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bible Quiz</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <header>
     <h1>📜 Bible Quiz</h1>
-<!-- Sidebar Toggle Button -->
-<button id="sidebar-toggle" class="sidebar-open-btn">☰
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebar-toggle" class="sidebar-open-btn">☰
 
   </header>
   <main>
@@ -31,10 +33,11 @@
                 <option value="New Testament">Greek scriptures-(New Testament)</option>
               </select>
             </div>
-              <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
-                <label class="subtitle" for="round-time" style="margin-right:8px;">Time Limit</label>
-                <input id="round-time" type="number" min="1" max="30" value="3" class="select" style="width:110px" aria-label="Round Time (minutes)" />
-              </div>
+            <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
+              <label class="subtitle" for="round-time" style="margin-right:8px;">Time Limit</label>
+              <input id="round-time" type="number" min="1" max="30" value="3" class="select" style="width:110px"
+                aria-label="Round Time (minutes)" />
+            </div>
             <label for="difficulty" class="subtitle" style="margin-top:8px; display:block;">Difficulty</label>
             <div class="controls">
               <select id="difficulty" class="select" aria-label="Difficulty">
@@ -45,7 +48,8 @@
             </div>
             <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
               <label class="subtitle" for="num-questions" style="margin-right:8px;">Number of Questions</label>
-              <input id="num-questions" type="number" min="1" max="50" value="10" class="select" style="width:110px" aria-label="Number of Questions" />
+              <input id="num-questions" type="number" min="1" max="50" value="10" class="select" style="width:110px"
+                aria-label="Number of Questions" />
             </div>
           </div>
 
@@ -84,22 +88,29 @@
           <div class="quiz-main">
             <div class="quiz-head">
               <div class="progress"><span id="progress-text">Question 1</span></div>
+              <button id="btn-bookmark-current" class="bookmark-btn" title="Bookmark for later"
+                style="font-size:1.4rem;">☆</button>
             </div>
             <!-- QUESTION TEXT -->
             <div class="question" id="question-text">Question will appear here</div>
             <div class="q-fact" id="fact"></div>
             <div class="options">
-              <button class="option" id="opt-0" data-index="0"><span class="badge">A</span><span class="opt-text"></span></button>
-              <button class="option" id="opt-1" data-index="1"><span class="badge">B</span><span class="opt-text"></span></button>
-              <button class="option" id="opt-2" data-index="2"><span class="badge">C</span><span class="opt-text"></span></button>
-              <button class="option" id="opt-3" data-index="3"><span class="badge">D</span><span class="opt-text"></span></button>
+              <button class="option" id="opt-0" data-index="0"><span class="badge">A</span><span
+                  class="opt-text"></span></button>
+              <button class="option" id="opt-1" data-index="1"><span class="badge">B</span><span
+                  class="opt-text"></span></button>
+              <button class="option" id="opt-2" data-index="2"><span class="badge">C</span><span
+                  class="opt-text"></span></button>
+              <button class="option" id="opt-3" data-index="3"><span class="badge">D</span><span
+                  class="opt-text"></span></button>
             </div>
             <div class="feedback" id="feedback">
               <div class="ref" id="ref"></div>
             </div>
             <div class="controls">
               <button id="btn-skip" class="secondary" title="Skip this question and move on">Skip</button>
-              <button id="btn-submit-quiz" class="primary" title="Submit quiz now" style="margin-left:8px;">Submit</button>
+              <button id="btn-submit-quiz" class="primary" title="Submit quiz now"
+                style="margin-left:8px;">Submit</button>
             </div>
           </div>
           <aside class="quiz-sidebar">
@@ -139,18 +150,28 @@
           <div class="achievements" id="achievements"></div>
         </div>
 
-        <div style="margin-top:16px;">
-
-        <!-- Full Question Review -->
-        <div style="margin-top:16px;">
-          <h3 style="margin:0 0 8px; font-size:1.05rem; color:var(--brand-2)">Question Review</h3>
-          <div class="question-review" id="question-review-list"></div>
+        <!-- Bookmarking Controls -->
+        <div style="margin-top:16px; text-align:center;">
+          <button id="btn-show-bookmarks" class="secondary" style="width:100%">★ Bookmarked Questions</button>
+          <button id="btn-show-results-msg" class="secondary" style="width:100%; display:none;">← Back to
+            Results</button>
         </div>
 
-        <div class="controls" style="margin-top:16px;">
-          <button id="btn-restart" class="primary">Play Again</button>
-          <button id="btn-home" class="secondary">Home</button>
-        </div>
+        <!-- Bookmark View (initially hidden) -->
+        <div id="bookmark-view"></div>
+
+        <div style="margin-top:16px;">
+
+          <!-- Full Question Review -->
+          <div style="margin-top:16px;">
+            <h3 style="margin:0 0 8px; font-size:1.05rem; color:var(--brand-2)">Question Review</h3>
+            <div class="question-review" id="question-review-list"></div>
+          </div>
+
+          <div class="controls" style="margin-top:16px;">
+            <button id="btn-restart" class="primary">Play Again</button>
+            <button id="btn-home" class="secondary">Home</button>
+          </div>
       </section>
       <div id="modal-submit" class="modal" aria-hidden="true">
         <div class="modal-backdrop"></div>
@@ -188,46 +209,50 @@
           <button id="toggle-darkmode">🌙 Dark Mode</button>
         </div>
         <div class="sidebar-item">
-          <button id="addQuestionBtn" style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left;">➕ Add Question</button>
+          <button id="addQuestionBtn"
+            style="display:block; width:100%; background:var(--brand-1,#3b82f6); color:#fff; border:none; padding:0.6rem 1rem; font-size:1rem; font-weight:500; border-radius:0.4rem; cursor:pointer; text-align:left;">➕
+            Add Question</button>
         </div>
         <div class="sidebar-item">
           <button id="adminLoginBtn">🔒 Admin</button>
         </div>
 
         <div id="questionModal" class="question-modal" style="display:none;">
-            <h3 style="margin:0 0 8px">Add a Scripture Question</h3>
-            <input type="text" id="qText" placeholder="Question Text">
-            <input type="text" id="qOptionA" placeholder="Option A">
-            <input type="text" id="qOptionB" placeholder="Option B">
-            <input type="text" id="qOptionC" placeholder="Option C">
-            <input type="text" id="qOptionD" placeholder="Option D">
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <label class="subtitle" for="qCorrect" style="margin:0">Correct:</label>
-              <select id="qCorrect" aria-label="Correct option">
-                <option value="0">A</option>
-                <option value="1">B</option>
-                <option value="2">C</option>
-                <option value="3">D</option>
-              </select>
-              <label class="subtitle" for="qCategory" style="margin:0 0 0 12px">Category:</label>
-              <select id="qCategory" aria-label="Question category">
-                <option value="All">All</option>
-                <option value="New Testament">New Testament</option>
-                <option value="Old Testament">Old Testament</option>
-              </select>
-            </div>
-            <input type="text" id="qReference" placeholder="Reference (e.g. John 3:16)" style="margin-top:8px;" />
-            <textarea id="qFact" placeholder="Fact (optional)" style="margin-top:8px; width:100%; min-height:60px"></textarea>
-            <div class="controls">
-              <button id="submitToBackend">Submit to Backend</button>
-              <button class="close-btn" onclick="closeQuestionModal()">Cancel</button>
-            </div>
+          <h3 style="margin:0 0 8px">Add a Scripture Question</h3>
+          <input type="text" id="qText" placeholder="Question Text">
+          <input type="text" id="qOptionA" placeholder="Option A">
+          <input type="text" id="qOptionB" placeholder="Option B">
+          <input type="text" id="qOptionC" placeholder="Option C">
+          <input type="text" id="qOptionD" placeholder="Option D">
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <label class="subtitle" for="qCorrect" style="margin:0">Correct:</label>
+            <select id="qCorrect" aria-label="Correct option">
+              <option value="0">A</option>
+              <option value="1">B</option>
+              <option value="2">C</option>
+              <option value="3">D</option>
+            </select>
+            <label class="subtitle" for="qCategory" style="margin:0 0 0 12px">Category:</label>
+            <select id="qCategory" aria-label="Question category">
+              <option value="All">All</option>
+              <option value="New Testament">New Testament</option>
+              <option value="Old Testament">Old Testament</option>
+            </select>
+          </div>
+          <input type="text" id="qReference" placeholder="Reference (e.g. John 3:16)" style="margin-top:8px;" />
+          <textarea id="qFact" placeholder="Fact (optional)"
+            style="margin-top:8px; width:100%; min-height:60px"></textarea>
+          <div class="controls">
+            <button id="submitToBackend">Submit to Backend</button>
+            <button class="close-btn" onclick="closeQuestionModal()">Cancel</button>
+          </div>
         </div>
 
         <!-- Admin Login Modal placed inside sidebar for context with controls -->
         <div id="adminLoginModal" class="modal" aria-hidden="true">
           <div class="modal-backdrop"></div>
-          <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-login-title" style="max-width:400px;">
+          <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-login-title"
+            style="max-width:400px;">
             <h3 id="admin-login-title">Admin Login</h3>
             <p class="subtitle">Enter admin password to view pending questions.</p>
             <input id="adminPasswordInput" type="password" placeholder="Password" />
@@ -250,4 +275,5 @@
   <!-- Toast container -->
   <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 </body>
+
 </html>
