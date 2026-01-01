@@ -80,6 +80,16 @@ An admin interface is included to collect, review, and approve submitted questio
 - **Keyboard Support**: Press Enter to login or confirm modal actions
 - **Structured Logging**: All admin actions are logged with timestamps
 
+### Admin UI — Compact Summary View (Updated)
+
+- The admin interface now uses a compact summary + expandable details pattern across the **Pending**, **Reports**, and **Search** tabs.
+- Each item shows a single-line summary (full question text and status) with an expand toggle. Click the expand button to reveal editable fields, options, and action buttons (Save / Approve / Delete or Resolve / Delete for reports).
+- This reduces visual clutter and improves scanning large lists.
+
+Quick notes for the admin UI:
+- To test the admin UI without the backend, serve the project root as a static site (see Testing below) and open `admin.html`.
+- If the backend is running, the admin UI will load pending items from the API endpoints and wire Save / Approve / Delete actions to the backend.
+
 ### Backend Summary (in `backend/app.py`)
 
 - Built with Flask and `flask-cors`.
@@ -106,6 +116,29 @@ python backend/app.py
 ```
 
 ---
+
+## 🧪 Testing the Admin UI (Quick)
+
+You can open the `admin.html` file directly from a static server or via the backend. Recommended quick tests:
+
+Static server (no backend API):
+```powershell
+# from project root
+python -m http.server 8000
+# then open http://localhost:8000/admin.html
+```
+
+With backend (API wired):
+```powershell
+cd backend
+python app.py
+# then open http://localhost:5000/admin.html
+```
+
+When testing, try:
+- Expand / collapse rows in Pending, Reports, and Search
+- Perform Save, Approve, Delete actions (with backend running)
+- Use the login area to set the admin key (if backend requires auth)
 
 ## ➕ Adding / Contributing Questions
 
