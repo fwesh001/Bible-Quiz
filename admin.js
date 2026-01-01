@@ -16,6 +16,16 @@
   const btnDoLogin = document.getElementById('btn-do-login');
   const loginMsg = document.getElementById('login-msg');
 
+  // Search Tab Elements
+  const searchBody = document.getElementById('search-body');
+  const searchInput = document.getElementById('search-input');
+  const searchStatus = document.getElementById('search-status');
+  const searchCategory = document.getElementById('search-category');
+  const searchStats = document.getElementById('search-stats');
+  const btnSearchRefresh = document.getElementById('btn-search-refresh');
+
+  let allQuestions = []; // Combined pool for search
+
   function getAdminKey() {
     return sessionStorage.getItem('adminKey') || null;
   }
@@ -127,53 +137,160 @@
     } catch (err) { body.innerHTML = `<tr><td colspan="9">Error: ${err.message}</td></tr>`; }
   }
 
-  function renderList(list) {
-    if (!list || list.length === 0) { body.innerHTML = '<tr><td colspan="9">No questions.</td></tr>'; return; }
-    body.innerHTML = '';
+  function renderList(list, targetBody = body) {
+    if (!list || list.length === 0) {
+      targetBody.innerHTML = `<tr><td colspan="10">No questions found.</td></tr>`;
+      return;
+    }
+    targetBody.innerHTML = '';
     list.forEach(q => {
       const tr = document.createElement('tr');
+      const isApproved = (q.status || 'PENDING').toUpperCase() === 'APPROVED';
+      const isFile = (q.source === 'File');
+
       tr.innerHTML = `
-        <td><input type="checkbox" class="q-select" data-id="${q.id}" /></td>
-        <td>${q.id}</td>
-        <td><textarea data-field="question" data-id="${q.id}" style="width:300px;min-height:48px">${escapeHtml(q.question || '')}</textarea></td>
-        <td style="min-width:220px">
-          <div><input data-field="option_a" data-id="${q.id}" value="${escapeHtml(q.option_a || '')}" /></div>
-          <div><input data-field="option_b" data-id="${q.id}" value="${escapeHtml(q.option_b || '')}" /></div>
-          <div><input data-field="option_c" data-id="${q.id}" value="${escapeHtml(q.option_c || '')}" /></div>
-          <div><input data-field="option_d" data-id="${q.id}" value="${escapeHtml(q.option_d || '')}" /></div>
+        ${targetBody === body ? `<td><input type="checkbox" class="q-select" data-id="${q.id}" /></td>` : ''}
+        <td data-label="ID">${q.id}</td>
+        <td data-label="Question"><textarea data-field="question" data-id="${q.id}" style="width:100%;min-height:48px" ${isFile ? 'readonly' : ''}>${escapeHtml(q.question || '')}</textarea></td>
+        <td data-label="Options" style="min-width:200px">
+          <div><input data-field="option_a" data-id="${q.id}" value="${escapeHtml(q.option_a || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+          <div><input data-field="option_b" data-id="${q.id}" value="${escapeHtml(q.option_b || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+          <div><input data-field="option_c" data-id="${q.id}" value="${escapeHtml(q.option_c || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+          <div><input data-field="option_d" data-id="${q.id}" value="${escapeHtml(q.option_d || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
         </td>
-        <td>
-          <select data-field="correct_index" data-id="${q.id}">
+        <td data-label="Correct">
+          <select data-field="correct_index" data-id="${q.id}" ${isFile ? 'disabled' : ''}>
             <option value="0" ${q.correct_index == 0 ? 'selected' : ''}>A</option>
             <option value="1" ${q.correct_index == 1 ? 'selected' : ''}>B</option>
             <option value="2" ${q.correct_index == 2 ? 'selected' : ''}>C</option>
             <option value="3" ${q.correct_index == 3 ? 'selected' : ''}>D</option>
           </select>
         </td>
-        <td><input data-field="category" data-id="${q.id}" value="${escapeHtml(q.category || '')}" /></td>
-        <td><input data-field="reference" data-id="${q.id}" value="${escapeHtml(q.reference || '')}" /></td>
-        <td><input data-field="fact" data-id="${q.id}" value="${escapeHtml(q.fact || '')}" /></td>
-        <td class="status-col">
-          <span class="status-badge status-${(q.status || 'PENDING').toLowerCase()}">${q.status || 'PENDING'}</span>
+        <td data-label="Category"><input data-field="category" data-id="${q.id}" value="${escapeHtml(q.category || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></td>
+        <td data-label="Reference"><input data-field="reference" data-id="${q.id}" value="${escapeHtml(q.reference || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></td>
+        <td data-label="Fact"><input data-field="fact" data-id="${q.id}" value="${escapeHtml(q.fact || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></td>
+        <td data-label="Status" class="status-col">
+          <span class="status-badge status-${(q.status || 'PENDING').toLowerCase().replace(' ', '-')}">${q.status || 'PENDING'}</span>
         </td>
-        <td class="controls">
-          <button data-action="approve" data-id="${q.id}">Approve</button>
-          <button data-action="del" data-id="${q.id}">Delete</button>
+        <td data-label="Actions" class="controls">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            ${!isFile ? `
+              <button data-action="save" data-id="${q.id}" class="primary">Save</button>
+              ${!isApproved ? `<button data-action="approve" data-id="${q.id}" class="secondary">Approve</button>` : ''}
+              <button data-action="del" data-id="${q.id}" class="danger">Delete</button>
+            ` : `<span style="font-size:10px; color:var(--text-2); text-align:center;">Source: questions.js</span>`}
+          </div>
         </td>
       `;
 
-      body.appendChild(tr);
+      targetBody.appendChild(tr);
     });
 
     // Attach handlers
-    body.querySelectorAll('button[data-action]').forEach(btn => {
+    targetBody.querySelectorAll('button[data-action]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = btn.dataset.id;
         const action = btn.dataset.action;
+        if (action === 'save') saveQuestion(id);
         if (action === 'approve') approveQuestion(id);
         if (action === 'del') deleteQuestion(id);
       });
     });
+  }
+
+  async function saveQuestion(id) {
+    const fields = collectFieldsFor(id);
+    try {
+      const res = await fetch(`${API_BASE}/admin/edit/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Admin-Key': getAdminKey() },
+        body: JSON.stringify(fields)
+      });
+      if (!res.ok) throw new Error('Save failed');
+      showToast('Changes saved locally (DB)', 'success');
+      // If we are in search mode, we don't necessarily want to reload everything, 
+      // but we should update the in-memory allQuestions if we want search to stay current.
+      const q = allQuestions.find(x => String(x.id) === String(id));
+      if (q) Object.assign(q, fields);
+    } catch (err) { showToast(err.message, 'error'); }
+  }
+
+  async function loadAllData() {
+    if (!searchBody) return;
+    searchBody.innerHTML = '<tr><td colspan="10">Loading all data...</td></tr>';
+    try {
+      // 1. Fetch from DB
+      const res = await fetch(API_BASE + '/admin/questions', { headers: { 'Admin-Key': getAdminKey() } });
+      const dbData = await res.json();
+      const dbQs = dbData.map(q => ({
+        ...q,
+        status: (q.status || 'PENDING').toUpperCase(),
+        source: 'Database'
+      }));
+
+      // 2. Load from Global bibleQuestions (from questions.js)
+      let fileQs = [];
+      if (typeof bibleQuestions !== 'undefined') {
+        fileQs = bibleQuestions.map((q, idx) => ({
+          ...q,
+          id: `F-${idx + 1}`,
+          status: 'IN FILE',
+          source: 'File',
+          // Map array options to fields
+          option_a: q.options ? q.options[0] : '',
+          option_b: q.options ? q.options[1] : '',
+          option_c: q.options ? q.options[2] : '',
+          option_d: q.options ? q.options[3] : '',
+          correct_index: q.correct !== undefined ? q.correct : 0
+        }));
+      }
+
+      allQuestions = [...dbQs, ...fileQs];
+      runSearch();
+    } catch (err) {
+      searchBody.innerHTML = `<tr><td colspan="10">Error loading data: ${err.message}. Showing file data if available.</td></tr>`;
+      if (typeof bibleQuestions !== 'undefined') {
+        allQuestions = bibleQuestions.map((q, idx) => ({
+          ...q, id: `F-${idx + 1}`, status: 'IN FILE', source: 'File',
+          option_a: q.options ? q.options[0] : '',
+          option_b: q.options ? q.options[1] : '',
+          option_c: q.options ? q.options[2] : '',
+          option_d: q.options ? q.options[3] : '',
+          correct_index: q.correct
+        }));
+        runSearch();
+      }
+    }
+  }
+
+  function runSearch() {
+    if (!searchBody) return;
+    const query = (searchInput.value || '').toLowerCase().trim();
+    const statusFilter = (searchStatus.value || 'ALL').toUpperCase();
+    const catFilter = (searchCategory.value || 'ALL').toUpperCase();
+
+    const filtered = allQuestions.filter(q => {
+      // Status Filter
+      if (statusFilter !== 'ALL' && (q.status || 'PENDING').toUpperCase() !== statusFilter) return false;
+
+      // Category Filter
+      if (catFilter !== 'ALL' && (q.category || '').toUpperCase() !== catFilter) return false;
+
+      // Text Search
+      if (!query) return true;
+      const content = [
+        q.question,
+        q.option_a, q.option_b, q.option_c, q.option_d,
+        q.reference,
+        q.fact,
+        q.category
+      ].join(' ').toLowerCase();
+
+      return content.includes(query);
+    });
+
+    searchStats.textContent = `Showing ${filtered.length} of ${allQuestions.length} total questions.`;
+    renderList(filtered, searchBody);
   }
 
   function collectFieldsFor(id) {
@@ -311,6 +428,11 @@
   // Wire UI
   btnRefresh.addEventListener('click', () => loadQuestions());
   if (btnRefreshReports) btnRefreshReports.addEventListener('click', () => loadReports());
+  if (btnSearchRefresh) btnSearchRefresh.addEventListener('click', () => loadAllData());
+
+  if (searchInput) searchInput.addEventListener('input', runSearch);
+  if (searchStatus) searchStatus.addEventListener('change', runSearch);
+  if (searchCategory) searchCategory.addEventListener('change', runSearch);
 
 
   if (selectAllBox) {
@@ -329,18 +451,25 @@
   // Tabs
   const tabQ = document.getElementById('tab-questions');
   const tabR = document.getElementById('tab-reports');
+  const tabS = document.getElementById('tab-search');
   const secQ = document.getElementById('questions-section');
   const secR = document.getElementById('reports-section');
+  const secS = document.getElementById('search-section');
 
-  if (tabQ && tabR) {
+  if (tabQ && tabR && tabS) {
     tabQ.addEventListener('click', () => {
-      tabQ.classList.add('active'); tabR.classList.remove('active');
-      secQ.style.display = 'block'; secR.style.display = 'none';
+      tabQ.classList.add('active'); tabR.classList.remove('active'); tabS.classList.remove('active');
+      secQ.style.display = 'block'; secR.style.display = 'none'; secS.style.display = 'none';
     });
     tabR.addEventListener('click', () => {
-      tabR.classList.add('active'); tabQ.classList.remove('active');
-      secQ.style.display = 'none'; secR.style.display = 'block';
+      tabR.classList.add('active'); tabQ.classList.remove('active'); tabS.classList.remove('active');
+      secQ.style.display = 'none'; secR.style.display = 'block'; secS.style.display = 'none';
       loadReports();
+    });
+    tabS.addEventListener('click', () => {
+      tabS.classList.add('active'); tabQ.classList.remove('active'); tabR.classList.remove('active');
+      secQ.style.display = 'none'; secR.style.display = 'none'; secS.style.display = 'block';
+      loadAllData();
     });
   }
 

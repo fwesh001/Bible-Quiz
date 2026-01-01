@@ -11,7 +11,7 @@
 <body>
   <div id="admin-root">
     <div class="admin-header">
-      <h1>Admin Dashboard — Pending Questions</h1>
+      <h1>Admin Dashboard</h1>
       <div class="admin-controls">
         <button id="btn-back" class="secondary">Back</button>
         <div id="admin-login-area"></div>
@@ -33,6 +33,8 @@
           style="border-bottom-left-radius:0; border-bottom-right-radius:0;">Pending Questions</button>
         <button id="tab-reports" class="secondary"
           style="border-bottom-left-radius:0; border-bottom-right-radius:0;">Reports</button>
+        <button id="tab-search" class="secondary"
+          style="border-bottom-left-radius:0; border-bottom-right-radius:0;">Search</button>
       </section>
 
       <section id="questions-section">
@@ -82,6 +84,54 @@
           <tbody id="reports-body"></tbody>
         </table>
       </section>
+
+      <section id="search-section" style="display:none;">
+        <div class="admin-controls"
+          style="margin:16px 0; background:rgba(255,255,255,0.02); padding:16px; border-radius:12px; border:1px solid var(--border); display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
+          <div style="flex:1; min-width:260px;">
+            <label class="subtitle">Search questions, answers, or facts</label>
+            <input type="text" id="search-input" placeholder="🔍 Type to search..."
+              style="width:100%; margin-top:4px;" />
+          </div>
+          <div style="min-width:140px;">
+            <label class="subtitle">Status</label>
+            <select id="search-status" style="width:100%; margin-top:4px;">
+              <option value="ALL">All Status</option>
+              <option value="APPROVED">Live (Approved)</option>
+              <option value="PENDING">Pending</option>
+              <option value="IN FILE">In File (Static)</option>
+            </select>
+          </div>
+          <div style="min-width:140px;">
+            <label class="subtitle">Category</label>
+            <select id="search-category" style="width:100%; margin-top:4px;">
+              <option value="ALL">All Categories</option>
+              <option value="OLD TESTAMENT">Old Testament</option>
+              <option value="NEW TESTAMENT">New Testament</option>
+            </select>
+          </div>
+          <button id="btn-search-refresh" class="secondary">Sync Data</button>
+        </div>
+
+        <div id="search-stats" class="subtitle" style="margin-bottom:10px; color:var(--text-2);"></div>
+
+        <table id="search-table" style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left">ID</th>
+              <th style="text-align:left">Question</th>
+              <th>Options</th>
+              <th>Correct</th>
+              <th>Category</th>
+              <th>Reference</th>
+              <th>Fact</th>
+              <th class="text-center">Status</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="search-body"></tbody>
+        </table>
+      </section>
     </main>
   </div>
 
@@ -97,6 +147,7 @@
     </div>
   </div>
 
+  <script src="questions.js"></script>
   <script src="admin.js"></script>
 </body>
 
