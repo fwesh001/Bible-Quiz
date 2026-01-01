@@ -1,578 +1,234 @@
-/* Admin dashboard - Techy dark theme */
+/* Admin Dashboard - Premium Modern Dark Theme */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
 :root {
-  --bg: #06070b;
-  --panel: #0f1724;
-  --muted: #c7937b;
-  --text: #0b2b4c;
+  --bg: #030712;
+  --surface: #0f172a;
+  --surface-2: #1e293b;
+  --panel: rgba(15, 23, 42, 0.8);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(0, 229, 255, 0.4);
+
+  --text: #f8fafc;
+  --text-2: #94a3b8;
+  --muted: #64748b;
+
   --accent: #00e5ff;
-  --accent-2: #7c3aed;
-  --border: rgba(255, 255, 255, 0.06);
-  --glass: rgba(255, 255, 255, 0.02);
+  --accent-2: #8b5cf6;
+  --accent-gradient: linear-gradient(135deg, #00e5ff 0%, #8b5cf6 100%);
+
+  --success: #22c55e;
+  --wrong: #ef4444;
+  --warn: #f59e0b;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
 * {
-  box-sizing: border-box
-}
-
-html,
-body {
-  height: 100%;
+  box-sizing: border-box;
   margin: 0;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  color: var(--text);
-  background: linear-gradient(180deg, var(--bg) 0%, #071029 100%);
+  padding: 0;
 }
 
 body {
-  padding: 28px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: 24px;
   display: flex;
   justify-content: center;
 }
 
-/* Root container to center the dashboard and reuse site panel color */
 #admin-root {
-  width: min(1100px, 96vw);
-  max-width: 1100px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+  width: 100%;
+  max-width: 1200px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-  max-height: 90vh;
-  overflow: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  max-height: 94vh;
+  overflow: hidden;
+  /* Header/Footer will be handled inside main if needed, but here we want scrolling on content */
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* --- Header Section --- */
+.admin-header {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(12px);
 }
 
 h1 {
-  font-weight: 600;
-  margin: 0 0 18px;
-  color: var(--accent)
-}
-
-/* header controls */
-.admin-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
 }
 
 .admin-controls {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 12px;
 }
 
-#adminList {
-  display: block;
-  margin-top: 8px
-}
-
-#adminList>div {
-  background: transparent;
-  border-radius: 8px;
-  padding: 0;
-  margin-bottom: 10px;
-}
-
-#adminList p {
-  margin: 6px 0;
-  color: var(--muted)
-}
-
-#adminList p strong {
-  color: var(--text);
-  font-weight: 700
-}
-
+/* --- Buttons --- */
 button {
-  font-weight: 700;
-  border-radius: 8px;
-  padding: 8px 12px;
-  border: none;
-  cursor: pointer
-}
-
-button[onclick] {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: #041022;
-  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.12);
-  transition: transform .12s ease, filter .12s ease
-}
-
-button[onclick]:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.06)
-}
-
-/* Small secondary controls */
-.controls {
-  display: flex;
-  gap: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* Center buttons */
+  gap: 8px;
 }
 
-/* Resolve Button (Green) */
-button.btn-resolve {
-  background: linear-gradient(90deg, #22c55e, #16a34a);
+button.primary {
+  background: var(--accent-gradient);
   color: #041022;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 229, 255, 0.2);
 }
 
-button.btn-resolve:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
+button.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border-color: var(--border);
 }
 
-/* Delete Button (Red) */
-button.btn-delete {
-  background: linear-gradient(90deg, #ef4444, #dc2626);
-  color: #041022;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
-}
-
-button.btn-delete:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
-}
-
-
-/* Responsive styles for tablets and small laptops */
-@media (max-width: 960px) {
-  #admin-root {
-    width: 94vw;
-    padding: 16px;
-  }
-
-  .admin-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .admin-controls {
-    justify-content: space-between;
-  }
-}
-
-/* Responsive styles for mobile devices (412px - 768px) */
-@media (max-width: 768px) {
-  body {
-    padding: 14px;
-  }
-
-  #admin-root {
-    padding: 14px;
-    max-height: 92vh;
-  }
-
-  h1 {
-    font-size: 1.4rem;
-    margin-bottom: 14px;
-  }
-
-  /* Make tables scrollable on mobile */
-  #questions-table,
-  #reports-table,
-  #search-table {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  #questions-table thead,
-  #questions-table tbody,
-  #questions-table tr,
-  #reports-table thead,
-  #reports-table tbody,
-  #reports-table tr,
-  #search-table thead,
-  #search-table tbody,
-  #search-table tr {
-    display: block;
-  }
-
-  #questions-table thead,
-  #reports-table thead,
-  #search-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    /* Hide headers visually but keep for access if needed, or just hide entirely since we use data-labels */
-    display: none;
-  }
-
-  #questions-table tbody tr,
-  #reports-table tbody tr,
-  #search-table tbody tr {
-    margin-bottom: 16px;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px;
-  }
-
-  #questions-table tbody td,
-  #reports-table tbody td,
-  #search-table tbody td {
-    display: grid;
-    grid-template-columns: 100px 1fr;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: none;
-    align-items: start;
-  }
-
-  #questions-table tbody td:before,
-  #reports-table tbody td:before,
-  #search-table tbody td:before {
-    content: attr(data-label);
-    font-weight: 700;
-    color: var(--accent);
-    font-size: 0.85rem;
-  }
-
-  #questions-table td.controls,
-  #reports-table td.controls,
-  #search-table td.controls {
-    grid-template-columns: 1fr;
-    width: 100%;
-  }
-
-  #questions-table td.controls button,
-  #reports-table td.controls button,
-  #search-table td.controls button {
-    width: 100%;
-    margin: 4px 0;
-  }
-
-  #questions-table input,
-  #reports-table input,
-  #search-table input,
-  #questions-table textarea,
-  #reports-table textarea,
-  #search-table textarea,
-  #questions-table select,
-  #reports-table select,
-  #search-table select {
-    font-size: 14px;
-    padding: 8px;
-  }
-
-  #questions-table textarea {
-    min-height: 60px;
-  }
-
-  /* Button adjustments */
-  button {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-  }
-
-  .admin-controls button {
-    padding: 8px 10px;
-  }
-}
-
-/* Mobile devices - 412px to 600px */
-@media (max-width: 600px) {
-  body {
-    padding: 8px;
-  }
-
-  #admin-root {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    max-height: 94vh;
-  }
-
-  h1 {
-    font-size: 1.3rem;
-    margin-bottom: 12px;
-  }
-
-  .admin-header {
-    gap: 8px;
-  }
-
-  .admin-controls {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .admin-controls button {
-    width: 100%;
-    padding: 10px 12px;
-  }
-
-  /* Table card-style layout for very small screens */
-  #questions-table tbody td {
-    grid-template-columns: 1fr;
-  }
-
-  #questions-table tbody td:before {
-    margin-bottom: 4px;
-  }
-
-  #questions-table input,
-  #questions-table textarea,
-  #questions-table select {
-    width: 100%;
-    font-size: 16px;
-    /* Prevents iOS zoom on focus */
-  }
-
-  /* Modal adjustments */
-  .modal-box {
-    width: 94%;
-    padding: 16px;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-
-  .modal-box h3 {
-    font-size: 1.1rem;
-  }
-
-  .modal-actions {
-    flex-direction: column-reverse;
-    gap: 8px;
-  }
-
-  .modal-actions button {
-    width: 100%;
-    min-width: auto;
-  }
-
-  /* Toast notifications */
-  .toast-container {
-    top: 10px;
-    right: 10px;
-    left: 10px;
-  }
-
-  .toast {
-    min-width: auto;
-    font-size: 0.85rem;
-  }
-}
-
-/* Very small mobile devices - up to 412px */
-@media (max-width: 412px) {
-  #admin-root {
-    padding: 10px;
-  }
-
-  h1 {
-    font-size: 1.2rem;
-  }
-
-  #questions-table tbody tr {
-    padding: 10px;
-    margin-bottom: 12px;
-  }
-
-  #questions-table tbody td {
-    padding: 4px 0;
-  }
-
-  #questions-table tbody td:before {
-    font-size: 0.8rem;
-  }
-
-  #questions-table input,
-  #questions-table textarea,
-  #questions-table select {
-    font-size: 16px;
-    padding: 6px 8px;
-  }
-
-  button {
-    padding: 8px 10px;
-    font-size: 0.85rem;
-  }
-
-  .status-badge {
-    font-size: 0.75em;
-    padding: 3px 6px;
-  }
-}
-
-/* Landscape orientation for mobile */
-@media (max-width: 915px) and (orientation: landscape) {
-  #admin-root {
-    max-height: 88vh;
-    overflow-y: auto;
-  }
-
-  .admin-header {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .admin-controls {
-    flex-direction: row;
-  }
-
-  #questions-table {
-    max-height: 60vh;
-    overflow-y: auto;
-  }
-}
-
-/* Touch-friendly enhancements */
-@media (hover: none) and (pointer: coarse) {
-
-  /* Larger tap targets for touch devices */
-  button {
-    min-height: 44px;
-    padding: 10px 14px;
-  }
-
-  #questions-table button {
-    min-height: 40px;
-  }
-
-  input,
-  textarea,
-  select {
-    min-height: 44px;
-  }
-
-  /* Prevent double-tap zoom */
-  * {
-    touch-action: manipulation;
-  }
-}
-
-/* High pixel density screens */
-@media (-webkit-min-device-pixel-ratio: 2),
-(min-resolution: 192dpi) {
-
-  button,
-  input,
-  textarea,
-  select {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-}
-
-
-/* subtle glow for approved state */
-.approved {
-  border-color: rgba(0, 229, 255, 0.12);
-  box-shadow: 0 10px 26px rgba(0, 229, 255, 0.05) inset
-}
-
-/* Status Badges */
-.status-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.85em;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.status-pending {
-  background: rgba(250, 204, 21, 0.15);
-  color: #facc15;
-  border: 1px solid rgba(250, 204, 21, 0.2);
-}
-
-.status-approved {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.status-deleted {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+button.danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--wrong);
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
-.status-open {
-  background: rgba(250, 204, 21, 0.15);
-  /* Yellow/Amber like Pending */
-  color: #facc15;
-  border: 1px solid rgba(250, 204, 21, 0.2);
+button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.15);
 }
 
-.status-resolved {
-  background: rgba(34, 197, 94, 0.15);
-  /* Green like Approved */
-  color: #22c55e;
-  border: 1px solid rgba(34, 197, 94, 0.2);
+button:active {
+  transform: translateY(0);
 }
 
-/* accessibility focus */
-button:focus {
-  outline: 2px solid rgba(0, 229, 255, 0.12);
-  outline-offset: 2px
+/* --- Tabs --- */
+#nav-tabs {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 32px;
+  display: flex;
+  gap: 4px;
 }
 
-/* Table and form elements for admin UI */
-#questions-table {
-  width: 100%;
-  border-collapse: collapse;
-  color: #e6eef8;
+#nav-tabs button {
+  background: transparent;
+  color: var(--text-2);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: none;
+  padding: 10px 20px;
 }
 
-#questions-table thead th {
-  text-align: left;
-  padding: 10px 12px;
+#nav-tabs button.active {
+  background: rgba(255, 255, 255, 0.06);
   color: var(--accent);
-  font-weight: 700;
-  border-bottom: 1px solid var(--border);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+/* --- Main Content --- */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+}
+
+section {
+  width: 100%;
+}
+
+/* --- Login Section --- */
+#login {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 32px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Table Design --- */
+table {
+  width: 100%;
+  border-spacing: 0;
+  border-collapse: separate;
+}
+
+thead th {
+  padding: 16px 12px;
+  text-align: left;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  border-bottom: 2px solid var(--border);
   position: sticky;
   top: 0;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
-  z-index: 2
+  background: var(--surface);
+  z-index: 5;
 }
 
-#questions-table tbody td,
-#reports-body td {
-  padding: 10px 12px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+tbody tr {
+  transform: scale(1);
+  transition: background 0.15s ease;
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
   vertical-align: top;
-  color: #e2e8f0;
-  /* Lighter text for visibility */
-}
-
-#questions-table input,
-#questions-table textarea,
-#questions-table select {
-  width: 100%;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  background: rgba(255, 255, 255, 0.02);
-  color: #dbeafe;
-}
-
-#questions-table textarea {
-  min-height: 48px;
-}
-
-#questions-table button {
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  border: none;
-  margin-right: 6px
-}
-
-#questions-table button[data-action="save"] {
-  background: linear-gradient(90deg, var(--accent), #7c3aed);
   color: #041022;
 }
 

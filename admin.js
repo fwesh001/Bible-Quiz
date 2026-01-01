@@ -149,9 +149,9 @@
       const isFile = (q.source === 'File');
 
       tr.innerHTML = `
-        ${targetBody === body ? `<td><input type="checkbox" class="q-select" data-id="${q.id}" /></td>` : ''}
+        ${targetBody === body ? `<td data-label="Select"><input type="checkbox" class="q-select" data-id="${q.id}" /></td>` : ''}
         <td data-label="ID">${q.id}</td>
-        <td data-label="Question"><textarea data-field="question" data-id="${q.id}" style="width:100%;min-height:48px" ${isFile ? 'readonly' : ''}>${escapeHtml(q.question || '')}</textarea></td>
+        <td data-label="Question Content"><textarea data-field="question" data-id="${q.id}" style="width:100%;min-height:48px" ${isFile ? 'readonly' : ''}>${escapeHtml(q.question || '')}</textarea></td>
         <td data-label="Options" style="min-width:200px">
           <div><input data-field="option_a" data-id="${q.id}" value="${escapeHtml(q.option_a || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
           <div><input data-field="option_b" data-id="${q.id}" value="${escapeHtml(q.option_b || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
@@ -380,15 +380,13 @@
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td data-label="ID">${r.id}</td>
-        <td data-label="Reported Question">${escapeHtml(r.question_text || '')}</td>
-        <td data-label="Reason">${escapeHtml(r.reason || '')}</td>
-        <td data-label="Status" class="text-center"><span class="status-badge status-${(r.status || 'OPEN').toLowerCase()}">${r.status}</span></td>
+        <td data-label="Question">${escapeHtml(r.question_text || 'Unknown')}</td>
+        <td data-label="Reason">${escapeHtml(r.reason || 'No reason')}</td>
+        <td data-label="Status"><span class="status-badge status-${(r.status || 'OPEN').toLowerCase()}">${r.status}</span></td>
         <td data-label="Time">${new Date(r.created_at).toLocaleString()}</td>
-        <td data-label="Actions">
-           <div class="controls">
-             ${r.status !== 'RESOLVED' ? `<button class="btn-resolve" onclick="resolveReport(${r.id})">Resolve</button>` : ''}
-             <button class="btn-delete" onclick="deleteReport(${r.id})">Delete</button>
-           </div>
+        <td data-label="Actions" class="controls">
+          ${r.status !== 'RESOLVED' ? `<button class="primary" onclick="resolveReport(${r.id})">Resolve</button>` : ''}
+          <button class="danger" onclick="deleteReport(${r.id})">Delete</button>
         </td>
       `;
       reportsBody.appendChild(tr);
