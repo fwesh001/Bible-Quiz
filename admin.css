@@ -542,3 +542,21 @@ select[disabled] {
   .expanded-grid { grid-template-columns: 1fr; }
   .expanded-grid .col.right { order: 2; }
 }
+
+/* Brighten report tab text for better legibility */
+.r-summary .q-text {
+  color: var(--accent);
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 229, 255, 0.06);
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.r-summary .q-text:hover {
+  transform: translateY(-1px);
+  color: var(--accent-2);
+}
+
+.expanded-row .col.left > div,
+.expanded-row .col.left {
+  color: var(--text);
+}
