@@ -274,7 +274,7 @@ function startQuiz(mode = 'normal') {
   state.bonuses5 = 0;
   state.missed = [];
   state.accepting = true;
-  state.bookmarks = loadBookmarks(); // Load bookmarks on start
+  state.bookmarks = []; // Start with empty bookmarks for new session
 
 
   // Set round and per-question timer from user input
@@ -851,16 +851,8 @@ if (els.submitDuring) {
     showSubmitModal(true);
   });
   // Global Enter key handling for quiz submit
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      const modal = document.getElementById('custom-modal');
-      // Only trigger if no modal is visible
-      if (!modal || modal.style.display === 'none') {
-        e.preventDefault();
-        els.submitDuring.click();
-      }
-    }
-  });
+  // Global Enter key handler removed per user request
+
 }
 
 // Skip current question (does not affect score or accuracy; breaks streak)
