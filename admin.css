@@ -109,8 +109,35 @@ button[onclick]:hover {
 .controls {
   display: flex;
   gap: 8px;
-  align-items: center
+  align-items: center;
+  justify-content: center;
+  /* Center buttons */
 }
+
+/* Resolve Button (Green) */
+button.btn-resolve {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  color: #041022;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+button.btn-resolve:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+/* Delete Button (Red) */
+button.btn-delete {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  color: #041022;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+button.btn-delete:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
 
 /* Responsive styles for tablets and small laptops */
 @media (max-width: 960px) {
@@ -450,6 +477,20 @@ button[onclick]:hover {
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+.status-open {
+  background: rgba(250, 204, 21, 0.15);
+  /* Yellow/Amber like Pending */
+  color: #facc15;
+  border: 1px solid rgba(250, 204, 21, 0.2);
+}
+
+.status-resolved {
+  background: rgba(34, 197, 94, 0.15);
+  /* Green like Approved */
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
 /* accessibility focus */
 button:focus {
   outline: 2px solid rgba(0, 229, 255, 0.12);
@@ -475,10 +516,13 @@ button:focus {
   z-index: 2
 }
 
-#questions-table tbody td {
+#questions-table tbody td,
+#reports-body td {
   padding: 10px 12px;
   border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
   vertical-align: top;
+  color: #e2e8f0;
+  /* Lighter text for visibility */
 }
 
 #questions-table input,

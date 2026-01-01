@@ -262,11 +262,13 @@
         <td>${r.id}</td>
         <td>${escapeHtml(r.question_text || '')}</td>
         <td>${escapeHtml(r.reason || '')}</td>
-        <td><span class="status-badge status-${(r.status || 'OPEN').toLowerCase()}">${r.status}</span></td>
+        <td class="text-center"><span class="status-badge status-${(r.status || 'OPEN').toLowerCase()}">${r.status}</span></td>
         <td>${new Date(r.created_at).toLocaleString()}</td>
         <td>
-           ${r.status !== 'RESOLVED' ? `<button class="primary" onclick="resolveReport(${r.id})">Resolve</button>` : ''}
-           <button class="danger" onclick="deleteReport(${r.id})">Delete</button>
+           <div class="controls">
+             ${r.status !== 'RESOLVED' ? `<button class="btn-resolve" onclick="resolveReport(${r.id})">Resolve</button>` : ''}
+             <button class="btn-delete" onclick="deleteReport(${r.id})">Delete</button>
+           </div>
         </td>
       `;
       reportsBody.appendChild(tr);
