@@ -1255,7 +1255,7 @@ function renderBookmarks() {
 }
 
 function submitReport(q, reason, containerToClose) {
-  fetch('/report-question', {
+  fetch('http://localhost:5000/report-question', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
