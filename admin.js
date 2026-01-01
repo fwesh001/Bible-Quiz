@@ -1,5 +1,5 @@
 (function () {
-  const API_BASE = ''; // Use relative URLs for both local and production
+  const API_BASE = 'http://localhost:5000'; // Target python backend explicitly
   const body = document.getElementById('questions-body');
   const reportsBody = document.getElementById('reports-body');
   const btnRefresh = document.getElementById('btn-refresh');

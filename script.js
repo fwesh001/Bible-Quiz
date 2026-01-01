@@ -227,7 +227,7 @@ if (typeof bibleQuestions === 'undefined') {
 }
 
 // Go get the approved questions from the kitchen
-fetch('/questions/live')
+fetch('http://localhost:5000/questions/live')
   .then(res => res.json())
   .then(data => {
     bibleQuestions = data;
@@ -1045,7 +1045,7 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
   };
 
   // Send it to the Python Kitchen!
-  fetch('/add-question', {
+  fetch('http://localhost:5000/add-question', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(questionData)
@@ -1137,7 +1137,7 @@ if (adminSubmitBtn) adminSubmitBtn.addEventListener('click', () => {
   const pwd = adminPasswordInput ? adminPasswordInput.value : '';
   if (!pwd) { showToast('Enter password', 'warn'); return; }
 
-  fetch('/admin/login', {
+  fetch('http://localhost:5000/admin/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: pwd })
