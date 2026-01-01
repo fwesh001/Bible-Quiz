@@ -505,3 +505,40 @@ select[disabled] {
     transform: translateY(0) scale(1)
   }
 }
+
+/* Compact summary + expandable details for pending rows */
+.q-summary .q-text {
+  white-space: pre-wrap;
+  color: var(--text);
+  background: transparent;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.expand-btn {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+  color: var(--text-2);
+  padding: 6px 10px;
+  border-radius: 8px;
+  min-width:40px;
+}
+
+.expanded-row td {
+  background: rgba(255,255,255,0.01);
+  padding: 16px;
+}
+
+.expanded-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 18px;
+  align-items: start;
+}
+
+.expanded-grid .subtitle { font-size: 0.8rem; color: var(--muted); display:block; margin-bottom:6px }
+
+@media (max-width:900px) {
+  .expanded-grid { grid-template-columns: 1fr; }
+  .expanded-grid .col.right { order: 2; }
+}

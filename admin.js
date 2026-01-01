@@ -144,49 +144,79 @@
     }
     targetBody.innerHTML = '';
     list.forEach(q => {
-      const tr = document.createElement('tr');
       const isApproved = (q.status || 'PENDING').toUpperCase() === 'APPROVED';
       const isFile = (q.source === 'File');
 
-      tr.innerHTML = `
+      // Summary row: shows checkbox, id, full question, status and an expand toggle
+      const summary = document.createElement('tr');
+      summary.className = 'q-summary';
+      summary.innerHTML = `
         ${targetBody === body ? `<td data-label="Select"><input type="checkbox" class="q-select" data-id="${q.id}" /></td>` : ''}
         <td data-label="ID">${q.id}</td>
-        <td data-label="Question Content"><textarea data-field="question" data-id="${q.id}" style="width:100%;min-height:48px" ${isFile ? 'readonly' : ''}>${escapeHtml(q.question || '')}</textarea></td>
-        <td data-label="Options" style="min-width:200px">
-          <div><input data-field="option_a" data-id="${q.id}" value="${escapeHtml(q.option_a || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
-          <div><input data-field="option_b" data-id="${q.id}" value="${escapeHtml(q.option_b || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
-          <div><input data-field="option_c" data-id="${q.id}" value="${escapeHtml(q.option_c || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
-          <div><input data-field="option_d" data-id="${q.id}" value="${escapeHtml(q.option_d || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
-        </td>
-        <td data-label="Correct">
-          <select data-field="correct_index" data-id="${q.id}" ${isFile ? 'disabled' : ''}>
-            <option value="0" ${q.correct_index == 0 ? 'selected' : ''}>A</option>
-            <option value="1" ${q.correct_index == 1 ? 'selected' : ''}>B</option>
-            <option value="2" ${q.correct_index == 2 ? 'selected' : ''}>C</option>
-            <option value="3" ${q.correct_index == 3 ? 'selected' : ''}>D</option>
-          </select>
-        </td>
-        <td data-label="Category"><input data-field="category" data-id="${q.id}" value="${escapeHtml(q.category || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></td>
-        <td data-label="Reference"><input data-field="reference" data-id="${q.id}" value="${escapeHtml(q.reference || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></td>
-        <td data-label="Fact"><input data-field="fact" data-id="${q.id}" value="${escapeHtml(q.fact || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></td>
+        <td data-label="Question Content" style="width:100%"><div class="q-text">${escapeHtml(q.question || '')}</div></td>
         <td data-label="Status" class="status-col">
           <span class="status-badge status-${(q.status || 'PENDING').toLowerCase().replace(' ', '-')}">${q.status || 'PENDING'}</span>
         </td>
-        <td data-label="Actions" class="controls">
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            ${!isFile ? `
-              <button data-action="save" data-id="${q.id}" class="primary">Save</button>
-              ${!isApproved ? `<button data-action="approve" data-id="${q.id}" class="secondary">Approve</button>` : ''}
-              <button data-action="del" data-id="${q.id}" class="danger">Delete</button>
-            ` : `<span style="font-size:10px; color:var(--text-2); text-align:center;">Source: questions.js</span>`}
+        <td data-label="Expand" class="controls">
+          <button data-action="toggle" data-id="${q.id}" class="expand-btn">▾</button>
+        </td>
+      `;
+
+      // Details row: hidden by default, contains the full editable fields + actions
+      const details = document.createElement('tr');
+      details.className = 'expanded-row';
+      details.style.display = 'none';
+      details.innerHTML = `
+        <td colspan="5">
+          <div class="expanded-grid">
+            <div class="col left">
+              <label class="subtitle">Question</label>
+              <textarea data-field="question" data-id="${q.id}" style="width:100%;min-height:80px" ${isFile ? 'readonly' : ''}>${escapeHtml(q.question || '')}</textarea>
+            </div>
+            <div class="col right">
+              <label class="subtitle">Options</label>
+              <div><input data-field="option_a" data-id="${q.id}" value="${escapeHtml(q.option_a || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+              <div><input data-field="option_b" data-id="${q.id}" value="${escapeHtml(q.option_b || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+              <div><input data-field="option_c" data-id="${q.id}" value="${escapeHtml(q.option_c || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+              <div><input data-field="option_d" data-id="${q.id}" value="${escapeHtml(q.option_d || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+              <div style="margin-top:8px">
+                <label class="subtitle">Correct</label>
+                <select data-field="correct_index" data-id="${q.id}" ${isFile ? 'disabled' : ''}>
+                  <option value="0" ${q.correct_index == 0 ? 'selected' : ''}>A</option>
+                  <option value="1" ${q.correct_index == 1 ? 'selected' : ''}>B</option>
+                  <option value="2" ${q.correct_index == 2 ? 'selected' : ''}>C</option>
+                  <option value="3" ${q.correct_index == 3 ? 'selected' : ''}>D</option>
+                </select>
+              </div>
+              <div style="margin-top:8px"><label class="subtitle">Category</label><input data-field="category" data-id="${q.id}" value="${escapeHtml(q.category || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+              <div style="margin-top:8px"><label class="subtitle">Reference</label><input data-field="reference" data-id="${q.id}" value="${escapeHtml(q.reference || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+              <div style="margin-top:8px"><label class="subtitle">Fact</label><input data-field="fact" data-id="${q.id}" value="${escapeHtml(q.fact || '')}" style="width:100%" ${isFile ? 'readonly' : ''} /></div>
+              <div style="margin-top:12px; display:flex; gap:8px;">
+                ${!isFile ? `
+                  <button data-action="save" data-id="${q.id}" class="primary">Save</button>
+                  ${!isApproved ? `<button data-action="approve" data-id="${q.id}" class="secondary">Approve</button>` : ''}
+                  <button data-action="del" data-id="${q.id}" class="danger">Delete</button>
+                ` : `<span style="font-size:12px; color:var(--text-2);">Source: questions.js</span>`}
+              </div>
+            </div>
           </div>
         </td>
       `;
 
-      targetBody.appendChild(tr);
+      // Toggle handler
+      summary.querySelectorAll('button[data-action="toggle"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const open = details.style.display !== 'none';
+          details.style.display = open ? 'none' : 'table-row';
+          btn.textContent = open ? '▾' : '▴';
+        });
+      });
+
+      targetBody.appendChild(summary);
+      targetBody.appendChild(details);
     });
 
-    // Attach handlers
+    // Attach handlers for action buttons in the whole table body
     targetBody.querySelectorAll('button[data-action]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = btn.dataset.id;
