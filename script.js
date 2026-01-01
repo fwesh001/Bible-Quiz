@@ -1164,7 +1164,7 @@ function getQuestionKey(q) {
 }
 
 function toggleBookmark(q, btnEl) {
-  state.bookmarks = loadBookmarks();
+  // Use in-memory state which holds live references
   const key = getQuestionKey(q);
   const existingIdx = state.bookmarks.findIndex(b => getQuestionKey(b) === key);
 
@@ -1187,7 +1187,9 @@ function toggleBookmark(q, btnEl) {
     }
     showToast('Bookmark added');
   }
+  // We still save to LS just in case, but application logic relies on memory
   saveBookmarks(state.bookmarks);
+
   // If we are currently viewing bookmarks, refresh the list
   if (els.bookmarkView && els.bookmarkView.classList.contains('active')) {
     renderBookmarks();
@@ -1196,7 +1198,7 @@ function toggleBookmark(q, btnEl) {
 
 function renderBookmarks() {
   if (!els.bookmarkView) return;
-  state.bookmarks = loadBookmarks();
+  // Use in-memory state.bookmarks to ensure we have 'userAnswer' and other live data
   els.bookmarkView.innerHTML = '';
 
   if (state.bookmarks.length === 0) {
@@ -1205,6 +1207,20 @@ function renderBookmarks() {
   }
 
   state.bookmarks.forEach((q, i) => {
+    // Determine answer status
+    let userAnsText = '<i>Skipped</i>';
+    let ansClass = 'question-review-wrong'; // default red/skipped style
+
+    if (q.userAnswer !== undefined && q.userAnswer !== null) {
+      userAnsText = q.options[q.userAnswer];
+      if (q.userAnswer === q.correct) {
+        ansClass = 'question-review-correct';
+      }
+    } else {
+      // Skipped
+      ansClass = 'question-review-skipped'; // You might want a specific style for skipped
+    }
+
     const div = document.createElement('div');
     div.className = 'bookmark-item';
     div.innerHTML = `
@@ -1213,7 +1229,21 @@ function renderBookmarks() {
         <button class="bookmark-btn active" title="Remove Bookmark">★</button>
       </div>
       <div class="bookmark-meta">Category: ${q.category || 'General'}</div>
-      <div class="bookmark-meta">Correct: ${(q.options && q.options[q.correct]) ? q.options[q.correct] : 'Unknown'}</div>
+      
+      <div class="bookmark-meta">
+        Your Answer: <span class="${ansClass}">${userAnsText}</span>
+      </div>
+      <div class="bookmark-meta">
+        Correct Answer: <span class="question-review-correct">${(q.options && q.options[q.correct]) ? q.options[q.correct] : 'Unknown'}</span>
+      </div>
+      
+      <div class="bookmark-meta" style="margin-top:8px; font-style:italic; color:var(--muted);">
+         Reference: ${q.reference || 'N/A'}
+      </div>
+      <div class="bookmark-meta" style="color:var(--text-2);">
+         Fact: ${q.fact || ''}
+      </div>
+
       <div class="bookmark-actions">
         <button class="small secondary btn-report-toggle">⚠️ Report Issue</button>
       </div>

@@ -1410,3 +1410,10 @@ body.dark-mode .sidebar {
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* Skipped answer in bookmark review */
+.question-review-skipped {
+  color: var(--muted);
+  font-style: italic;
+  font-weight: 500;
+}
