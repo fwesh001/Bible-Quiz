@@ -56,6 +56,9 @@ def init_db():
 init_db()
 
 # --- ROUTES ---
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 @app.route('/add-question', methods=['POST'])
 def add_question():
