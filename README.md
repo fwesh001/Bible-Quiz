@@ -109,17 +109,7 @@ Quick notes for the admin UI:
 
 Environment example (Windows PowerShell):
 
-```powershell
-# Generate hash once (replace YourStrongPasswordHere)
-python -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('YourStrongPasswordHere'))"
 
-# Set env vars
-$env:ADMIN_KEY = 'supersecret'
-$env:ADMIN_PASSWORD_HASH = 'paste-generated-hash-here'
-python backend/app.py
-```
-
----
 
 ## 🧪 Testing the Admin UI (Quick)
 
