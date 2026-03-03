@@ -15,18 +15,34 @@ app = Flask(__name__, static_folder=parent_dir, static_url_path='')
 CORS(app)
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
-ADMIN_KEY = os.environ.get('ADMIN_KEY', 'hacking')
+ADMIN_KEY = os.environ.get('ADMIN_KEY')
 ADMIN_PASSWORD_HASH = os.environ.get('ADMIN_PASSWORD_HASH')
 
 
-def get_db_connection():
+def validate_required_config():
+    missing = []
     if not DATABASE_URL:
-        raise RuntimeError('DATABASE_URL is not set')
+        missing.append('DATABASE_URL')
+    if not ADMIN_KEY:
+        missing.append('ADMIN_KEY')
+    if not ADMIN_PASSWORD_HASH:
+        missing.append('ADMIN_PASSWORD_HASH')
+
+    if missing:
+        raise RuntimeError(f"Missing required environment variables: {', '.join(missing)}")
+
+
+def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
 
 def require_admin():
-    return request.headers.get('Admin-Key') == ADMIN_KEY
+    if not ADMIN_KEY:
+        return False
+    incoming_key = request.headers.get('Admin-Key')
+    if not incoming_key:
+        return False
+    return incoming_key == ADMIN_KEY
 
 
 def verify_admin_password(password):
@@ -90,6 +106,7 @@ def init_db():
     logger.info('Postgres database initialized')
 
 
+validate_required_config()
 init_db()
 
 
