@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from werkzeug.security import check_password_hash
 
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] %(message)s')
@@ -15,7 +16,7 @@ CORS(app)
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 ADMIN_KEY = os.environ.get('ADMIN_KEY', 'hacking')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
+ADMIN_PASSWORD_HASH = os.environ.get('ADMIN_PASSWORD_HASH')
 
 
 def get_db_connection():
@@ -26,6 +27,13 @@ def get_db_connection():
 
 def require_admin():
     return request.headers.get('Admin-Key') == ADMIN_KEY
+
+
+def verify_admin_password(password):
+    if not ADMIN_PASSWORD_HASH:
+        logger.error('ADMIN_PASSWORD_HASH is not configured')
+        return False
+    return check_password_hash(ADMIN_PASSWORD_HASH, password)
 
 
 def row_to_quiz_question(row):
@@ -162,7 +170,7 @@ def report_question():
 def admin_login():
     data = request.get_json(silent=True) or {}
     password = data.get('password', '')
-    if password != ADMIN_PASSWORD:
+    if not verify_admin_password(password):
         return jsonify({'message': 'Invalid password'}), 401
     return jsonify({'admin_key': ADMIN_KEY})
 
