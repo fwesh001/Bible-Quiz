@@ -95,7 +95,7 @@ Quick notes for the admin UI:
 - Built with Flask and `flask-cors`.
 - Creates/uses `quiz_data.db` (SQLite) and a `pending_questions` table.
 - **File System Sync**: The `approve_question` endpoint writes directly to the local `questions.js` file, keeping the static frontend updated.
-- Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD_HASH`.
+- Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD_HASH` (both required).
 
 ### Key Endpoints
 
