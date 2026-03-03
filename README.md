@@ -95,7 +95,7 @@ Quick notes for the admin UI:
 - Built with Flask and `flask-cors`.
 - Creates/uses `quiz_data.db` (SQLite) and a `pending_questions` table.
 - **File System Sync**: The `approve_question` endpoint writes directly to the local `questions.js` file, keeping the static frontend updated.
-- Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD`. Defaults are set in the code for local testing but change them in production.
+- Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD_HASH`.
 
 ### Key Endpoints
 
@@ -104,14 +104,18 @@ Quick notes for the admin UI:
 - `POST /admin/approve/<id>` — Mark a question as `APPROVED` and sync to `questions.js` (requires `Admin-Key` header)
 - `DELETE /admin/delete/<id>` — Permanently delete a question from the database (requires `Admin-Key` header)
 - `POST /admin/edit/<id>` — Edit question fields (requires `Admin-Key`)
-- `POST /admin/login` — Simple password check, returns `admin_key` on success
+- `POST /admin/login` — Verifies password against `ADMIN_PASSWORD_HASH`, returns `admin_key` on success
 - `GET /questions/live` — Returns approved questions in the same format as `questions.js` for the frontend to consume
 
 Environment example (Windows PowerShell):
 
 ```powershell
+# Generate hash once (replace YourStrongPasswordHere)
+python -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('YourStrongPasswordHere'))"
+
+# Set env vars
 $env:ADMIN_KEY = 'supersecret'
-$env:ADMIN_PASSWORD = 'safepassword'
+$env:ADMIN_PASSWORD_HASH = 'paste-generated-hash-here'
 python backend/app.py
 ```
 
