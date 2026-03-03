@@ -11,6 +11,27 @@ const API_BASE = (window.location.hostname === '127.0.0.1' || window.location.ho
   ? 'http://localhost:5000'
   : '';
 
+async function parseJsonResponse(res) {
+  const raw = await res.text();
+  let data = null;
+
+  if (raw) {
+    try {
+      data = JSON.parse(raw);
+    } catch (error) {
+      if (res.ok) {
+        throw new Error('Server returned an invalid JSON response');
+      }
+    }
+  }
+
+  if (!res.ok) {
+    throw new Error((data && data.message) || `Request failed (${res.status})`);
+  }
+
+  return data;
+}
+
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -234,14 +255,18 @@ if (typeof bibleQuestions === 'undefined') {
 
 // Go get the approved questions from the kitchen
 fetch(API_BASE + '/questions/live')
-  .then(res => res.json())
+  .then(parseJsonResponse)
   .then(data => {
-    bibleQuestions = data;
-    console.log("Quiz Loaded with", bibleQuestions.length, "questions!");
+    if (Array.isArray(data) && data.length > 0) {
+      bibleQuestions = data;
+      console.log("Quiz Loaded with", bibleQuestions.length, "questions!");
+      return;
+    }
+    console.warn('No live questions returned; using bundled questions.js data.');
     // Now you can call your function to start the quiz
   })
   .catch(err => {
-    console.error('Failed to load live questions:', err);
+    console.warn('Live question endpoint unavailable, using bundled questions.js data:', err.message || err);
   });
 
 // ========================
@@ -1048,13 +1073,16 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(questionData)
   })
-    .then(res => res.json())
+    .then(parseJsonResponse)
     .then(data => {
       showToast("Thanks!: " + (data.message || ''), 'success');
       // clear and close
       closeQuestionModal();
     })
-    .catch(err => console.error("Error connecting to Python:", err));
+    .catch(err => {
+      console.error("Error connecting to Python:", err);
+      showToast(err.message || 'Failed to submit question', 'error');
+    });
 });
 
 // Defensive handler: intercept any mailto link that targets the add-question email
@@ -1292,7 +1320,7 @@ function submitReport(q, reason, containerToClose) {
       id: q.id || 0 // pass ID if available
     })
   })
-    .then(res => res.json())
+    .then(parseJsonResponse)
     .then(data => {
       showToast(data.message || 'Report submitted', 'success');
       if (containerToClose) containerToClose.classList.remove('show');
