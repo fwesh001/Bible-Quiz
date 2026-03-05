@@ -45,6 +45,13 @@
         </svg>
         Reports
       </button>
+      <button id="tab-feedback">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+        Feedback
+      </button>
       <button id="tab-search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -112,6 +119,27 @@
               </tr>
             </thead>
             <tbody id="reports-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Feedback Section -->
+      <section id="feedback-section" style="display:none;">
+        <div class="admin-controls" style="margin-bottom:24px;">
+          <button id="btn-refresh-feedback" class="primary">Refresh Feedback</button>
+        </div>
+        <div class="table-container">
+          <table id="feedback-table">
+            <thead>
+              <tr>
+                <th style="width:60px">ID</th>
+                <th style="width:140px">Type</th>
+                <th>Feedback</th>
+                <th style="width:120px">Status</th>
+                <th style="width:80px"></th>
+              </tr>
+            </thead>
+            <tbody id="feedback-body"></tbody>
           </table>
         </div>
       </section>
