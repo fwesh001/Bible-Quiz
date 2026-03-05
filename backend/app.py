@@ -5,12 +5,19 @@ from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import check_password_hash
+from dotenv import load_dotenv
 
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] %(message)s')
 logger = logging.getLogger(__name__)
 
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+backend_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(backend_dir, '..'))
+
+# Local development support: load environment values from .env if present
+load_dotenv(os.path.join(parent_dir, '.env'))
+load_dotenv(os.path.join(backend_dir, '.env'))
+
 app = Flask(__name__, static_folder=parent_dir, static_url_path='')
 CORS(app)
 
@@ -100,6 +107,16 @@ def init_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS feedback (
+            id SERIAL PRIMARY KEY,
+            type TEXT DEFAULT 'BUG',
+            message TEXT,
+            context_text TEXT,
+            status TEXT DEFAULT 'OPEN',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     conn.commit()
     cur.close()
     conn.close()
@@ -181,6 +198,31 @@ def report_question():
     cur.close()
     conn.close()
     return jsonify({'message': 'Report submitted'}), 201
+
+
+@app.route('/feedback', methods=['POST'])
+def submit_feedback():
+    data = request.get_json(silent=True) or {}
+    feedback_type = (data.get('type') or 'BUG').strip().upper()
+    message = (data.get('message') or '').strip()
+    context_text = (data.get('context_text') or '').strip()
+
+    if feedback_type not in ('BUG', 'SUGGESTION'):
+        feedback_type = 'BUG'
+
+    if not message:
+        return jsonify({'message': 'Feedback message is required'}), 400
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('''
+        INSERT INTO feedback (type, message, context_text, status)
+        VALUES (%s, %s, %s, %s)
+    ''', (feedback_type, message, context_text, 'OPEN'))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({'message': 'Feedback submitted'}), 201
 
 
 @app.route('/admin/login', methods=['POST'])
@@ -311,6 +353,48 @@ def delete_report(report_id):
     cur.close()
     conn.close()
     return jsonify({'message': 'Report deleted'})
+
+
+@app.route('/admin/feedback', methods=['GET'])
+def get_feedback():
+    if not require_admin():
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+    cur.execute('SELECT * FROM feedback ORDER BY created_at DESC, id DESC')
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return jsonify(rows)
+
+
+@app.route('/admin/resolve-feedback/<int:feedback_id>', methods=['POST'])
+def resolve_feedback(feedback_id):
+    if not require_admin():
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("UPDATE feedback SET status = 'RESOLVED' WHERE id = %s", (feedback_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({'message': 'Feedback resolved'})
+
+
+@app.route('/admin/delete-feedback/<int:feedback_id>', methods=['DELETE'])
+def delete_feedback(feedback_id):
+    if not require_admin():
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('DELETE FROM feedback WHERE id = %s', (feedback_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return jsonify({'message': 'Feedback deleted'})
 
 
 if __name__ == '__main__':
