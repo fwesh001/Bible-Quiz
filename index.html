@@ -214,6 +214,9 @@
             Add Question</button>
         </div>
         <div class="sidebar-item">
+          <button id="feedbackBtn">💬 Feedback</button>
+        </div>
+        <div class="sidebar-item">
           <button id="adminLoginBtn">🔒 Admin</button>
         </div>
 
@@ -245,6 +248,24 @@
           <div class="controls">
             <button id="submitToBackend">Submit to Backend</button>
             <button class="close-btn" onclick="closeQuestionModal()">Cancel</button>
+          </div>
+        </div>
+
+        <div id="feedbackModal" class="question-modal" style="display:none;">
+          <h3 style="margin:0 0 8px">Share Feedback</h3>
+          <div class="feedback-tabs" role="tablist" aria-label="Feedback type">
+            <button id="feedbackTabBug" class="feedback-tab active" type="button" data-feedback-type="BUG"
+              role="tab" aria-selected="true">🐞 Bug</button>
+            <button id="feedbackTabSuggestion" class="feedback-tab" type="button" data-feedback-type="SUGGESTION"
+              role="tab" aria-selected="false">💡 Suggestion</button>
+          </div>
+          <textarea id="feedbackMessage" placeholder="Tell us what happened or what you'd like improved..."
+            style="margin-top:8px; width:100%; min-height:100px"></textarea>
+          <label class="subtitle" for="feedbackContext" style="display:block; margin-top:8px;">Context (auto-captured)</label>
+          <textarea id="feedbackContext" readonly style="margin-top:6px; width:100%; min-height:78px"></textarea>
+          <div class="controls">
+            <button id="submitFeedback">Submit Feedback</button>
+            <button class="close-btn" onclick="closeFeedbackModal()">Cancel</button>
           </div>
         </div>
 
