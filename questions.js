@@ -443,7 +443,7 @@ const bibleQuestions = [
   // Song of Solomon
   {
     question: "Which book contains love poems often attributed to Solomon?",
-    options: ["Song of Songs", "Psalms", "Proverbs", "Ecclesiastes"],
+    options: ["Song of solomon", "Psalms", "Proverbs", "Ecclesiastes"],
     correct: 0,
     reference: "Song of Solomon 1:1",
     fact: "This book celebrates love and is attributed to Solomon.",
