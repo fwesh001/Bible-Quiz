@@ -1082,6 +1082,46 @@ body.dark-mode .sidebar {
   cursor: pointer;
 }
 
+#feedbackModal .feedback-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+#feedbackModal .feedback-tab {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+#feedbackModal .feedback-tab.active {
+  background: linear-gradient(180deg, var(--brand), #5b21b6);
+  color: #fff;
+  border-color: transparent;
+}
+
+#feedbackModal textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 8px 0;
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+#feedbackModal #submitFeedback {
+  background: linear-gradient(180deg, var(--brand), #5b21b6);
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 /* Mobile Responsive Styles - For screens around 412x915 and similar */
 
 /* Tablets and smaller laptops */
