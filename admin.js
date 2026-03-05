@@ -5,8 +5,10 @@
     : '';
   const body = document.getElementById('questions-body');
   const reportsBody = document.getElementById('reports-body');
+  const feedbackBody = document.getElementById('feedback-body');
   const btnRefresh = document.getElementById('btn-refresh');
   const btnRefreshReports = document.getElementById('btn-refresh-reports');
+  const btnRefreshFeedback = document.getElementById('btn-refresh-feedback');
   const btnApproveSelected = document.getElementById('btn-approve-selected');
   const btnDeleteSelected = document.getElementById('btn-delete-selected');
   const selectAllBox = document.getElementById('select-all');
@@ -122,6 +124,7 @@
         loginSection.style.display = 'none';
         loadQuestions();
         loadReports();
+        loadFeedback();
       }
       else throw new Error(j.message || 'Invalid response');
     } catch (err) { loginMsg.textContent = err.message; }
@@ -402,6 +405,17 @@
     } catch (err) { reportsBody.innerHTML = `<tr><td colspan="6">Error: ${err.message}</td></tr>`; }
   }
 
+  async function loadFeedback() {
+    if (!feedbackBody) return;
+    feedbackBody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
+    try {
+      const res = await fetch(API_BASE + '/admin/feedback', { headers: { 'Admin-Key': getAdminKey() } });
+      if (!res.ok) throw new Error('Failed to load feedback');
+      const list = await res.json();
+      renderFeedback(list || []);
+    } catch (err) { feedbackBody.innerHTML = `<tr><td colspan="6">Error: ${err.message}</td></tr>`; }
+  }
+
   function renderReports(list) {
     if (!reportsBody) return;
     if (!list || list.length === 0) { reportsBody.innerHTML = '<tr><td colspan="4">No reports.</td></tr>'; return; }
@@ -462,6 +476,65 @@
     });
   }
 
+  function renderFeedback(list) {
+    if (!feedbackBody) return;
+    if (!list || list.length === 0) { feedbackBody.innerHTML = '<tr><td colspan="5">No feedback yet.</td></tr>'; return; }
+    feedbackBody.innerHTML = '';
+    list.forEach(item => {
+      const summary = document.createElement('tr');
+      summary.className = 'r-summary';
+      const shortMsg = (item.message || '').length > 180 ? (item.message || '').slice(0, 177) + '...' : (item.message || 'No message');
+      summary.innerHTML = `
+        <td data-label="ID">${item.id}</td>
+        <td data-label="Type"><span class="status-badge">${escapeHtml(item.type || 'BUG')}</span></td>
+        <td data-label="Feedback"><div class="q-text">${escapeHtml(shortMsg)}</div></td>
+        <td data-label="Status"><span class="status-badge status-${(item.status || 'OPEN').toLowerCase()}">${item.status || 'OPEN'}</span></td>
+        <td data-label="Expand" class="controls"><button data-action="toggle-feedback" data-id="${item.id}" class="expand-btn">▾</button></td>
+      `;
+
+      const details = document.createElement('tr');
+      details.className = 'expanded-row';
+      details.style.display = 'none';
+      details.innerHTML = `
+        <td colspan="5">
+          <div class="expanded-grid">
+            <div class="col left">
+              <label class="subtitle">Full Feedback</label>
+              <div style="white-space:pre-wrap; color:var(--text);">${escapeHtml(item.message || '')}</div>
+              <div style="margin-top:12px;"><label class="subtitle">Context</label><div style="white-space:pre-wrap; color:var(--muted);">${escapeHtml(item.context_text || 'No context')}</div></div>
+            </div>
+            <div class="col right">
+              <label class="subtitle">Submitted At</label>
+              <div class="subtitle">${item.created_at ? new Date(item.created_at).toLocaleString() : 'Unknown'}</div>
+              <div style="margin-top:12px; display:flex; gap:8px;">
+                ${(item.status || 'OPEN') !== 'RESOLVED' ? `<button data-action="resolve-feedback" data-id="${item.id}" class="primary">Resolve</button>` : ''}
+                <button data-action="del-feedback" data-id="${item.id}" class="danger">Delete</button>
+              </div>
+            </div>
+          </div>
+        </td>
+      `;
+
+      summary.querySelectorAll('button[data-action="toggle-feedback"]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const open = details.style.display !== 'none';
+          details.style.display = open ? 'none' : 'table-row';
+          btn.textContent = open ? '▾' : '▴';
+        });
+      });
+
+      feedbackBody.appendChild(summary);
+      feedbackBody.appendChild(details);
+
+      details.querySelectorAll('button[data-action]').forEach(b => {
+        const act = b.dataset.action;
+        const id = b.dataset.id;
+        if (act === 'resolve-feedback') b.addEventListener('click', () => { window.resolveFeedback(id); });
+        if (act === 'del-feedback') b.addEventListener('click', () => { window.deleteFeedback(id); });
+      });
+    });
+  }
+
   // Expose these to global scope so onclick handlers work
   window.resolveReport = async function (id) {
     const confirmed = await showConfirm('Are you sure you want to resolve this report?');
@@ -485,6 +558,28 @@
     } catch (e) { showToast(e.message, 'error'); }
   };
 
+  window.resolveFeedback = async function (id) {
+    const confirmed = await showConfirm('Are you sure you want to resolve this feedback?');
+    if (!confirmed) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/resolve-feedback/${id}`, { method: 'POST', headers: { 'Admin-Key': getAdminKey() } });
+      if (!res.ok) throw new Error('Failed');
+      showToast('Feedback resolved', 'success');
+      loadFeedback();
+    } catch (e) { showToast(e.message, 'error'); }
+  };
+
+  window.deleteFeedback = async function (id) {
+    const confirmed = await showConfirm('Delete this feedback? This action cannot be undone.');
+    if (!confirmed) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/delete-feedback/${id}`, { method: 'DELETE', headers: { 'Admin-Key': getAdminKey() } });
+      if (!res.ok) throw new Error('Failed');
+      showToast('Feedback deleted', 'success');
+      loadFeedback();
+    } catch (e) { showToast(e.message, 'error'); }
+  };
+
   function escapeHtml(str) {
 
     if (!str) return '';
@@ -495,6 +590,7 @@
   // Wire UI
   btnRefresh.addEventListener('click', () => loadQuestions());
   if (btnRefreshReports) btnRefreshReports.addEventListener('click', () => loadReports());
+  if (btnRefreshFeedback) btnRefreshFeedback.addEventListener('click', () => loadFeedback());
   if (btnSearchRefresh) btnSearchRefresh.addEventListener('click', () => loadAllData());
 
   if (searchInput) searchInput.addEventListener('input', runSearch);
@@ -518,24 +614,31 @@
   // Tabs
   const tabQ = document.getElementById('tab-questions');
   const tabR = document.getElementById('tab-reports');
+  const tabF = document.getElementById('tab-feedback');
   const tabS = document.getElementById('tab-search');
   const secQ = document.getElementById('questions-section');
   const secR = document.getElementById('reports-section');
+  const secF = document.getElementById('feedback-section');
   const secS = document.getElementById('search-section');
 
-  if (tabQ && tabR && tabS) {
+  if (tabQ && tabR && tabF && tabS) {
     tabQ.addEventListener('click', () => {
-      tabQ.classList.add('active'); tabR.classList.remove('active'); tabS.classList.remove('active');
-      secQ.style.display = 'block'; secR.style.display = 'none'; secS.style.display = 'none';
+      tabQ.classList.add('active'); tabR.classList.remove('active'); tabF.classList.remove('active'); tabS.classList.remove('active');
+      secQ.style.display = 'block'; secR.style.display = 'none'; secF.style.display = 'none'; secS.style.display = 'none';
     });
     tabR.addEventListener('click', () => {
-      tabR.classList.add('active'); tabQ.classList.remove('active'); tabS.classList.remove('active');
-      secQ.style.display = 'none'; secR.style.display = 'block'; secS.style.display = 'none';
+      tabR.classList.add('active'); tabQ.classList.remove('active'); tabF.classList.remove('active'); tabS.classList.remove('active');
+      secQ.style.display = 'none'; secR.style.display = 'block'; secF.style.display = 'none'; secS.style.display = 'none';
       loadReports();
     });
+    tabF.addEventListener('click', () => {
+      tabF.classList.add('active'); tabQ.classList.remove('active'); tabR.classList.remove('active'); tabS.classList.remove('active');
+      secQ.style.display = 'none'; secR.style.display = 'none'; secF.style.display = 'block'; secS.style.display = 'none';
+      loadFeedback();
+    });
     tabS.addEventListener('click', () => {
-      tabS.classList.add('active'); tabQ.classList.remove('active'); tabR.classList.remove('active');
-      secQ.style.display = 'none'; secR.style.display = 'none'; secS.style.display = 'block';
+      tabS.classList.add('active'); tabQ.classList.remove('active'); tabR.classList.remove('active'); tabF.classList.remove('active');
+      secQ.style.display = 'none'; secR.style.display = 'none'; secF.style.display = 'none'; secS.style.display = 'block';
       loadAllData();
     });
   }
@@ -545,6 +648,7 @@
   if (getAdminKey()) {
     loadQuestions();
     loadReports();
+    loadFeedback();
   }
 
 })();
