@@ -1029,6 +1029,14 @@ if (timerBtn) {
 
 // 1. Show the form when the "Add Question" button is clicked
 const questionModal = document.getElementById('questionModal');
+const feedbackModal = document.getElementById('feedbackModal');
+const feedbackBtn = document.getElementById('feedbackBtn');
+const feedbackMessageInput = document.getElementById('feedbackMessage');
+const feedbackContextInput = document.getElementById('feedbackContext');
+const feedbackTabBug = document.getElementById('feedbackTabBug');
+const feedbackTabSuggestion = document.getElementById('feedbackTabSuggestion');
+let selectedFeedbackType = 'BUG';
+
 function closeQuestionModal() {
   if (!questionModal) return;
   questionModal.classList.remove('show');
@@ -1042,12 +1050,75 @@ function closeQuestionModal() {
   } catch (e) { /* ignore */ }
 }
 
+function setFeedbackType(type) {
+  selectedFeedbackType = (type === 'SUGGESTION') ? 'SUGGESTION' : 'BUG';
+  if (feedbackTabBug) {
+    const bugActive = selectedFeedbackType === 'BUG';
+    feedbackTabBug.classList.toggle('active', bugActive);
+    feedbackTabBug.setAttribute('aria-selected', bugActive ? 'true' : 'false');
+  }
+  if (feedbackTabSuggestion) {
+    const suggestionActive = selectedFeedbackType === 'SUGGESTION';
+    feedbackTabSuggestion.classList.toggle('active', suggestionActive);
+    feedbackTabSuggestion.setAttribute('aria-selected', suggestionActive ? 'true' : 'false');
+  }
+  if (feedbackMessageInput) {
+    feedbackMessageInput.placeholder = selectedFeedbackType === 'BUG'
+      ? 'Describe the issue, what you expected, and what happened...'
+      : 'Share your improvement idea or feature request...';
+  }
+}
+
+function getFeedbackContextText() {
+  try {
+    const current = state.questions && state.questions.length > 0 ? state.questions[state.index] : null;
+    const contextLines = [
+      `Screen: ${screens.quiz && screens.quiz.classList.contains('active') ? 'Quiz' : (screens.results && screens.results.classList.contains('active') ? 'Results' : 'Welcome')}`,
+      `Mode: ${state.mode || 'normal'}`,
+      `Category: ${state.category || 'All'}`,
+      `Difficulty: ${state.difficulty || 'All'}`
+    ];
+
+    if (current) {
+      contextLines.push(`Question: ${(current.question || '').slice(0, 200)}`);
+      contextLines.push(`Reference: ${current.reference || 'N/A'}`);
+    }
+
+    return contextLines.join('\n');
+  } catch (e) {
+    return 'Context unavailable';
+  }
+}
+
+function closeFeedbackModal() {
+  if (!feedbackModal) return;
+  feedbackModal.classList.remove('show');
+  feedbackModal.style.display = 'none';
+  if (feedbackMessageInput) feedbackMessageInput.value = '';
+  if (feedbackContextInput) feedbackContextInput.value = '';
+  setFeedbackType('BUG');
+}
+
 document.getElementById('addQuestionBtn').addEventListener('click', () => {
   if (!questionModal) return;
   questionModal.style.display = 'block';
   // trigger animated 'show' class
   requestAnimationFrame(() => questionModal.classList.add('show'));
 });
+
+if (feedbackBtn) {
+  feedbackBtn.addEventListener('click', () => {
+    if (!feedbackModal) return;
+    if (feedbackContextInput) feedbackContextInput.value = getFeedbackContextText();
+    feedbackModal.style.display = 'block';
+    requestAnimationFrame(() => feedbackModal.classList.add('show'));
+    setFeedbackType('BUG');
+    if (feedbackMessageInput) feedbackMessageInput.focus();
+  });
+}
+
+if (feedbackTabBug) feedbackTabBug.addEventListener('click', () => setFeedbackType('BUG'));
+if (feedbackTabSuggestion) feedbackTabSuggestion.addEventListener('click', () => setFeedbackType('SUGGESTION'));
 
 // 2. Handle the actual submission
 document.getElementById('submitToBackend').addEventListener('click', () => {
@@ -1084,6 +1155,39 @@ document.getElementById('submitToBackend').addEventListener('click', () => {
       showToast(err.message || 'Failed to submit question', 'error');
     });
 });
+
+const submitFeedbackBtn = document.getElementById('submitFeedback');
+if (submitFeedbackBtn) {
+  submitFeedbackBtn.addEventListener('click', () => {
+    const message = (feedbackMessageInput && feedbackMessageInput.value ? feedbackMessageInput.value : '').trim();
+    if (!message) {
+      showToast('Please enter feedback details', 'warn');
+      if (feedbackMessageInput) feedbackMessageInput.focus();
+      return;
+    }
+
+    const payload = {
+      type: selectedFeedbackType,
+      message,
+      context_text: feedbackContextInput ? feedbackContextInput.value : ''
+    };
+
+    fetch(API_BASE + '/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(parseJsonResponse)
+      .then(data => {
+        showToast(data.message || 'Feedback submitted', 'success');
+        closeFeedbackModal();
+      })
+      .catch(err => {
+        console.error('Error submitting feedback:', err);
+        showToast(err.message || 'Failed to submit feedback', 'error');
+      });
+  });
+}
 
 // Defensive handler: intercept any mailto link that targets the add-question email
 // and force the in-app modal to open instead of allowing the mail client to launch.
