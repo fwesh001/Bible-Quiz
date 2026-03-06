@@ -36,7 +36,21 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-3. Run the backend (required for API features):
+3. Create local environment variables file:
+
+```powershell
+copy .env.example .env
+```
+
+Then edit `.env` and set `DATABASE_URL`, `ADMIN_KEY`, and `ADMIN_PASSWORD_HASH`.
+
+Generate a hash for `ADMIN_PASSWORD_HASH` with:
+
+```powershell
+python -c "from werkzeug.security import generate_password_hash; print(generate_password_hash('YourPasswordHere'))"
+```
+
+4. Run the backend (required for API features):
 
 ```powershell
 # from project root
