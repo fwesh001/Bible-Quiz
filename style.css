@@ -117,8 +117,9 @@ body {
   /* amber-500 */
 }
 
-/* Dark theme variables applied on body.dark */
-body.dark {
+/* Dark theme variables applied on body.dark/body.dark-mode */
+body.dark,
+body.dark-mode {
   --bg: #0f172a;
   /* slate-900 */
   --panel: #111827;
@@ -439,6 +440,7 @@ button.secondary {
   border-radius: 12px;
   padding: 12px;
   text-align: center;
+  color: var(--text);
 }
 
 .stat .big {
@@ -755,6 +757,37 @@ button.secondary {
   grid-template-columns: auto 1fr auto;
   gap: 10px;
   align-items: center;
+  color: var(--text);
+}
+
+.achievement-status {
+  font-weight: 700;
+}
+
+.achievement-status.earned {
+  color: #22c55e;
+}
+
+.achievement-status.locked {
+  color: var(--muted);
+}
+
+.question-timer-chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--panel-2);
+  color: var(--text);
+  font-weight: 700;
+  min-width: 84px;
+  text-align: center;
+}
+
+#enable-round-timer-btn.active,
+#enable-timer-btn.active {
+  background: linear-gradient(180deg, var(--brand), #5b21b6);
+  color: #fff;
+  border-color: transparent;
 }
 
 .achievement .status {
@@ -942,8 +975,8 @@ footer {
 
 /* Dark mode styles */
 body.dark-mode {
-  background: #111;
-  color: #eee;
+  background: radial-gradient(1200px 800px at 100% -20%, #1e293b 0%, var(--bg) 60%);
+  color: var(--text);
 }
 
 body.dark-mode .sidebar {
