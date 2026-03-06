@@ -11,14 +11,15 @@ A lightweight, browser-based quiz game to test and learn knowledge of the Script
 - **Deployment Ready**: Configured for seamless deployment on Render with Flask serving static files
 - Category filter: Old Testament / New Testament / All
 - Difficulty filter (Normal / Hard / All)
-- **Visual Timers**: Round Timer (bar) and Question Timer (circular countdown)
+- **Visual Timers**: Round Timer (bar) and Question Timer (header chip countdown)
+- **Timer Toggles**: Separate ON/OFF controls for Round Timer and Per-Question Timer on the welcome screen
 - **Immersive Audio**: WebAudio feedback for correct/wrong answers
-- **Keyboard Shortcuts**: Press Enter to submit quiz or confirm admin actions
 - Daily Challenge (deterministic 5-question set)
 - **Achievements**: Unlock titles like "Bible Student", "Hebrew Scripture Expert", and "Daily Challenger"
 - Local high score & achievements saved to localStorage
-- Dark Mode and mute controls
+- Dark Mode and mute controls with improved dark-theme contrast in result/stat cards
 - Question review and simple navigation
+- In-app feedback modal with **Bug** / **Suggestion** tabs and auto-captured context
 
 ---
 
@@ -76,9 +77,10 @@ The app is configured to deploy easily on Render:
 ## ▶️ How to Use
 
 - Select a **Category**, **Difficulty**, **Time Limit**, and **Number of Questions**.
+- Toggle **Round Timer** and **Question Timer** ON/OFF on the welcome screen as desired.
 - Click **Start Quiz** for a normal round or **Daily Challenge** for the deterministic 5-question set.
 - During the quiz you can skip questions, see facts/references after answering, and view results at the end.
-- Use the sidebar to toggle **Dark Mode** and **Mute**.
+- Use the sidebar to toggle **Dark Mode** and **Mute**, open **Add Question**, or send **Feedback**.
 
 ---
 
@@ -93,10 +95,11 @@ An admin interface is included to collect, review, and approve submitted questio
 - **Hard Delete**: Permanently remove questions from the database
 - **Keyboard Support**: Press Enter to login or confirm modal actions
 - **Structured Logging**: All admin actions are logged with timestamps
+- **Feedback Inbox**: Dedicated Feedback tab with expand/collapse rows and Resolve/Delete actions
 
 ### Admin UI — Compact Summary View (Updated)
 
-- The admin interface now uses a compact summary + expandable details pattern across the **Pending**, **Reports**, and **Search** tabs.
+- The admin interface now uses a compact summary + expandable details pattern across the **Pending**, **Reports**, **Feedback**, and **Search** tabs.
 - Each item shows a single-line summary (full question text and status) with an expand toggle. Click the expand button to reveal editable fields, options, and action buttons (Save / Approve / Delete or Resolve / Delete for reports).
 - This reduces visual clutter and improves scanning large lists.
 
@@ -107,18 +110,26 @@ Quick notes for the admin UI:
 ### Backend Summary (in `backend/app.py`)
 
 - Built with Flask and `flask-cors`.
-- Creates/uses `quiz_data.db` (SQLite) and a `pending_questions` table.
-- **File System Sync**: The `approve_question` endpoint writes directly to the local `questions.js` file, keeping the static frontend updated.
+- Uses PostgreSQL (via `DATABASE_URL`) with tables for `pending_questions`, `reports`, and `feedback`.
+- Approved questions are served dynamically through `/questions/live`.
 - Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD_HASH` (both required).
 
 ### Key Endpoints
 
 - `POST /add-question` — Save a submitted question into `pending_questions` (status="PENDING")
+- `POST /feedback` — Submit user feedback (`BUG` or `SUGGESTION`) with message/context
+- `POST /report-question` — Submit a report for a problematic quiz question
 - `GET /admin/questions` — Return all pending questions (for the admin UI)
-- `POST /admin/approve/<id>` — Mark a question as `APPROVED` and sync to `questions.js` (requires `Admin-Key` header)
+- `POST /admin/approve/<id>` — Mark a question as `APPROVED` (requires `Admin-Key` header)
 - `DELETE /admin/delete/<id>` — Permanently delete a question from the database (requires `Admin-Key` header)
 - `POST /admin/edit/<id>` — Edit question fields (requires `Admin-Key`)
 - `POST /admin/login` — Verifies password against `ADMIN_PASSWORD_HASH`, returns `admin_key` on success
+- `GET /admin/reports` — List submitted reports (requires `Admin-Key`)
+- `POST /admin/resolve-report/<id>` — Mark report as `RESOLVED` (requires `Admin-Key`)
+- `DELETE /admin/delete-report/<id>` — Delete report (requires `Admin-Key`)
+- `GET /admin/feedback` — List feedback entries (requires `Admin-Key`)
+- `POST /admin/resolve-feedback/<id>` — Mark feedback as `RESOLVED` (requires `Admin-Key`)
+- `DELETE /admin/delete-feedback/<id>` — Delete feedback entry (requires `Admin-Key`)
 - `GET /questions/live` — Returns approved questions in the same format as `questions.js` for the frontend to consume
 
 Environment example (Windows PowerShell):
@@ -182,8 +193,8 @@ Questions are stored in `questions.js` in the `bibleQuestions` array for the sta
   - [admin.css](admin.css)
 
 - Backend:
-  - [backend/app.py](backend/app.py) — Flask API and SQLite storage
-  - DB file `quiz_data.db` is created in the project root when the backend runs
+  - [backend/app.py](backend/app.py) — Flask API and PostgreSQL-backed storage
+  - Database connection is configured with `DATABASE_URL`
 
 ---
 
