@@ -129,7 +129,8 @@ const state = {
   bonuses3: 0,
   bonuses5: 0,
   missed: [],
-  timerEnabled: false,
+  timerEnabled: true,
+  roundTimerEnabled: true,
   timeLimit: 15,
   timeLeft: 15,
   timerId: null,
@@ -233,9 +234,10 @@ const els = {
   modalSubmit: $('#modal-submit'),
   modalSubmitConfirm: $('#btn-confirm-submit'),
   modalSubmitCancel: $('#btn-cancel-submit'),
-  roundTimerBar: document.getElementById('round-timer-bar'),
+  roundTimerBarOuter: document.getElementById('round-timer-bar-outer'),
   roundTimerBarFill: document.getElementById('round-timer-bar-fill'),
   roundTimerLabel: document.getElementById('round-timer-label'),
+  questionTimerLabel: document.getElementById('question-timer-label'),
   questionTimerBarOuter: document.getElementById('question-timer-bar-outer'),
   questionTimerBarFill: document.getElementById('question-timer-bar-fill'),
   questionTimerBarLabel: document.getElementById('question-timer-bar-label'),
@@ -292,7 +294,7 @@ function startQuiz(mode = 'normal') {
   state.mode = mode;
   state.category = els.category.value;
   state.difficulty = els.difficulty ? els.difficulty.value : 'All';
-  // Use state.timerEnabled instead of els.enableTimer
+  state.roundTimerEnabled = typeof state.roundTimerEnabled === 'boolean' ? state.roundTimerEnabled : true;
   state.timerEnabled = typeof state.timerEnabled === 'boolean' ? state.timerEnabled : true;
   state.timeLeft = state.timeLimit;
   state.index = 0;
@@ -316,8 +318,11 @@ function startQuiz(mode = 'normal') {
   }
   roundTimeTotal = roundTimeMinutes * 60;
   roundTimeLeft = roundTimeTotal;
-  questionTimeTotal = parseInt(els.questionTimeInput?.value, 10) || 20;
+  questionTimeTotal = Math.max(5, Math.min(60, parseInt(els.questionTimeInput?.value, 10) || 20));
   questionTimeLeft = questionTimeTotal;
+  if (els.questionTimerLabel) {
+    els.questionTimerLabel.textContent = state.timerEnabled ? `${questionTimeTotal}s` : 'OFF';
+  }
   clearInterval(roundTimer);
   clearInterval(questionTimer);
 
@@ -373,6 +378,18 @@ function startQuiz(mode = 'normal') {
 }
 
 function startRoundTimer() {
+  if (!state.roundTimerEnabled) {
+    clearInterval(roundTimer);
+    roundTimer = null;
+    if (els.roundTimerBarOuter) {
+      els.roundTimerBarOuter.style.display = 'none';
+    }
+    return;
+  }
+
+  if (els.roundTimerBarOuter) {
+    els.roundTimerBarOuter.style.display = 'flex';
+  }
   // Reset round timer bar
   updateRoundTimerBar();
   clearInterval(roundTimer);
@@ -390,7 +407,7 @@ function startRoundTimer() {
 
 function updateRoundTimerBar() {
   if (!els.roundTimerBarFill || !els.roundTimerLabel) return;
-  const pct = Math.max(0, (roundTimeLeft / roundTimeTotal));
+  const pct = Math.max(0, (roundTimeLeft / Math.max(1, roundTimeTotal)));
   els.roundTimerBarFill.style.width = (pct * 100) + '%';
   els.roundTimerBarFill.style.transform = 'scaleX(' + pct + ')';
   // Color gradient: green > yellow > red
@@ -503,7 +520,7 @@ function renderQuestion() {
       els.questionTimerArc.setAttribute('stroke', '#22c55e');
     }
     if (els.questionTimerLabel) {
-      els.questionTimerLabel.textContent = questionTimeTotal;
+      els.questionTimerLabel.textContent = 'OFF';
     }
   }
 
@@ -540,7 +557,7 @@ function updateQuestionTimerCircle() {
   if (pct <= 0.2) color = '#ef4444';
   else if (pct <= 0.4) color = '#facc15';
   els.questionTimerArc.setAttribute('stroke', color);
-  els.questionTimerLabel.textContent = Math.ceil(questionTimeLeft);
+  els.questionTimerLabel.textContent = `${Math.ceil(questionTimeLeft)}s`;
 }
 
 function startQuestionTimer() {
@@ -567,28 +584,22 @@ function stopQuestionTimer() {
 }
 
 function updateQuestionTimerCircle() {
-  if (!els.questionTimerArc || !els.questionTimerLabel) {
-    console.log('Timer arc or label not found', els.questionTimerArc, els.questionTimerLabel);
-    return;
-  }
+  if (!els.questionTimerLabel) return;
   const pct = Math.max(0, questionTimeLeft / questionTimeTotal);
   // SVG circle: circumference = 2 * PI * r = 2*PI*20 = ~125.66
   const CIRC = 125.66;
-  els.questionTimerArc.setAttribute('stroke-dasharray', CIRC);
-  els.questionTimerArc.setAttribute('stroke-dashoffset', (CIRC * (1 - pct)).toFixed(2));
+  if (els.questionTimerArc) {
+    els.questionTimerArc.setAttribute('stroke-dasharray', CIRC);
+    els.questionTimerArc.setAttribute('stroke-dashoffset', (CIRC * (1 - pct)).toFixed(2));
+  }
   // Color: green > yellow > red
   let color = '#22c55e';
   if (pct <= 0.2) color = '#ef4444';
   else if (pct <= 0.4) color = '#facc15';
-  els.questionTimerArc.setAttribute('stroke', color);
-  // Set SVG <text> value
-  console.log('Timer update:', { questionTimeLeft, pct, label: els.questionTimerLabel });
-  if (typeof els.questionTimerLabel.textContent !== 'undefined') {
-    els.questionTimerLabel.textContent = Math.ceil(questionTimeLeft);
-    console.log('Set timer label to', Math.ceil(questionTimeLeft));
-  } else {
-    console.log('SVG text element not found or not settable');
+  if (els.questionTimerArc) {
+    els.questionTimerArc.setAttribute('stroke', color);
   }
+  els.questionTimerLabel.textContent = `${Math.ceil(questionTimeLeft)}s`;
 }
 
 function endRoundDueToTimeout() {
@@ -842,7 +853,7 @@ function renderAchievements(items) {
         <div style="font-weight:700;">${item.title}</div>
         <div class="subtitle" style="margin:0">${item.desc}</div>
       </div>
-      <div style="color:${item.earned ? '#22c55e' : '#9ca3af'}; font-weight:700;">${item.earned ? 'Earned' : 'Locked'}</div>
+      <div class="achievement-status ${item.earned ? 'earned' : 'locked'}">${item.earned ? 'Earned' : 'Locked'}</div>
     `;
     els.achievementsBox.appendChild(div);
   });
@@ -1000,6 +1011,7 @@ toggleDarkmodeBtn.addEventListener('click', () => {
   try {
     isDark = !isDark;
     document.body.classList.toggle('dark-mode', isDark);
+    document.body.classList.toggle('dark', isDark);
     toggleDarkmodeBtn.textContent = isDark ? '🔆 Light Mode' : '🌙 Dark Mode';
     console.log('Dark mode toggled:', isDark);
   } catch (e) {
@@ -1008,20 +1020,42 @@ toggleDarkmodeBtn.addEventListener('click', () => {
 });
 
 // Timer toggle button logic
+const roundTimerBtn = document.getElementById('enable-round-timer-btn');
 const timerBtn = document.getElementById('enable-timer-btn');
+
+function syncTimerButtons() {
+  if (roundTimerBtn) {
+    roundTimerBtn.textContent = state.roundTimerEnabled ? 'Round Timer: ON' : 'Round Timer: OFF';
+    roundTimerBtn.classList.toggle('active', state.roundTimerEnabled);
+  }
+  if (timerBtn) {
+    timerBtn.textContent = state.timerEnabled ? 'Question Timer: ON' : 'Question Timer: OFF';
+    timerBtn.classList.toggle('active', state.timerEnabled);
+  }
+}
+
+if (roundTimerBtn) {
+  state.roundTimerEnabled = true;
+  roundTimerBtn.addEventListener('click', () => {
+    state.roundTimerEnabled = !state.roundTimerEnabled;
+    syncTimerButtons();
+  });
+}
+
 if (timerBtn) {
   // Use els.enableTimerBtn for compatibility with game logic
   els.enableTimerBtn = timerBtn;
-  // Default ON
   state.timerEnabled = true;
-  timerBtn.textContent = state.timerEnabled ? 'Timer: ON' : 'Timer: OFF';
-  timerBtn.classList.toggle('active', state.timerEnabled);
   timerBtn.addEventListener('click', () => {
     state.timerEnabled = !state.timerEnabled;
-    timerBtn.textContent = state.timerEnabled ? 'Timer: ON' : 'Timer: OFF';
-    timerBtn.classList.toggle('active', state.timerEnabled);
+    syncTimerButtons();
+    if (!state.timerEnabled && els.questionTimerLabel) {
+      els.questionTimerLabel.textContent = 'OFF';
+    }
   });
 }
+
+syncTimerButtons();
 
 // ========================
 // Add question logic
