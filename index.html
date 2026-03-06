@@ -37,6 +37,13 @@
               <label class="subtitle" for="round-time" style="margin-right:8px;">Time Limit</label>
               <input id="round-time" type="number" min="1" max="30" value="3" class="select" style="width:110px"
                 aria-label="Round Time (minutes)" />
+              <button id="enable-round-timer-btn" type="button" class="secondary">Round Timer: ON</button>
+            </div>
+            <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
+              <label class="subtitle" for="question-time" style="margin-right:8px;">Per Question (sec)</label>
+              <input id="question-time" type="number" min="5" max="60" value="20" class="select" style="width:110px"
+                aria-label="Question Time (seconds)" />
+              <button id="enable-timer-btn" type="button" class="secondary">Question Timer: ON</button>
             </div>
             <label for="difficulty" class="subtitle" style="margin-top:8px; display:block;">Difficulty</label>
             <div class="controls">
@@ -88,6 +95,7 @@
           <div class="quiz-main">
             <div class="quiz-head">
               <div class="progress"><span id="progress-text">Question 1</span></div>
+              <div id="question-timer-chip" class="question-timer-chip">⏱ <span id="question-timer-label">20s</span></div>
               <button id="btn-bookmark-current" class="bookmark-btn" title="Bookmark for later"
                 style="font-size:1.4rem;">☆</button>
             </div>
