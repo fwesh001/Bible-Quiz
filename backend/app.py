@@ -1,5 +1,10 @@
 import os
+import re
 import logging
+import threading
+from contextlib import contextmanager
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import psycopg2
@@ -21,42 +26,171 @@ load_dotenv(os.path.join(backend_dir, '.env'))
 app = Flask(__name__, static_folder=parent_dir, static_url_path='')
 CORS(app)
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
-ADMIN_KEY = os.environ.get('ADMIN_KEY')
-ADMIN_PASSWORD_HASH = os.environ.get('ADMIN_PASSWORD_HASH')
+_SCHEMA_NAME_RE = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
+_db_initialized = False
+_db_init_lock = threading.Lock()
 
 
-def validate_required_config():
-    missing = []
-    if not DATABASE_URL:
-        missing.append('DATABASE_URL')
-    if not ADMIN_KEY:
-        missing.append('ADMIN_KEY')
-    if not ADMIN_PASSWORD_HASH:
-        missing.append('ADMIN_PASSWORD_HASH')
+class DatabaseConfigError(RuntimeError):
+    """Raised when required database configuration is missing or invalid."""
 
+
+def get_db_schema():
+    schema = (os.environ.get('DB_SCHEMA') or 'bible_quiz').strip()
+    if not _SCHEMA_NAME_RE.match(schema):
+        raise DatabaseConfigError(f"Invalid DB_SCHEMA identifier: {schema!r}")
+    return schema
+
+
+def table_name(name):
+    return f'"{get_db_schema()}"."{name}"'
+
+
+def normalize_database_url(raw_url):
+    url = (raw_url or '').strip()
+    if not url:
+        raise DatabaseConfigError('DATABASE_URL is not configured')
+
+    if url.startswith('postgres://'):
+        url = 'postgresql://' + url[len('postgres://'):]
+
+    parsed = urlparse(url)
+    host = (parsed.hostname or '').lower()
+    query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+
+    # Enforce SSL for remote Postgres hosts (e.g., Supabase/Render) if omitted
+    if host and host not in ('localhost', '127.0.0.1', '::1') and 'sslmode' not in query:
+        query['sslmode'] = 'require'
+        url = urlunparse(parsed._replace(query=urlencode(query)))
+
+    return url
+
+
+def log_startup_config_warnings():
+    missing = [
+        name for name in ('DATABASE_URL', 'ADMIN_KEY', 'ADMIN_PASSWORD_HASH')
+        if not os.environ.get(name)
+    ]
     if missing:
-        raise RuntimeError(f"Missing required environment variables: {', '.join(missing)}")
+        logger.warning(
+            'Missing environment variables (%s); static quiz will still load, '
+            'but affected API endpoints will be unavailable.',
+            ', '.join(missing)
+        )
 
 
 def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
+    dsn = normalize_database_url(os.environ.get('DATABASE_URL'))
+    return psycopg2.connect(dsn, connect_timeout=10)
+
+
+def _create_schema_and_tables(cur):
+    schema = get_db_schema()
+    pending_table = table_name('pending_questions')
+    reports_table = table_name('reports')
+    feedback_table = table_name('feedback')
+
+    cur.execute(f'CREATE SCHEMA IF NOT EXISTS "{schema}"')
+    cur.execute(f'''
+        CREATE TABLE IF NOT EXISTS {pending_table} (
+            id SERIAL PRIMARY KEY,
+            question TEXT,
+            option_a TEXT,
+            option_b TEXT,
+            option_c TEXT,
+            option_d TEXT,
+            correct_index INTEGER,
+            category TEXT,
+            reference TEXT,
+            fact TEXT,
+            difficulty TEXT DEFAULT 'NORMAL',
+            status TEXT DEFAULT 'PENDING'
+        )
+    ''')
+    cur.execute(f"ALTER TABLE {pending_table} ADD COLUMN IF NOT EXISTS difficulty TEXT DEFAULT 'NORMAL'")
+    cur.execute(f'''
+        CREATE TABLE IF NOT EXISTS {reports_table} (
+            id SERIAL PRIMARY KEY,
+            question_id INTEGER,
+            question_text TEXT,
+            reason TEXT,
+            status TEXT DEFAULT 'OPEN',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    cur.execute(f'''
+        CREATE TABLE IF NOT EXISTS {feedback_table} (
+            id SERIAL PRIMARY KEY,
+            type TEXT DEFAULT 'BUG',
+            message TEXT,
+            context_text TEXT,
+            status TEXT DEFAULT 'OPEN',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+
+def init_db():
+    conn = get_db_connection()
+    try:
+        with conn.cursor() as cur:
+            _create_schema_and_tables(cur)
+        conn.commit()
+        logger.info('Postgres database initialized (schema=%s)', get_db_schema())
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+
+def ensure_db_initialized():
+    """Initialize schema and tables lazily so import/startup never blocks Gunicorn port binding."""
+    global _db_initialized
+    if _db_initialized:
+        return
+
+    with _db_init_lock:
+        if _db_initialized:
+            return
+        init_db()
+        _db_initialized = True
+
+
+@contextmanager
+def db_cursor(dict_cursor=False, commit=False):
+    ensure_db_initialized()
+    conn = get_db_connection()
+    cursor_factory = RealDictCursor if dict_cursor else None
+    cur = conn.cursor(cursor_factory=cursor_factory)
+    try:
+        yield cur
+        if commit:
+            conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        cur.close()
+        conn.close()
 
 
 def require_admin():
-    if not ADMIN_KEY:
+    admin_key = os.environ.get('ADMIN_KEY')
+    if not admin_key:
         return False
     incoming_key = request.headers.get('Admin-Key')
     if not incoming_key:
         return False
-    return incoming_key == ADMIN_KEY
+    return incoming_key == admin_key
 
 
 def verify_admin_password(password):
-    if not ADMIN_PASSWORD_HASH:
+    password_hash = os.environ.get('ADMIN_PASSWORD_HASH')
+    if not password_hash:
         logger.error('ADMIN_PASSWORD_HASH is not configured')
         return False
-    return check_password_hash(ADMIN_PASSWORD_HASH, password)
+    return check_password_hash(password_hash, password)
 
 
 def row_to_quiz_question(row):
@@ -77,59 +211,43 @@ def row_to_quiz_question(row):
     }
 
 
-def init_db():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS pending_questions (
-            id SERIAL PRIMARY KEY,
-            question TEXT,
-            option_a TEXT,
-            option_b TEXT,
-            option_c TEXT,
-            option_d TEXT,
-            correct_index INTEGER,
-            category TEXT,
-            reference TEXT,
-            fact TEXT,
-            difficulty TEXT DEFAULT 'NORMAL',
-            status TEXT DEFAULT 'PENDING'
-        )
-    ''')
-    cur.execute("ALTER TABLE pending_questions ADD COLUMN IF NOT EXISTS difficulty TEXT DEFAULT 'NORMAL'")
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS reports (
-            id SERIAL PRIMARY KEY,
-            question_id INTEGER,
-            question_text TEXT,
-            reason TEXT,
-            status TEXT DEFAULT 'OPEN',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS feedback (
-            id SERIAL PRIMARY KEY,
-            type TEXT DEFAULT 'BUG',
-            message TEXT,
-            context_text TEXT,
-            status TEXT DEFAULT 'OPEN',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    cur.close()
-    conn.close()
-    logger.info('Postgres database initialized')
+@app.errorhandler(DatabaseConfigError)
+@app.errorhandler(psycopg2.Error)
+def handle_database_error(exc):
+    logger.error('Database error during request: %s', exc)
+    return jsonify({'message': 'Database service temporarily unavailable'}), 503
 
 
-validate_required_config()
-init_db()
+log_startup_config_warnings()
 
 
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    try:
+        ensure_db_initialized()
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute('SELECT 1')
+                cur.fetchone()
+        finally:
+            conn.close()
+        return jsonify({
+            'status': 'ok',
+            'database': 'connected',
+            'schema': get_db_schema()
+        }), 200
+    except (DatabaseConfigError, psycopg2.Error) as exc:
+        logger.warning('Health check database probe failed: %s', exc)
+        return jsonify({
+            'status': 'degraded',
+            'database': 'unavailable'
+        }), 200
 
 
 @app.route('/add-question', methods=['POST'])
@@ -142,39 +260,35 @@ def add_question():
     if not isinstance(opts, list):
         opts = []
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        INSERT INTO pending_questions
-        (question, option_a, option_b, option_c, option_d, correct_index, category, reference, fact, difficulty, status)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    ''', (
-        question,
-        opts[0] if len(opts) > 0 else '',
-        opts[1] if len(opts) > 1 else '',
-        opts[2] if len(opts) > 2 else '',
-        opts[3] if len(opts) > 3 else '',
-        int(data.get('correct', 0) or 0),
-        data.get('category', 'ALL'),
-        data.get('reference', ''),
-        data.get('fact', ''),
-        data.get('difficulty', 'NORMAL'),
-        'PENDING'
-    ))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(f'''
+            INSERT INTO {table_name('pending_questions')}
+            (question, option_a, option_b, option_c, option_d, correct_index, category, reference, fact, difficulty, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ''', (
+            question,
+            opts[0] if len(opts) > 0 else '',
+            opts[1] if len(opts) > 1 else '',
+            opts[2] if len(opts) > 2 else '',
+            opts[3] if len(opts) > 3 else '',
+            int(data.get('correct', 0) or 0),
+            data.get('category', 'ALL'),
+            data.get('reference', ''),
+            data.get('fact', ''),
+            data.get('difficulty', 'NORMAL'),
+            'PENDING'
+        ))
     return jsonify({'status': 'success', 'message': 'Saved for admin review'}), 201
 
 
 @app.route('/questions/live', methods=['GET'])
 def get_live_questions():
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute("SELECT * FROM pending_questions WHERE UPPER(COALESCE(status, '')) = 'APPROVED' ORDER BY id ASC")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
+    with db_cursor(dict_cursor=True) as cur:
+        cur.execute(
+            f"SELECT * FROM {table_name('pending_questions')} "
+            "WHERE UPPER(COALESCE(status, '')) = 'APPROVED' ORDER BY id ASC"
+        )
+        rows = cur.fetchall()
     return jsonify([row_to_quiz_question(r) for r in rows])
 
 
@@ -188,15 +302,11 @@ def report_question():
     if not reason:
         return jsonify({'message': 'Reason is required'}), 400
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        INSERT INTO reports (question_id, question_text, reason, status)
-        VALUES (%s, %s, %s, %s)
-    ''', (int(question_id or 0), question_text, reason, 'OPEN'))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(f'''
+            INSERT INTO {table_name('reports')} (question_id, question_text, reason, status)
+            VALUES (%s, %s, %s, %s)
+        ''', (int(question_id or 0), question_text, reason, 'OPEN'))
     return jsonify({'message': 'Report submitted'}), 201
 
 
@@ -213,15 +323,11 @@ def submit_feedback():
     if not message:
         return jsonify({'message': 'Feedback message is required'}), 400
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        INSERT INTO feedback (type, message, context_text, status)
-        VALUES (%s, %s, %s, %s)
-    ''', (feedback_type, message, context_text, 'OPEN'))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(f'''
+            INSERT INTO {table_name('feedback')} (type, message, context_text, status)
+            VALUES (%s, %s, %s, %s)
+        ''', (feedback_type, message, context_text, 'OPEN'))
     return jsonify({'message': 'Feedback submitted'}), 201
 
 
@@ -231,17 +337,17 @@ def admin_login():
     password = data.get('password', '')
     if not verify_admin_password(password):
         return jsonify({'message': 'Invalid password'}), 401
-    return jsonify({'admin_key': ADMIN_KEY})
+    admin_key = os.environ.get('ADMIN_KEY')
+    if not admin_key:
+        return jsonify({'message': 'Admin key is not configured'}), 503
+    return jsonify({'admin_key': admin_key})
 
 
 @app.route('/admin/questions', methods=['GET'])
 def get_questions():
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute('SELECT * FROM pending_questions ORDER BY id DESC')
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
+    with db_cursor(dict_cursor=True) as cur:
+        cur.execute(f"SELECT * FROM {table_name('pending_questions')} ORDER BY id DESC")
+        rows = cur.fetchall()
     return jsonify(rows)
 
 
@@ -251,37 +357,33 @@ def edit_question(q_id):
         return jsonify({'message': 'Unauthorized'}), 401
 
     data = request.get_json(silent=True) or {}
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        UPDATE pending_questions
-        SET question = %s,
-            option_a = %s,
-            option_b = %s,
-            option_c = %s,
-            option_d = %s,
-            correct_index = %s,
-            category = %s,
-            reference = %s,
-            fact = %s,
-            difficulty = %s
-        WHERE id = %s
-    ''', (
-        data.get('question', ''),
-        data.get('option_a', ''),
-        data.get('option_b', ''),
-        data.get('option_c', ''),
-        data.get('option_d', ''),
-        int(data.get('correct_index', 0) or 0),
-        data.get('category', 'ALL'),
-        data.get('reference', ''),
-        data.get('fact', ''),
-        data.get('difficulty', 'NORMAL'),
-        q_id
-    ))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(f'''
+            UPDATE {table_name('pending_questions')}
+            SET question = %s,
+                option_a = %s,
+                option_b = %s,
+                option_c = %s,
+                option_d = %s,
+                correct_index = %s,
+                category = %s,
+                reference = %s,
+                fact = %s,
+                difficulty = %s
+            WHERE id = %s
+        ''', (
+            data.get('question', ''),
+            data.get('option_a', ''),
+            data.get('option_b', ''),
+            data.get('option_c', ''),
+            data.get('option_d', ''),
+            int(data.get('correct_index', 0) or 0),
+            data.get('category', 'ALL'),
+            data.get('reference', ''),
+            data.get('fact', ''),
+            data.get('difficulty', 'NORMAL'),
+            q_id
+        ))
     return jsonify({'message': 'Question updated'})
 
 
@@ -290,12 +392,11 @@ def approve_question(q_id):
     if not require_admin():
         return jsonify({'message': 'Unauthorized'}), 401
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE pending_questions SET status = 'APPROVED' WHERE id = %s", (q_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(
+            f"UPDATE {table_name('pending_questions')} SET status = 'APPROVED' WHERE id = %s",
+            (q_id,)
+        )
     return jsonify({'message': 'Question approved'})
 
 
@@ -304,12 +405,8 @@ def delete_question(q_id):
     if not require_admin():
         return jsonify({'message': 'Unauthorized'}), 401
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM pending_questions WHERE id = %s', (q_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(f"DELETE FROM {table_name('pending_questions')} WHERE id = %s", (q_id,))
     return jsonify({'message': 'Deleted from Postgres'})
 
 
@@ -318,12 +415,9 @@ def get_reports():
     if not require_admin():
         return jsonify({'message': 'Unauthorized'}), 401
 
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute('SELECT * FROM reports ORDER BY created_at DESC, id DESC')
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
+    with db_cursor(dict_cursor=True) as cur:
+        cur.execute(f"SELECT * FROM {table_name('reports')} ORDER BY created_at DESC, id DESC")
+        rows = cur.fetchall()
     return jsonify(rows)
 
 
@@ -332,12 +426,11 @@ def resolve_report(report_id):
     if not require_admin():
         return jsonify({'message': 'Unauthorized'}), 401
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE reports SET status = 'RESOLVED' WHERE id = %s", (report_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(
+            f"UPDATE {table_name('reports')} SET status = 'RESOLVED' WHERE id = %s",
+            (report_id,)
+        )
     return jsonify({'message': 'Report resolved'})
 
 
@@ -346,12 +439,8 @@ def delete_report(report_id):
     if not require_admin():
         return jsonify({'message': 'Unauthorized'}), 401
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM reports WHERE id = %s', (report_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(f"DELETE FROM {table_name('reports')} WHERE id = %s", (report_id,))
     return jsonify({'message': 'Report deleted'})
 
 
@@ -360,12 +449,9 @@ def get_feedback():
     if not require_admin():
         return jsonify({'message': 'Unauthorized'}), 401
 
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute('SELECT * FROM feedback ORDER BY created_at DESC, id DESC')
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
+    with db_cursor(dict_cursor=True) as cur:
+        cur.execute(f"SELECT * FROM {table_name('feedback')} ORDER BY created_at DESC, id DESC")
+        rows = cur.fetchall()
     return jsonify(rows)
 
 
@@ -374,12 +460,11 @@ def resolve_feedback(feedback_id):
     if not require_admin():
         return jsonify({'message': 'Unauthorized'}), 401
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("UPDATE feedback SET status = 'RESOLVED' WHERE id = %s", (feedback_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(
+            f"UPDATE {table_name('feedback')} SET status = 'RESOLVED' WHERE id = %s",
+            (feedback_id,)
+        )
     return jsonify({'message': 'Feedback resolved'})
 
 
@@ -388,12 +473,8 @@ def delete_feedback(feedback_id):
     if not require_admin():
         return jsonify({'message': 'Unauthorized'}), 401
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute('DELETE FROM feedback WHERE id = %s', (feedback_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
+    with db_cursor(commit=True) as cur:
+        cur.execute(f"DELETE FROM {table_name('feedback')} WHERE id = %s", (feedback_id,))
     return jsonify({'message': 'Feedback deleted'})
 
 
