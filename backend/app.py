@@ -3,7 +3,7 @@ import re
 import logging
 import threading
 from contextlib import contextmanager
-from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse, quote, unquote
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -53,6 +53,18 @@ def normalize_database_url(raw_url):
 
     if url.startswith('postgres://'):
         url = 'postgresql://' + url[len('postgres://'):]
+
+    # Percent-encode userinfo credentials safely so special characters like '@' or '#' in passwords don't break urlparse/libpq
+    if '://' in url and '@' in url:
+        scheme, rest = url.split('://', 1)
+        if '@' in rest:
+            creds, host_part = rest.rsplit('@', 1)
+            if ':' in creds:
+                user, password = creds.split(':', 1)
+                creds = f"{quote(unquote(user), safe='')}:{quote(unquote(password), safe='')}"
+            else:
+                creds = quote(unquote(creds), safe='')
+            url = f"{scheme}://{creds}@{host_part}"
 
     parsed = urlparse(url)
     host = (parsed.hostname or '').lower()
