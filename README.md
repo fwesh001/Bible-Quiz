@@ -63,14 +63,20 @@ python app.py
    - Visit `http://localhost:5000` in your browser
    - The app works on both desktop and mobile screens
 
-### Deployment (Render)
+### Deployment (Render + Supabase Postgres)
 
 The app is configured to deploy easily on Render:
 1. Push code to GitHub
 2. Create a new Web Service on Render linked to your repo
 3. Set Build Command: `pip install -r requirements.txt`
 4. Set Start Command: `gunicorn --chdir backend app:app`
-5. Your app will automatically serve the frontend from the root URL!
+5. Configure Environment Variables on Render:
+   - `DATABASE_URL` — When using Supabase, copy the **Session Pooler** URI (port `5432`, IPv4-compatible for Render) from Supabase Dashboard → Connect, with `?sslmode=require`
+   - `DB_SCHEMA` — Optional, defaults to `bible_quiz` (isolates quiz tables from `public`)
+   - `ADMIN_KEY` — Secret key returned on `/admin/login`
+   - `ADMIN_PASSWORD_HASH` — Output from `generate_password_hash(...)`
+6. Optional Health Check Path: `/health`
+7. Your app will automatically serve the frontend from the root URL (even if the database is temporarily unreachable, `/questions/live` degrades gracefully to bundled `questions.js`).
 
 ---
 
@@ -110,11 +116,13 @@ Quick notes for the admin UI:
 ### Backend Summary (in `backend/app.py`)
 
 - Built with Flask and `flask-cors`.
-- Uses PostgreSQL (via `DATABASE_URL`) with tables for `pending_questions`, `reports`, and `feedback`.
+- Uses PostgreSQL (via `DATABASE_URL`) with tables for `pending_questions`, `reports`, and `feedback` inside `DB_SCHEMA` (default: `bible_quiz`).
 - Approved questions are served dynamically through `/questions/live`.
-- Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD_HASH` (both required).
+- Admin credentials are read from environment variables: `ADMIN_KEY` and `ADMIN_PASSWORD_HASH` (both required for admin mutations).
 
 ### Key Endpoints
+
+- `GET /health` — Reports app and PostgreSQL connection health (`status: ok` or `degraded`)
 
 - `POST /add-question` — Save a submitted question into `pending_questions` (status="PENDING")
 - `POST /feedback` — Submit user feedback (`BUG` or `SUGGESTION`) with message/context
