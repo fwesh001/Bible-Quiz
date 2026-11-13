@@ -41,139 +41,517 @@
   letter-spacing: 0.5px;
 }
 
-/* 🌞 Default Light Mode */
+/* ==========================================================================
+   CLAYMORPHISM DESIGN SYSTEM TOKENS — LIGHT THEME (BIBLICAL PARCHMENT)
+   ========================================================================== */
 :root {
-  --bg-color: #e5e7eb;
-  /* ash gray for light mode */
-  --text-color: #22223b;
-  /* deep slate, high contrast */
-  --card-bg: #ffffff;
-  /* pure white for cards/panels */
-  --brand-1: #2563eb;
-  /* vibrant blue */
-  --brand-2: #9333ea;
-  /* rich purple accent */
-  --sidebar-btn-hover: #4338ca;
-  /* deep blue for hover */
+  /* --- PALETTE: WARM BIBLICAL SURFACES --- */
+  --clay-canvas: #F8F5EE;           /* Warm biblical parchment background */
+  --clay-surface: #FFFFFF;          /* Pure white inflated clay cards */
+  --clay-surface-sunken: #EFE9DC;   /* Sunken wells, timer tracks, inputs */
+  --clay-surface-glass: rgba(255, 255, 255, 0.88);
+
+  /* --- BRAND COLORS: ROYAL LAPIS & SCRIPTURE NAVY --- */
+  --clay-primary: #324D70;          /* Deep Scripture Navy */
+  --clay-primary-light: #4A6B94;    /* Light Navy */
+  --clay-primary-dark: #20334D;     /* Shadow anchor for navy clay */
+  --clay-primary-text: #FFFFFF;
+
+  /* --- SECONDARY ACCENT: DESERT AMBER / BIBLICAL GOLD --- */
+  --clay-amber: #D98E32;            /* Warm Desert Amber */
+  --clay-amber-light: #ECC078;
+  --clay-amber-dark: #A66418;
+  --clay-amber-surface: #FDF3E3;
+  --clay-amber-text: #613803;
+
+  /* --- SCRIPTURAL OLIVE GREEN (Success / Hebrew Scriptures Accent) --- */
+  --clay-olive: #4E7A58;            /* Mount of Olives Green */
+  --clay-olive-light: #7AA884;
+  --clay-olive-dark: #315239;
+  --clay-olive-surface: #EDF5EE;
+  --clay-olive-text: #FFFFFF;
+
+  /* --- TERRA COTTA / CEDAR RED (Error / Missed / Critical) --- */
+  --clay-terracotta: #C85A48;       /* Ancient Pottery Terra Cotta */
+  --clay-terracotta-light: #E08576;
+  --clay-terracotta-dark: #8F3324;
+  --clay-terracotta-surface: #FDF0ED;
+  --clay-terracotta-text: #FFFFFF;
+
+  /* --- TYPOGRAPHY COLORS --- */
+  --clay-text-primary: #2C2621;     /* Charcoal with warm umber undertone */
+  --clay-text-secondary: #6B6258;   /* Muted warm slate */
+  --clay-text-tertiary: #9C9388;    /* Caption & footnote gray */
+
+  /* --- TYPOGRAPHY FONT FAMILIES --- */
+  --font-display: 'Fredoka', ui-rounded, system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-scripture: Georgia, "Times New Roman", Garamond, serif;
+
+  /* --- FLUID TYPOGRAPHY SCALE --- */
+  --font-h1: clamp(1.50rem, 4.5vw + 0.5rem, 2.25rem);
+  --font-h2: clamp(1.25rem, 3.0vw + 0.3rem, 1.75rem);
+  --font-question: clamp(1.10rem, 2.2vw + 0.35rem, 1.35rem);
+  --font-body: clamp(0.92rem, 1.2vw + 0.25rem, 1.05rem);
+  --font-caption: clamp(0.75rem, 0.8vw + 0.2rem, 0.88rem);
+
+  /* --- CLAYMORPHIC SKELETON SHIMMER PALETTE (LIGHT PARCHMENT) --- */
+  --clay-skeleton-base: #EFE9DC;           /* Warm biblical parchment sunken base */
+  --clay-skeleton-shimmer: #FAF7F0;        /* Soft pulsating warm highlight */
+  --clay-skeleton-accent: #E5DEC9;         /* Subdued edge shadow */
+  --clay-skeleton-pill: #F5EFE3;           /* Skeleton pill surface */
+
+  /* --- BORDER RADIUS STANDARDS --- */
+  --radius-xs: 8px;                 /* Chips, status tags */
+  --radius-sm: 12px;                /* Inputs, option letter badges */
+  --radius-md: 18px;                /* Buttons, dialog controls */
+  --radius-lg: 26px;                /* Main cards, containers */
+  --radius-xl: 34px;                /* Hero cards, dialog containers */
+  --radius-pill: 9999px;            /* Capsules, rounded navigation pills */
+
+  /* --- EXACT CLAYMORPHIC SHADOW FORMULAS (LIGHT MODE) --- */
+  --shadow-clay-card: 
+    0 16px 32px -8px rgba(78, 62, 45, 0.12),
+    0 6px 16px -4px rgba(78, 62, 45, 0.08),
+    inset 3px 3px 6px 0 rgba(255, 255, 255, 0.95),
+    inset -4px -4px 8px 0 rgba(140, 120, 95, 0.14);
+
+  --shadow-clay-btn-primary:
+    0 8px 18px -4px rgba(32, 51, 77, 0.35),
+    0 4px 8px -2px rgba(32, 51, 77, 0.20),
+    inset 2px 2px 4px 0 rgba(255, 255, 255, 0.45),
+    inset -3px -3px 6px 0 rgba(16, 26, 40, 0.35);
+
+  --shadow-clay-btn-amber:
+    0 8px 18px -4px rgba(166, 100, 24, 0.35),
+    0 4px 8px -2px rgba(166, 100, 24, 0.20),
+    inset 2px 2px 4px 0 rgba(255, 255, 255, 0.60),
+    inset -3px -3px 6px 0 rgba(100, 55, 8, 0.30);
+
+  --shadow-clay-option:
+    0 6px 14px -3px rgba(78, 62, 45, 0.08),
+    0 2px 6px -1px rgba(78, 62, 45, 0.04),
+    inset 2px 2px 4px 0 rgba(255, 255, 255, 0.95),
+    inset -3px -3px 5px 0 rgba(140, 120, 95, 0.10);
+
+  --shadow-clay-pressed:
+    0 2px 4px 0 rgba(78, 62, 45, 0.06),
+    inset 3px 3px 6px 0 rgba(100, 80, 60, 0.22),
+    inset -2px -2px 4px 0 rgba(255, 255, 255, 0.60);
+
+  --shadow-clay-dialog:
+    0 28px 56px -12px rgba(44, 38, 33, 0.25),
+    0 12px 24px -6px rgba(44, 38, 33, 0.15),
+    inset 3px 3px 6px 0 rgba(255, 255, 255, 0.95),
+    inset -5px -5px 10px 0 rgba(120, 100, 80, 0.18);
+
+  --shadow-clay-skeleton:
+    0 4px 12px -2px rgba(78, 62, 45, 0.06),
+    inset 2px 2px 4px 0 rgba(255, 255, 255, 0.85),
+    inset -2px -2px 4px 0 rgba(140, 120, 95, 0.14);
+
+  --clay-border: 1.5px solid rgba(255, 255, 255, 0.65);
+
+  /* --- BACKWARDS COMPATIBILITY ALIASES --- */
+  --bg-color: var(--clay-canvas);
+  --bg: var(--clay-canvas);
+  --text-color: var(--clay-text-primary);
+  --text: var(--clay-text-primary);
+  --card-bg: var(--clay-surface);
+  --panel: var(--clay-surface);
+  --panel-2: var(--clay-surface-sunken);
+  --brand-1: var(--clay-primary);
+  --brand: var(--clay-primary);
+  --brand-2: var(--clay-amber);
+  --correct: var(--clay-olive);
+  --wrong: var(--clay-terracotta);
+  --accent: var(--clay-amber);
+  --muted: var(--clay-text-secondary);
+  --sidebar-btn-hover: var(--clay-primary-light);
+  --border: rgba(140, 120, 95, 0.18);
 }
 
-/* 🌙 Dark Mode */
-.dark-mode {
-  --bg-color: #18181b;
-  /* near-black, not pure black */
-  --text-color: #f3f4f6;
-  /* very light gray for text */
-  --card-bg: #23233a;
-  /* deep blue-gray for cards */
-  --brand-1: #60a5fa;
-  /* lighter blue for buttons */
-  --brand-2: #a78bfa;
-  /* soft purple accent */
-  --sidebar-btn-hover: #6366f1;
-  /* lighter blue for hover */
-}
+/* ==========================================================================
+   CLAYMORPHISM DESIGN SYSTEM TOKENS — DARK THEME (OBSIDIAN & NIGHT SKY)
+   ========================================================================== */
+[data-theme="dark"], body.dark-mode, body.dark {
+  --clay-canvas: #16181D;           /* Deep obsidian-slate canvas */
+  --clay-surface: #22262E;          /* Elevated dark slate clay */
+  --clay-surface-sunken: #1A1D23;   /* Sunken wells / inputs */
+  --clay-surface-glass: rgba(34, 38, 46, 0.90);
 
-body {
-  background: var(--bg-color);
-  color: var(--text-color);
-}
+  --clay-primary: #527DB3;
+  --clay-primary-light: #709BD1;
+  --clay-primary-dark: #375782;
+  --clay-primary-text: #FFFFFF;
 
-.sidebar-btn {
-  background: var(--brand-1);
-  color: #fff;
-  transition: background 0.2s;
-}
+  --clay-amber: #E29F47;
+  --clay-amber-light: #F0B86F;
+  --clay-amber-dark: #B37525;
+  --clay-amber-surface: #2E271D;
+  --clay-amber-text: #FFDFAB;
 
-.sidebar-btn:hover {
-  background: var(--sidebar-btn-hover);
-}
+  --clay-olive: #5D946A;
+  --clay-olive-light: #7FBA8D;
+  --clay-olive-dark: #3E6948;
+  --clay-olive-surface: #1E2820;
+  --clay-olive-text: #FFFFFF;
 
-/* Ensure sidebar-btn text is visible in dark mode */
-.dark-mode .sidebar-btn {
-  color: #f3f4f6;
-}
+  --clay-terracotta: #D96957;
+  --clay-terracotta-light: #EA8A7B;
+  --clay-terracotta-dark: #A64333;
+  --clay-terracotta-surface: #2B1D1B;
+  --clay-terracotta-text: #FFFFFF;
 
-/* Bible Quiz Styles */
-:root {
-  --bg: #fef9c3;
-  /* light yellow background */
-  --panel: #ffffff;
-  /* white panels */
-  --panel-2: #fef3c7;
-  /* soft cream panels */
-  --text: #1f2937;
-  /* slate-800 for text */
-  --muted: #6b7280;
-  /* gray-500 */
-  --brand: #0ea5e9;
-  /* sky-500 (bright blue) */
-  --brand-2: #f472b6;
-  /* pink-400 */
-  --correct: #22c55e;
-  /* green-500 */
-  --wrong: #ef4444;
-  /* red-500 */
-  --accent: #f59e0b;
-  /* amber-500 */
-}
+  --clay-text-primary: #F2EFE9;     /* Soft ivory text */
+  --clay-text-secondary: #A69E92;   /* Warm muted gray */
+  --clay-text-tertiary: #6E6860;    /* Footnote slate */
 
-/* Dark theme variables applied on body.dark/body.dark-mode */
-body.dark,
-body.dark-mode {
-  --bg: #0f172a;
-  /* slate-900 */
-  --panel: #111827;
-  /* deep panel */
-  --panel-2: #1e293b;
-  /* dark panel variant */
-  --text: #ffffff;
-  /* very light gray for main text */
-  --muted: #97bceb;
-  /* light gray for secondary text */
-  --brand: #22d3ee;
-  /* cyan-400 */
-  --brand-2: #f472b6;
-  /* pink-400 */
-  --correct: #22c55e;
-  /* green-500 */
-  --wrong: #ef4444;
-  /* red-500 */
-  --accent: #fbbf24;
-  /* amber-400 for highlights */
+  /* --- CLAYMORPHIC SKELETON SHIMMER PALETTE (DARK OBSIDIAN) --- */
+  --clay-skeleton-base: #1C2028;           /* Sunken obsidian base */
+  --clay-skeleton-shimmer: #2C3240;        /* Pulsing night slate highlight */
+  --clay-skeleton-accent: #15181F;         /* Deep edge anchor */
+  --clay-skeleton-pill: #252A35;           /* Dark skeleton pill surface */
+
+  --shadow-clay-card:
+    0 16px 32px -8px rgba(0, 0, 0, 0.50),
+    0 6px 16px -4px rgba(0, 0, 0, 0.35),
+    inset 2px 2px 4px 0 rgba(255, 255, 255, 0.12),
+    inset -3px -3px 6px 0 rgba(0, 0, 0, 0.60);
+
+  --shadow-clay-btn-primary:
+    0 8px 18px -4px rgba(10, 16, 26, 0.65),
+    inset 2px 2px 4px 0 rgba(255, 255, 255, 0.28),
+    inset -3px -3px 6px 0 rgba(0, 0, 0, 0.65);
+
+  --shadow-clay-btn-amber:
+    0 8px 18px -4px rgba(30, 18, 5, 0.65),
+    inset 2px 2px 4px 0 rgba(255, 255, 255, 0.35),
+    inset -3px -3px 6px 0 rgba(0, 0, 0, 0.65);
+
+  --shadow-clay-option:
+    0 6px 14px -3px rgba(0, 0, 0, 0.35),
+    inset 2px 2px 3px 0 rgba(255, 255, 255, 0.10),
+    inset -2px -2px 4px 0 rgba(0, 0, 0, 0.45);
+
+  --shadow-clay-pressed:
+    0 2px 4px 0 rgba(0, 0, 0, 0.45),
+    inset 3px 3px 6px 0 rgba(0, 0, 0, 0.75),
+    inset -2px -2px 4px 0 rgba(255, 255, 255, 0.08);
+
+  --shadow-clay-dialog:
+    0 28px 56px -12px rgba(0, 0, 0, 0.75),
+    inset 2px 2px 4px 0 rgba(255, 255, 255, 0.15),
+    inset -4px -4px 8px 0 rgba(0, 0, 0, 0.75);
+
+  --shadow-clay-skeleton:
+    0 4px 12px -2px rgba(0, 0, 0, 0.40),
+    inset 2px 2px 3px 0 rgba(255, 255, 255, 0.10),
+    inset -2px -2px 4px 0 rgba(0, 0, 0, 0.55);
+
+  --clay-border: 1.5px solid rgba(255, 255, 255, 0.08);
+
+  /* Backwards compatibility */
+  --bg-color: var(--clay-canvas);
+  --bg: var(--clay-canvas);
+  --text-color: var(--clay-text-primary);
+  --text: var(--clay-text-primary);
+  --card-bg: var(--clay-surface);
+  --panel: var(--clay-surface);
+  --panel-2: var(--clay-surface-sunken);
+  --brand-1: var(--clay-primary);
+  --brand: var(--clay-primary);
+  --brand-2: var(--clay-amber);
+  --correct: var(--clay-olive);
+  --wrong: var(--clay-terracotta);
+  --accent: var(--clay-amber);
+  --muted: var(--clay-text-secondary);
+  --sidebar-btn-hover: var(--clay-primary-light);
   --border: rgba(255, 255, 255, 0.1);
-  /* for subtle borders */
 }
 
-
+/* ==========================================================================
+   GLOBAL BASE STYLES & MOBILE-FIRST RESET
+   ========================================================================== */
 * {
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
-  background: radial-gradient(1200px 800px at 100% -20%, #fef3c7 0%, var(--bg) 60%);
-  color: var(--text);
+  font-family: var(--font-sans);
+  background: var(--clay-canvas);
+  color: var(--clay-text-primary);
+  min-height: 100vh;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
 
 header {
   position: relative;
   text-align: center;
-  padding: 24px 16px 0;
+  padding: 20px 16px 0;
 }
 
 header h1 {
   margin: 0;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  letter-spacing: 0.5px;
+  font-family: var(--font-display);
+  font-size: var(--font-h1);
+  color: var(--clay-primary);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+[data-theme="dark"] header h1, body.dark-mode header h1, body.dark header h1 {
+  color: var(--clay-primary-light);
+}
+
+/* ==========================================================================
+   CLAYMORPHIC VECTOR ICONS & SKELETON ANIMATIONS
+   ========================================================================== */
+.clay-icon {
+  width: 1.25em;
+  height: 1.25em;
+  display: inline-block;
+  vertical-align: -0.2em;
+  stroke-width: 2;
+  fill: none;
+  stroke: currentColor;
+  transition: transform 0.2s ease, stroke 0.2s ease;
+}
+
+@keyframes clay-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes clay-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(0.995);
+  }
+}
+
+.clay-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--clay-skeleton-base) 0%,
+    var(--clay-skeleton-shimmer) 50%,
+    var(--clay-skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  animation: clay-shimmer 1.8s ease-in-out infinite, clay-pulse 2.4s ease-in-out infinite;
+  box-shadow: var(--shadow-clay-skeleton);
+  pointer-events: none;
+  user-select: none;
+  will-change: background-position, opacity, transform;
+}
+
+.clay-skeleton-text {
+  height: 1rem;
+  border-radius: var(--radius-xs);
+  margin-bottom: 0.65rem;
+}
+.clay-skeleton-text:last-child {
+  margin-bottom: 0;
+}
+
+.clay-skeleton-pill {
+  min-height: 52px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-clay-skeleton);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 14px;
+  margin-bottom: 12px;
+  background: var(--clay-surface-sunken);
+}
+
+.clay-skeleton-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--clay-skeleton-accent);
+  flex-shrink: 0;
+}
+
+.clay-skeleton-card {
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  box-shadow: var(--shadow-clay-card);
+  background: var(--clay-surface);
+  min-height: 220px;
+  border: var(--clay-border);
+  margin-bottom: 20px;
+}
+
+.clay-skeleton-circle {
+  border-radius: 50%;
+  box-shadow: var(--shadow-clay-skeleton);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clay-skeleton {
+    animation: none;
+    background: var(--clay-skeleton-base);
+  }
+}
+
+/* ==========================================================================
+   CLAYMORPHIC CORE COMPONENT UTILITIES
+   ========================================================================== */
+.container, .clay-card {
+  width: min(960px, 94vw);
+  background: var(--clay-surface);
+  border: var(--clay-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-clay-card);
+  padding: clamp(16px, 3.5vw, 32px);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+button.primary, .clay-btn-primary {
+  background: var(--clay-primary);
+  color: var(--clay-primary-text) !important;
+  border: none;
+  padding: 12px 20px;
+  min-height: 48px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-clay-btn-primary);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.02rem;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+button.primary:hover, .clay-btn-primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+button.primary:active, .clay-btn-primary:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: var(--shadow-clay-pressed);
+}
+
+button.secondary, .clay-btn-amber {
+  background: var(--clay-amber-surface);
+  color: var(--clay-amber-text) !important;
+  border: 1.5px solid var(--clay-amber-light);
+  padding: 10px 18px;
+  min-height: 48px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-clay-btn-amber);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.98rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+button.secondary:hover, .clay-btn-amber:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+button.secondary:active, .clay-btn-amber:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: var(--shadow-clay-pressed);
+}
+
+.select, .clay-input {
+  background: var(--clay-surface-sunken);
+  border: 1px solid rgba(140, 120, 95, 0.18);
+  color: var(--clay-text-primary);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-clay-pressed);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.select:focus, .clay-input:focus {
+  outline: none;
+  border-color: var(--clay-primary);
+  box-shadow: 0 0 0 3px rgba(50, 77, 112, 0.25);
+}
+
+.stat {
+  background: var(--clay-surface-sunken);
+  border: var(--clay-border);
+  border-radius: var(--radius-md);
+  padding: 14px 12px;
+  text-align: center;
+  color: var(--clay-text-primary);
+  box-shadow: var(--shadow-clay-option);
+}
+
+.stat .big {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--clay-primary);
+}
+
+[data-theme="dark"] .stat .big, body.dark-mode .stat .big, body.dark .stat .big {
+  color: var(--clay-primary-light);
+}
+
+.stat .label {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--clay-text-secondary);
+  margin-top: 4px;
+}
+
+.sidebar-open-btn {
+  background: var(--clay-surface);
+  box-shadow: var(--shadow-clay-option);
+  border: var(--clay-border);
+  border-radius: var(--radius-sm);
+  color: var(--clay-primary);
+}
+
+.sidebar-open-btn:active {
+  box-shadow: var(--shadow-clay-pressed);
+  transform: translateY(1px);
+}
+
+[data-theme="dark"] .sidebar-open-btn, body.dark-mode .sidebar-open-btn, body.dark .sidebar-open-btn {
+  color: var(--clay-primary-light);
 }
 
 .icon-btn {
