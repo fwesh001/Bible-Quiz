@@ -247,7 +247,18 @@ const els = {
   bookmarkView: document.getElementById('bookmark-view'),
   btnShowBookmarks: document.getElementById('btn-show-bookmarks'),
   btnShowResultsMsg: document.getElementById('btn-show-results-msg'), // toggle back to stats
-  btnBookmarkCurrent: document.getElementById('btn-bookmark-current')
+  btnBookmarkCurrent: document.getElementById('btn-bookmark-current'),
+  quizNavRibbon: document.getElementById('quiz-nav-ribbon'),
+  inGameSkeleton: document.getElementById('in-game-skeleton'),
+  resultsSkeleton: document.getElementById('results-skeleton'),
+  resultsContent: document.getElementById('results-content'),
+  quizGridContent: document.getElementById('quiz-grid-content'),
+  btnHintFifty: document.getElementById('btn-hint-fifty'),
+  btnHintClue: document.getElementById('btn-hint-clue'),
+  hintFiftyLabel: document.getElementById('hint-fifty-label'),
+  hintClueLabel: document.getElementById('hint-clue-label'),
+  clayClueCard: document.getElementById('clay-clue-card'),
+  clayClueText: document.getElementById('clay-clue-text')
 };
 
 // Ensure `bibleQuestions` exists (may be defined in questions.js). If not, initialize empty.
@@ -427,55 +438,128 @@ function getDynamicQuestionTime() {
 }
 
 function buildNavigator() {
-  if (!els.navList) return;
-  els.navList.innerHTML = '';
-  state.questions.forEach((_, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-item';
-    btn.type = 'button';
-    btn.textContent = String(i + 1);
-    btn.dataset.index = String(i);
-    btn.addEventListener('click', () => {
-      // Allow navigation even if current question is locked; stop timers and jump.
-      stopQuestionTimer();
-      state.streak = 0; // jumping breaks streak
-      state.index = i;
-      renderQuestion();
+  // 1. Sidebar list (tablet/desktop)
+  if (els.navList) {
+    els.navList.innerHTML = '';
+    state.questions.forEach((_, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'nav-item';
+      btn.type = 'button';
+      btn.textContent = String(i + 1);
+      btn.dataset.index = String(i);
+      btn.addEventListener('click', () => {
+        stopQuestionTimer();
+        state.streak = 0; // jumping breaks streak
+        state.index = i;
+        renderQuestion();
+      });
+      els.navList.appendChild(btn);
     });
-    els.navList.appendChild(btn);
-  });
+  }
+
+  // 2. Horizontal scrollable ribbon (mobile)
+  if (els.quizNavRibbon) {
+    els.quizNavRibbon.innerHTML = '';
+    state.questions.forEach((_, i) => {
+      const pill = document.createElement('button');
+      pill.className = 'quiz-nav-pill nav-item';
+      pill.type = 'button';
+      pill.textContent = String(i + 1);
+      pill.dataset.index = String(i);
+      pill.setAttribute('aria-label', `Question ${i + 1}`);
+      pill.addEventListener('click', () => {
+        stopQuestionTimer();
+        state.streak = 0;
+        state.index = i;
+        renderQuestion();
+      });
+      els.quizNavRibbon.appendChild(pill);
+    });
+  }
+
   updateNavigator();
 }
 
 function updateNavigator() {
-  if (!els.navList) return;
-  const items = Array.from(els.navList.querySelectorAll('.nav-item'));
-  items.forEach((el, i) => {
-    el.classList.remove('current');
-    el.classList.toggle('current', i === state.index);
-  });
+  // Update desktop sidebar items
+  if (els.navList) {
+    const items = Array.from(els.navList.querySelectorAll('.nav-item'));
+    items.forEach((el, i) => {
+      el.classList.remove('current');
+      el.classList.toggle('current', i === state.index);
+    });
+  }
+
+  // Update mobile ribbon pills and smooth scroll active pill into view
+  if (els.quizNavRibbon) {
+    const pills = Array.from(els.quizNavRibbon.querySelectorAll('.quiz-nav-pill'));
+    pills.forEach((el, i) => {
+      el.classList.remove('current');
+      el.classList.toggle('current', i === state.index);
+    });
+
+    const activePill = els.quizNavRibbon.querySelector(`.quiz-nav-pill[data-index="${state.index}"]`);
+    if (activePill) {
+      activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
 }
 
 function markNav(i, status) {
-  if (!els.navList) return;
-  const item = els.navList.querySelector(`.nav-item[data-index="${i}"]`);
-  if (!item) return;
-  item.classList.remove('correct', 'wrong', 'skipped');
-  if (status) item.classList.add(status);
+  if (els.navList) {
+    const item = els.navList.querySelector(`.nav-item[data-index="${i}"]`);
+    if (item) {
+      item.classList.remove('correct', 'wrong', 'skipped');
+      if (status) item.classList.add(status);
+    }
+  }
+
+  if (els.quizNavRibbon) {
+    const pill = els.quizNavRibbon.querySelector(`.quiz-nav-pill[data-index="${i}"]`);
+    if (pill) {
+      pill.classList.remove('correct', 'wrong', 'skipped');
+      if (status) pill.classList.add(status);
+    }
+  }
 }
 
 function renderQuestion() {
   const q = state.questions[state.index];
   els.qText.textContent = q.question;
+
   els.opts.forEach((btn, i) => {
-    btn.classList.remove('correct', 'wrong', 'disabled');
-    btn.querySelector('.opt-text').textContent = q.options[i];
+    btn.classList.remove('correct', 'wrong', 'disabled', 'clay-eliminated');
+    const textSpan = btn.querySelector('.opt-text') || btn.querySelector('.option-text');
+    if (textSpan) textSpan.textContent = q.options[i];
     btn.disabled = false;
+    btn.removeAttribute('aria-disabled');
   });
+
+  // Restore 50/50 eliminated state if already applied to this question
+  if (q.fiftyUsed && Array.isArray(q.eliminatedOptions)) {
+    q.eliminatedOptions.forEach(idx => {
+      if (els.opts[idx]) {
+        els.opts[idx].classList.add('clay-eliminated');
+        els.opts[idx].disabled = true;
+        els.opts[idx].setAttribute('aria-disabled', 'true');
+      }
+    });
+  }
+
+  // Restore or hide scripture clue card
+  if (els.clayClueCard) {
+    if (q.clueRevealed && q.clueText) {
+      els.clayClueCard.style.display = 'block';
+      if (els.clayClueText) els.clayClueText.textContent = q.clueText;
+    } else {
+      els.clayClueCard.style.display = 'none';
+      if (els.clayClueText) els.clayClueText.textContent = '';
+    }
+  }
+
   els.feedback.classList.remove('show');
   els.ref.textContent = '';
   els.fact.textContent = '';
-  if (els.ref) els.ref.classList.remove('show');
   if (els.ref) els.ref.classList.remove('show');
   if (els.fact) els.fact.classList.remove('show');
 
@@ -690,112 +774,92 @@ function nextQuestion() {
 }
 
 function showResults() {
-  const accuracy = state.answered ? Math.round((state.correctCount / state.answered) * 100) : 0;
-  els.finalScore.textContent = state.score;
-  els.finalAccuracy.textContent = accuracy + '%';
-  els.finalLongest.textContent = state.longestStreak;
-  els.finalBonuses.textContent = state.bonuses3 + state.bonuses5;
-
-  const msg = encouragementFor(accuracy);
-  els.encouragement.textContent = msg.text;
-  els.encouragement.title = msg.ref;
-
-  // Save highs
-  const high = loadHigh();
-  const newHigh = {
-    bestScore: Math.max(high.bestScore || 0, state.score),
-    bestAccuracy: Math.max(high.bestAccuracy || 0, accuracy),
-    bestStreak: Math.max(high.bestStreak || 0, state.longestStreak)
-  };
-  saveHigh(newHigh);
-
-  // Achievements
-  const earned = evaluateAchievements(accuracy);
-  renderAchievements(earned);
-
-
-  // Full question review list
-  if (els.questionReviewList) {
-    els.questionReviewList.innerHTML = '';
-    state.questions.forEach((q, idx) => {
-      // Determine user's answer
-      let userAnswer = null;
-      let wasCorrect = false;
-      let wasSkipped = false;
-      if (q.userAnswer !== undefined && q.userAnswer !== null) {
-        userAnswer = q.options[q.userAnswer];
-        wasCorrect = q.userAnswer === q.correct;
-        wasSkipped = false;
-      } else {
-        userAnswer = '<i>Skipped</i>';
-        wasSkipped = true;
-      }
-      // Correct: green, wrong/skipped: red
-      const item = document.createElement('div');
-      item.className = 'question-review-item ' + (wasCorrect ? 'correct' : 'wrong');
-      item.innerHTML = `
-        <div class="question-review-q">Q${idx + 1}: ${q.question}</div>
-        <div class="question-review-category">Category: ${q.category || 'N/A'}</div>
-        <div class="question-review-user">Your answer: <span class="${wasCorrect ? 'question-review-correct' : 'question-review-wrong'}">${userAnswer}</span></div>
-        <div>Correct answer: <span class="question-review-correct">${q.options[q.correct]}</span></div>
-        <div class="question-review-fact">Fact: ${q.fact || ''}</div>
-        <div class="question-review-ref">Reference: ${q.reference || ''}</div>
-      `;
-      els.questionReviewList.appendChild(item);
-    });
-  }
-
-  // Full question review list
-  if (els.questionReviewList) {
-    els.questionReviewList.innerHTML = '';
-    state.questions.forEach((q, idx) => {
-      // Determine user's answer
-      let userAnswer = null;
-      let wasCorrect = false;
-      if (q.userAnswer !== undefined && q.userAnswer !== null) {
-        userAnswer = q.options[q.userAnswer];
-        wasCorrect = q.userAnswer === q.correct;
-      }
-      // If missed, highlight red; if correct, green
-      const item = document.createElement('div');
-      item.className = 'question-review-item ' + (wasCorrect ? 'correct' : 'wrong');
-
-      // Bookmark button state
-      // Use question text + correct index + options[0] as unique key fallback if no ID
-      const qKey = getQuestionKey(q);
-      const isBookmarked = state.bookmarks.some(b => getQuestionKey(b) === qKey);
-
-      item.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-          <div class="question-review-q">Q${idx + 1}: ${q.question}</div>
-          <button class="bookmark-btn ${isBookmarked ? 'active' : ''}" title="${isBookmarked ? 'Remove Bookmark' : 'Bookmark for later'}" data-idx="${idx}">
-            ${isBookmarked ? '★' : '☆'}
-          </button>
-        </div>
-        <div class="question-review-category">Category: ${q.category || 'N/A'}</div>
-        <div class="question-review-user">Your answer: <span class="${wasCorrect ? 'question-review-correct' : 'question-review-wrong'}">${userAnswer !== null ? userAnswer : '<i>Skipped</i>'}</span></div>
-        <div>Correct answer: <span class="question-review-correct">${q.options[q.correct]}</span></div>
-        <div class="question-review-fact">Fact: ${q.fact || ''}</div>
-        <div class="question-review-ref">Reference: ${q.reference || ''}</div>
-      `;
-
-      // Attach click handler for bookmark
-      item.querySelector('.bookmark-btn').addEventListener('click', (e) => {
-        const btn = e.currentTarget;
-        const qIdx = parseInt(btn.dataset.idx, 10);
-        const question = state.questions[qIdx];
-        toggleBookmark(question, btn);
-      });
-
-      els.questionReviewList.appendChild(item);
-    });
-  }
-
-
-  // Update welcome stats now (so returning home shows latest)
-  updateWelcomeStats();
-
+  // Activate results screen
   showScreen('results');
+
+  // Display claymorphic results skeleton while compiling metrics and review list
+  if (els.resultsSkeleton && els.resultsContent) {
+    els.resultsSkeleton.style.display = 'block';
+    els.resultsContent.style.display = 'none';
+  }
+
+  setTimeout(() => {
+    const accuracy = state.answered ? Math.round((state.correctCount / state.answered) * 100) : 0;
+    if (els.finalScore) els.finalScore.textContent = state.score;
+    if (els.finalAccuracy) els.finalAccuracy.textContent = accuracy + '%';
+    if (els.finalLongest) els.finalLongest.textContent = state.longestStreak;
+    if (els.finalBonuses) els.finalBonuses.textContent = state.bonuses3 + state.bonuses5;
+
+    const msg = encouragementFor(accuracy);
+    if (els.encouragement) {
+      els.encouragement.textContent = msg.text;
+      els.encouragement.title = msg.ref;
+    }
+
+    // Save highs
+    const high = loadHigh();
+    const newHigh = {
+      bestScore: Math.max(high.bestScore || 0, state.score),
+      bestAccuracy: Math.max(high.bestAccuracy || 0, accuracy),
+      bestStreak: Math.max(high.bestStreak || 0, state.longestStreak)
+    };
+    saveHigh(newHigh);
+
+    // Achievements
+    const earned = evaluateAchievements(accuracy);
+    renderAchievements(earned);
+
+    // Full question review list
+    if (els.questionReviewList) {
+      els.questionReviewList.innerHTML = '';
+      state.questions.forEach((q, idx) => {
+        let userAnswer = null;
+        let wasCorrect = false;
+        if (q.userAnswer !== undefined && q.userAnswer !== null) {
+          userAnswer = q.options[q.userAnswer];
+          wasCorrect = q.userAnswer === q.correct;
+        }
+
+        const item = document.createElement('div');
+        item.className = 'question-review-item clay-card ' + (wasCorrect ? 'correct' : 'wrong');
+
+        const qKey = getQuestionKey(q);
+        const isBookmarked = state.bookmarks.some(b => getQuestionKey(b) === qKey);
+
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div class="question-review-q">Q${idx + 1}: ${q.question}</div>
+            <button class="bookmark-btn ${isBookmarked ? 'active' : ''}" title="${isBookmarked ? 'Remove Bookmark' : 'Bookmark for later'}" data-idx="${idx}">
+              ${isBookmarked ? '★' : '☆'}
+            </button>
+          </div>
+          <div class="question-review-category" style="color:var(--clay-primary); font-size:0.92rem; margin-top:2px;">Category: ${q.category || 'N/A'}</div>
+          <div class="question-review-user" style="margin-top:4px;">Your answer: <span class="${wasCorrect ? 'question-review-correct' : 'question-review-wrong'}">${userAnswer !== null ? userAnswer : '<i>Skipped</i>'}</span></div>
+          <div>Correct answer: <span class="question-review-correct" style="color:var(--clay-olive); font-weight:600;">${q.options[q.correct]}</span></div>
+          <div class="question-review-fact" style="margin-top:4px;">Fact: ${q.fact || ''}</div>
+          <div class="question-review-ref" style="color:var(--clay-primary); font-family:var(--font-scripture); font-weight:700;">Reference: ${q.reference || ''}</div>
+        `;
+
+        item.querySelector('.bookmark-btn').addEventListener('click', (e) => {
+          const btn = e.currentTarget;
+          const qIdx = parseInt(btn.dataset.idx, 10);
+          const question = state.questions[qIdx];
+          toggleBookmark(question, btn);
+        });
+
+        els.questionReviewList.appendChild(item);
+      });
+    }
+
+    // Update welcome stats now (so returning home shows latest)
+    updateWelcomeStats();
+
+    // Reveal compiled results content smoothly
+    if (els.resultsSkeleton && els.resultsContent) {
+      els.resultsSkeleton.style.display = 'none';
+      els.resultsContent.style.display = 'block';
+    }
+  }, 160);
 }
 
 function encouragementFor(accuracy) {
