@@ -202,38 +202,95 @@
           </div>
           <div class="round-timer-label" id="round-timer-label">3:00</div>
         </div>
-        <div class="quiz-grid">
+
+        <!-- Horizontal Scrollable Question Navigator Ribbon (Mobile-First) -->
+        <nav class="quiz-navigator-ribbon" id="quiz-nav-ribbon" aria-label="Question progress ribbon"></nav>
+
+        <!-- In-Game Question & 4-Option Pill Transition Skeleton Loader -->
+        <div id="in-game-skeleton" class="clay-skeleton-card" style="display:none;" aria-busy="true" aria-label="Loading next question transition">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <div class="clay-skeleton" style="width: 130px; height: 26px; border-radius: var(--radius-pill);"></div>
+            <div class="clay-skeleton clay-skeleton-circle" style="width: 32px; height: 32px;"></div>
+          </div>
+          <div class="clay-skeleton clay-skeleton-text" style="width: 90%; height: 1.25rem;"></div>
+          <div class="clay-skeleton clay-skeleton-text" style="width: 95%; height: 1.25rem;"></div>
+          <div class="clay-skeleton clay-skeleton-text" style="width: 55%; height: 1.25rem; margin-bottom: 24px;"></div>
+          <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <div class="clay-skeleton" style="width: 120px; height: 36px; border-radius: var(--radius-md);"></div>
+            <div class="clay-skeleton" style="width: 130px; height: 36px; border-radius: var(--radius-md);"></div>
+          </div>
+          <div class="clay-skeleton clay-skeleton-pill">
+            <div class="clay-skeleton-badge"></div>
+            <div class="clay-skeleton" style="width: 72%; height: 1rem; border-radius: var(--radius-xs);"></div>
+          </div>
+          <div class="clay-skeleton clay-skeleton-pill">
+            <div class="clay-skeleton-badge"></div>
+            <div class="clay-skeleton" style="width: 58%; height: 1rem; border-radius: var(--radius-xs);"></div>
+          </div>
+          <div class="clay-skeleton clay-skeleton-pill">
+            <div class="clay-skeleton-badge"></div>
+            <div class="clay-skeleton" style="width: 84%; height: 1rem; border-radius: var(--radius-xs);"></div>
+          </div>
+          <div class="clay-skeleton clay-skeleton-pill">
+            <div class="clay-skeleton-badge"></div>
+            <div class="clay-skeleton" style="width: 62%; height: 1rem; border-radius: var(--radius-xs);"></div>
+          </div>
+        </div>
+
+        <div class="quiz-grid" id="quiz-grid-content">
           <div class="quiz-main">
             <div class="quiz-head">
               <div class="progress"><span id="progress-text">Question 1</span></div>
-              <div id="question-timer-chip" class="question-timer-chip">⏱ <span id="question-timer-label">20s</span></div>
+              <div id="question-timer-chip" class="question-timer-chip"><svg class="clay-icon" style="margin-right:4px;"><use href="#icon-timer"/></svg><span id="question-timer-label">20s</span></div>
               <button id="btn-bookmark-current" class="bookmark-btn" title="Bookmark for later"
                 style="font-size:1.4rem;">☆</button>
             </div>
             <!-- QUESTION TEXT -->
-            <div class="question" id="question-text">Question will appear here</div>
+            <div class="question clay-card" id="question-text">Question will appear here</div>
             <div class="q-fact" id="fact"></div>
-            <div class="options">
-              <button class="option" id="opt-0" data-index="0"><span class="badge">A</span><span
-                  class="opt-text"></span></button>
-              <button class="option" id="opt-1" data-index="1"><span class="badge">B</span><span
-                  class="opt-text"></span></button>
-              <button class="option" id="opt-2" data-index="2"><span class="badge">C</span><span
-                  class="opt-text"></span></button>
-              <button class="option" id="opt-3" data-index="3"><span class="badge">D</span><span
-                  class="opt-text"></span></button>
+
+            <!-- In-Game Hints Bar -->
+            <div class="hint-controls-bar" id="hint-controls-bar">
+              <button id="btn-hint-fifty" type="button" class="clay-hint-btn" title="Eliminate two incorrect choices">
+                <svg class="clay-icon"><use href="#icon-fifty-fifty"/></svg>
+                <span id="hint-fifty-label">50/50 (1 left)</span>
+              </button>
+              <button id="btn-hint-clue" type="button" class="clay-hint-btn" title="Reveal Scripture Verse Clue">
+                <svg class="clay-icon"><use href="#icon-oil-lamp"/></svg>
+                <span id="hint-clue-label">Scripture Clue</span>
+              </button>
+            </div>
+
+            <!-- Scripture Clue Card (hidden by default) -->
+            <div id="clay-clue-card" class="clay-clue-card" style="display:none;" aria-live="polite">
+              <div class="clay-clue-header">
+                <svg class="clay-icon" style="color:var(--clay-amber)"><use href="#icon-oil-lamp"/></svg>
+                <strong>Scripture Clue</strong>
+              </div>
+              <div id="clay-clue-text" class="clay-clue-text"></div>
+            </div>
+
+            <div class="options" id="quiz-options">
+              <button class="option clay-option" id="opt-0" data-index="0"><span class="badge option-badge">A</span><span
+                  class="opt-text option-text"></span></button>
+              <button class="option clay-option" id="opt-1" data-index="1"><span class="badge option-badge">B</span><span
+                  class="opt-text option-text"></span></button>
+              <button class="option clay-option" id="opt-2" data-index="2"><span class="badge option-badge">C</span><span
+                  class="opt-text option-text"></span></button>
+              <button class="option clay-option" id="opt-3" data-index="3"><span class="badge option-badge">D</span><span
+                  class="opt-text option-text"></span></button>
             </div>
             <div class="feedback" id="feedback">
               <div class="ref" id="ref"></div>
             </div>
-            <div class="controls">
-              <button id="btn-skip" class="secondary" title="Skip this question and move on">Skip</button>
-              <button id="btn-submit-quiz" class="primary" title="Submit quiz now"
+            <div class="controls quiz-controls">
+              <button id="btn-skip" class="secondary clay-btn-amber" title="Skip this question and move on">Skip</button>
+              <button id="btn-submit-quiz" class="primary clay-btn-primary" title="Submit quiz now"
                 style="margin-left:8px;">Submit</button>
             </div>
           </div>
           <aside class="quiz-sidebar">
-            <h3 class="nav-title">Questions</h3>
+            <h3 class="nav-title"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-book-open"/></svg>Questions</h3>
             <div class="nav-list" id="nav-list" aria-label="Question navigator"></div>
           </aside>
         </div>
@@ -241,55 +298,72 @@
 
       <!-- Results Screen -->
       <section id="screen-results" class="screen">
-        <div class="title-row">
-          <h2 style="margin:0">Results</h2>
-          <span class="subtitle" id="encouragement"></span>
-        </div>
-        <div class="stats">
-          <div class="stat">
-            <div class="big" id="final-score">0</div>
-            <div class="label">Final Score</div>
+        <!-- Results Screen Skeleton Loader -->
+        <div id="results-skeleton" class="clay-card clay-skeleton-card" style="display:none;" aria-busy="true" aria-label="Calculating final results and compiling scripture review">
+          <div class="clay-skeleton clay-skeleton-text" style="width: 50%; height: 1.5rem; margin: 0 auto 12px; border-radius: var(--radius-sm);"></div>
+          <div class="clay-skeleton clay-skeleton-text" style="width: 75%; height: 1rem; margin: 0 auto 24px;"></div>
+          <div class="clay-skeleton" style="width: 140px; height: 56px; border-radius: var(--radius-pill); margin: 0 auto 28px;"></div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;">
+            <div class="clay-skeleton" style="height: 72px; border-radius: var(--radius-md);"></div>
+            <div class="clay-skeleton" style="height: 72px; border-radius: var(--radius-md);"></div>
+            <div class="clay-skeleton" style="height: 72px; border-radius: var(--radius-md);"></div>
+            <div class="clay-skeleton" style="height: 72px; border-radius: var(--radius-md);"></div>
           </div>
-          <div class="stat">
-            <div class="big" id="final-accuracy">0%</div>
-            <div class="label">Accuracy</div>
-          </div>
-          <div class="stat">
-            <div class="big" id="final-longest">0</div>
-            <div class="label">Longest Streak</div>
-          </div>
-          <div class="stat">
-            <div class="big" id="final-bonuses">0</div>
-            <div class="label">Bonus Streaks</div>
-          </div>
+          <div class="clay-skeleton" style="height: 48px; border-radius: var(--radius-md); margin-bottom: 20px;"></div>
+          <div class="clay-skeleton" style="height: 58px; border-radius: var(--radius-md); margin-bottom: 10px;"></div>
+          <div class="clay-skeleton" style="height: 58px; border-radius: var(--radius-md); margin-bottom: 10px;"></div>
+          <div class="clay-skeleton" style="height: 58px; border-radius: var(--radius-md);"></div>
         </div>
 
-        <div style="margin-top:16px;">
-          <h3 style="margin:0 0 8px; font-size:1.05rem; color:var(--brand-2)">Achievements</h3>
-          <div class="achievements" id="achievements"></div>
-        </div>
-
-        <!-- Bookmarking Controls -->
-        <div style="margin-top:16px; text-align:center;">
-          <button id="btn-show-bookmarks" class="secondary" style="width:100%">★ Bookmarked Questions</button>
-          <button id="btn-show-results-msg" class="secondary" style="width:100%; display:none;">← Back to
-            Results</button>
-        </div>
-
-        <!-- Bookmark View (initially hidden) -->
-        <div id="bookmark-view"></div>
-
-        <div style="margin-top:16px;">
-
-          <!-- Full Question Review -->
-          <div style="margin-top:16px;">
-            <h3 style="margin:0 0 8px; font-size:1.05rem; color:var(--brand-2)">Question Review</h3>
-            <div class="question-review" id="question-review-list"></div>
+        <div id="results-content">
+          <div class="title-row">
+            <h2 style="margin:0"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-scroll"/></svg>Results &amp; Review</h2>
+            <span class="subtitle" id="encouragement"></span>
+          </div>
+          <div class="stats results-stats">
+            <div class="stat">
+              <div class="big" id="final-score">0</div>
+              <div class="label">Final Score</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="final-accuracy">0%</div>
+              <div class="label">Accuracy</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="final-longest">0</div>
+              <div class="label">Longest Streak</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="final-bonuses">0</div>
+              <div class="label">Bonus Streaks</div>
+            </div>
           </div>
 
-          <div class="controls" style="margin-top:16px;">
-            <button id="btn-restart" class="primary">Play Again</button>
-            <button id="btn-home" class="secondary">Home</button>
+          <div style="margin-top:20px;">
+            <h3 style="margin:0 0 10px; font-size:1.1rem; color:var(--clay-primary); font-family:var(--font-display);"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-star-filled"/></svg>Achievements</h3>
+            <div class="achievements" id="achievements"></div>
+          </div>
+
+          <!-- Bookmarking Controls -->
+          <div style="margin-top:20px; text-align:center;">
+            <button id="btn-show-bookmarks" class="secondary clay-btn-amber" style="width:100%"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-star-filled"/></svg>Bookmarked Questions</button>
+            <button id="btn-show-results-msg" class="secondary clay-btn-amber" style="width:100%; display:none;">← Back to Results</button>
+          </div>
+
+          <!-- Bookmark View (initially hidden) -->
+          <div id="bookmark-view"></div>
+
+          <div style="margin-top:20px;">
+            <!-- Full Question Review -->
+            <div style="margin-top:16px;">
+              <h3 style="margin:0 0 10px; font-size:1.1rem; color:var(--clay-primary); font-family:var(--font-display);"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-book-open"/></svg>Question Review</h3>
+              <div class="question-review" id="question-review-list"></div>
+            </div>
+
+            <div class="controls results-actions" style="margin-top:20px;">
+              <button id="btn-restart" class="primary clay-btn-primary"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-scroll"/></svg>Play Again</button>
+              <button id="btn-home" class="secondary clay-btn-amber"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-book-open"/></svg>Home Screen</button>
+            </div>
           </div>
         </div>
       </section>
