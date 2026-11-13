@@ -5,64 +5,175 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bible Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-  <header>
-    <h1>📜 Bible Quiz</h1>
-    <!-- Sidebar Toggle Button -->
-    <button id="sidebar-toggle" class="sidebar-open-btn">☰
+  <!-- Embedded Claymorphic Vector SVG Sprite System -->
+  <svg id="clay-icons" style="display:none;" xmlns="http://www.w3.org/2000/svg">
+    <!-- 1. Ancient Scripture Scroll -->
+    <symbol id="icon-scroll" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 17V5a2 2 0 0 0-2-2H4"/>
+      <path d="M8 21h11a2 2 0 0 0 2-2v-2"/>
+      <path d="M4 19a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4z"/>
+      <line x1="8" y1="9" x2="15" y2="9"/>
+      <line x1="8" y1="13" x2="13" y2="13"/>
+    </symbol>
 
+    <!-- 2. Open Scripture Codex / Book -->
+    <symbol id="icon-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+    </symbol>
+
+    <!-- 3. Upright Stake (Scriptural Stauros) -->
+    <symbol id="icon-stake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="10" y="2" width="4" height="20" rx="1"/>
+      <line x1="12" y1="2" x2="12" y2="22"/>
+    </symbol>
+
+    <!-- 4. Clay Oil Lamp (Divine Revelation & Clues) -->
+    <symbol id="icon-oil-lamp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 14c0 3.3 2.7 6 6 6h4c3.3 0 6-2.7 6-6 0-2.5-1.5-4.7-3.7-5.5L14 8V5a2 2 0 0 0-4 0v3l-2.3.5C5.5 9.3 4 11.5 4 14z"/>
+      <path d="M12 2c-.8 1-1.5 2-1.5 3 0 1.1.7 1.8 1.5 1.8s1.5-.7 1.5-1.8c0-1-.7-2-1.5-3z" fill="currentColor"/>
+    </symbol>
+
+    <!-- 5. 50/50 Elimination Badge -->
+    <symbol id="icon-fifty-fifty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+      <text x="7" y="10" font-size="6" font-family="sans-serif" font-weight="bold" fill="currentColor" stroke="none">50</text>
+      <text x="12" y="17" font-size="6" font-family="sans-serif" font-weight="bold" fill="currentColor" stroke="none">50</text>
+    </symbol>
+
+    <!-- 6. Timer Dial -->
+    <symbol id="icon-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="13" r="8"/>
+      <path d="M12 9v4l2.5 2.5"/>
+      <path d="M10 2h4"/>
+    </symbol>
+
+    <!-- 7. Bookmark Star (Outline & Filled) -->
+    <symbol id="icon-star-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </symbol>
+    <symbol id="icon-star-filled" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </symbol>
+
+    <!-- 8. Audio Volume & Mute -->
+    <symbol id="icon-volume-high" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    </symbol>
+    <symbol id="icon-volume-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+      <line x1="23" y1="9" x2="17" y2="15"/>
+      <line x1="17" y1="9" x2="23" y2="15"/>
+    </symbol>
+
+    <!-- 9. Settings Sliders & Navigation -->
+    <symbol id="icon-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+      <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+      <line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
+    </symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </symbol>
+  </svg>
+
+  <header>
+    <h1><svg class="clay-icon" style="width:1.2em; height:1.2em; vertical-align:-0.15em; margin-right:6px;"><use href="#icon-scroll"/></svg>Bible Quiz</h1>
+    <!-- Sidebar Toggle Button -->
+    <button id="sidebar-toggle" class="sidebar-open-btn" aria-label="Open Settings">
+      <svg class="clay-icon"><use href="#icon-sliders"/></svg>
+    </button>
   </header>
   <main>
     <div class="container">
+      <!-- Claymorphic Live Question Loading Skeleton (Hidden by default, shown during live loading) -->
+      <div id="clay-live-skeleton" class="clay-skeleton-card" style="display:none;" aria-busy="true" aria-label="Loading live questions from Scripture database">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+          <div class="clay-skeleton" style="width: 140px; height: 26px; border-radius: var(--radius-pill);"></div>
+          <div class="clay-skeleton clay-skeleton-circle" style="width: 32px; height: 32px;"></div>
+        </div>
+        <div class="clay-skeleton clay-skeleton-text" style="width: 88%; height: 1.25rem;"></div>
+        <div class="clay-skeleton clay-skeleton-text" style="width: 96%; height: 1.25rem;"></div>
+        <div class="clay-skeleton clay-skeleton-text" style="width: 60%; height: 1.25rem; margin-bottom: 24px;"></div>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <div class="clay-skeleton" style="width: 120px; height: 36px; border-radius: var(--radius-md);"></div>
+          <div class="clay-skeleton" style="width: 130px; height: 36px; border-radius: var(--radius-md);"></div>
+        </div>
+        <div class="clay-skeleton clay-skeleton-pill">
+          <div class="clay-skeleton-badge"></div>
+          <div class="clay-skeleton" style="width: 75%; height: 1rem; border-radius: var(--radius-xs);"></div>
+        </div>
+        <div class="clay-skeleton clay-skeleton-pill">
+          <div class="clay-skeleton-badge"></div>
+          <div class="clay-skeleton" style="width: 60%; height: 1rem; border-radius: var(--radius-xs);"></div>
+        </div>
+        <div class="clay-skeleton clay-skeleton-pill">
+          <div class="clay-skeleton-badge"></div>
+          <div class="clay-skeleton" style="width: 82%; height: 1rem; border-radius: var(--radius-xs);"></div>
+        </div>
+        <div class="clay-skeleton clay-skeleton-pill">
+          <div class="clay-skeleton-badge"></div>
+          <div class="clay-skeleton" style="width: 45%; height: 1rem; border-radius: var(--radius-xs);"></div>
+        </div>
+      </div>
+
       <!-- Welcome Screen -->
       <section id="screen-welcome" class="screen active">
         <div class="title-row">
-          <h2 style="margin:0">Welcome</h2>
+          <h2 style="margin:0"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-book-open"/></svg>Welcome</h2>
           <span class="subtitle">Test your knowledge of the Scriptures</span>
         </div>
         <div class="grid">
           <div>
-            <label for="category" class="subtitle">Category</label>
+            <label for="category" class="subtitle">Scripture Category</label>
             <div class="controls">
-              <select id="category" class="select" aria-label="Category">
-                <option value="All">All</option>
-                <option value="Old Testament">Hebrew scriptures-(Old Testament)</option>
-                <option value="New Testament">Greek scriptures-(New Testament)</option>
+              <select id="category" class="select clay-input" aria-label="Category">
+                <option value="All">All Categories</option>
+                <option value="Old Testament">Hebrew-Aramaic Scriptures</option>
+                <option value="New Testament">Christian Greek Scriptures</option>
               </select>
             </div>
             <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
               <label class="subtitle" for="round-time" style="margin-right:8px;">Time Limit</label>
-              <input id="round-time" type="number" min="1" max="30" value="3" class="select" style="width:110px"
+              <input id="round-time" type="number" min="1" max="30" value="3" class="select clay-input" style="width:110px"
                 aria-label="Round Time (minutes)" />
-              <button id="enable-round-timer-btn" type="button" class="secondary">Round Timer: ON</button>
+              <button id="enable-round-timer-btn" type="button" class="secondary timer-toggle-btn"><svg class="clay-icon" style="margin-right:4px;"><use href="#icon-timer"/></svg>Round Timer: ON</button>
             </div>
             <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
               <label class="subtitle" for="question-time" style="margin-right:8px;">Per Question (sec)</label>
-              <input id="question-time" type="number" min="5" max="60" value="20" class="select" style="width:110px"
+              <input id="question-time" type="number" min="5" max="60" value="20" class="select clay-input" style="width:110px"
                 aria-label="Question Time (seconds)" />
-              <button id="enable-timer-btn" type="button" class="secondary">Question Timer: ON</button>
+              <button id="enable-timer-btn" type="button" class="secondary timer-toggle-btn"><svg class="clay-icon" style="margin-right:4px;"><use href="#icon-timer"/></svg>Question Timer: ON</button>
             </div>
             <label for="difficulty" class="subtitle" style="margin-top:8px; display:block;">Difficulty</label>
             <div class="controls">
-              <select id="difficulty" class="select" aria-label="Difficulty">
-                <option value="All">All</option>
+              <select id="difficulty" class="select clay-input" aria-label="Difficulty">
+                <option value="All">All Difficulties</option>
                 <option value="normal" selected>Normal</option>
                 <option value="hard">Hard</option>
               </select>
             </div>
             <div class="controls" style="margin-top:8px; flex-wrap:wrap; gap:8px;">
               <label class="subtitle" for="num-questions" style="margin-right:8px;">Number of Questions</label>
-              <input id="num-questions" type="number" min="1" max="50" value="10" class="select" style="width:110px"
+              <input id="num-questions" type="number" min="1" max="50" value="10" class="select clay-input" style="width:110px"
                 aria-label="Number of Questions" />
             </div>
           </div>
 
-          <div class="controls">
-            <button id="btn-start" class="primary">Start Quiz</button>
-            <button id="btn-daily" class="secondary" title="5 random questions for today">Daily Challenge</button>
+          <div class="controls welcome-actions">
+            <button id="btn-start" class="primary clay-btn-primary"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-scroll"/></svg>Start Quiz</button>
+            <button id="btn-daily" class="secondary clay-btn-amber" title="5 random questions for today"><svg class="clay-icon" style="margin-right:6px;"><use href="#icon-star-filled"/></svg>Daily Challenge</button>
           </div>
 
           <div class="stats" id="welcome-stats">
@@ -180,6 +291,7 @@
             <button id="btn-restart" class="primary">Play Again</button>
             <button id="btn-home" class="secondary">Home</button>
           </div>
+        </div>
       </section>
       <div id="modal-submit" class="modal" aria-hidden="true">
         <div class="modal-backdrop"></div>
